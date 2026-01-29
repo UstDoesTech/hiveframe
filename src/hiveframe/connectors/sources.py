@@ -1,13 +1,7 @@
 """
-HiveFrame Connectors
-====================
-Real data source integrations for production use cases.
-
-Supports:
-- File sources (CSV, JSON, JSONL) with file watching
-- HTTP APIs with rate limiting
-- Simulated Kafka-like streaming
-- Database connections (when drivers available)
+HiveFrame Data Sources
+======================
+Source implementations for reading data from various sources.
 """
 
 import json
@@ -15,28 +9,26 @@ import csv
 import time
 import threading
 import hashlib
-import os
-from abc import ABC, abstractmethod
-from collections import deque
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import (
-    Any, Callable, Dict, Generator, Generic, Iterator, 
-    List, Optional, Tuple, TypeVar, Union
-)
-from queue import Queue, Empty
 import urllib.request
 import urllib.error
 import urllib.parse
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import (
+    Any, Callable, Dict, Generator, Generic, 
+    List, Optional, TypeVar
+)
+from queue import Queue, Empty
 
-from .exceptions import (
-    HiveFrameError, TransientError, NetworkError, ParseError,
+from ..exceptions import (
+    TransientError, NetworkError, ParseError,
     ValidationError, RateLimitError, ConnectionError as HiveConnectionError,
     TimeoutError as HiveTimeoutError, ConfigurationError, DataError
 )
-from .resilience import (
+from ..resilience import (
     RetryPolicy, RetryContext, CircuitBreaker, CircuitBreakerConfig,
-    BackoffStrategy, with_retry, with_timeout
+    BackoffStrategy
 )
 
 
@@ -102,67 +94,6 @@ class DataSource(ABC, Generic[T]):
         }
 
 
-class DataSink(ABC, Generic[T]):
-    """
-    Abstract base for all data sinks.
-    
-    Provides a uniform interface for writing data to various destinations.
-    """
-    
-    def __init__(self, name: str):
-        self.name = name
-        self._records_written = 0
-        self._errors = 0
-        self._start_time: Optional[float] = None
-        self._is_open = False
-        
-    @abstractmethod
-    def open(self) -> None:
-        """Open the sink for writing."""
-        pass
-        
-    @abstractmethod
-    def close(self) -> None:
-        """Close the sink and flush any buffers."""
-        pass
-        
-    @abstractmethod
-    def write(self, record: T) -> None:
-        """Write a single record."""
-        pass
-        
-    def write_batch(self, records: List[T]) -> int:
-        """Write multiple records. Returns count written."""
-        written = 0
-        for record in records:
-            try:
-                self.write(record)
-                written += 1
-            except Exception:
-                self._errors += 1
-        return written
-        
-    def __enter__(self):
-        self.open()
-        return self
-        
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-        return False
-        
-    def get_metrics(self) -> Dict[str, Any]:
-        """Get sink metrics."""
-        elapsed = time.time() - self._start_time if self._start_time else 0
-        return {
-            'name': self.name,
-            'records_written': self._records_written,
-            'errors': self._errors,
-            'elapsed_seconds': elapsed,
-            'records_per_second': self._records_written / elapsed if elapsed > 0 else 0,
-            'is_open': self._is_open
-        }
-
-
 # ============================================================================
 # File Sources
 # ============================================================================
@@ -180,7 +111,7 @@ class CSVSource(DataSource[Dict[str, str]]):
     
     def __init__(
         self,
-        path: Union[str, Path],
+        path: str | Path,
         delimiter: str = ',',
         quotechar: str = '"',
         has_header: bool = True,
@@ -271,7 +202,7 @@ class JSONLSource(DataSource[Dict[str, Any]]):
     
     def __init__(
         self,
-        path: Union[str, Path],
+        path: str | Path,
         encoding: str = 'utf-8',
         skip_malformed: bool = True
     ):
@@ -330,7 +261,7 @@ class JSONSource(DataSource[Dict[str, Any]]):
     
     def __init__(
         self,
-        path: Union[str, Path],
+        path: str | Path,
         array_field: Optional[str] = None,
         encoding: str = 'utf-8'
     ):
@@ -370,206 +301,6 @@ class JSONSource(DataSource[Dict[str, Any]]):
         for record in self._data:
             self._records_read += 1
             yield record
-
-
-# ============================================================================
-# File Sinks
-# ============================================================================
-
-class JSONLSink(DataSink[Dict[str, Any]]):
-    """JSON Lines output sink."""
-    
-    def __init__(
-        self,
-        path: Union[str, Path],
-        encoding: str = 'utf-8',
-        append: bool = False
-    ):
-        super().__init__(f"jsonl:{path}")
-        self.path = Path(path)
-        self.encoding = encoding
-        self.append = append
-        self._file = None
-        
-    def open(self) -> None:
-        mode = 'a' if self.append else 'w'
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._file = open(self.path, mode, encoding=self.encoding)
-        self._start_time = time.time()
-        self._is_open = True
-        
-    def close(self) -> None:
-        if self._file:
-            self._file.flush()
-            self._file.close()
-            self._file = None
-        self._is_open = False
-        
-    def write(self, record: Dict[str, Any]) -> None:
-        if not self._is_open:
-            raise RuntimeError("Sink not open")
-            
-        self._file.write(json.dumps(record) + '\n')
-        self._records_written += 1
-
-
-class CSVSink(DataSink[Dict[str, str]]):
-    """CSV output sink."""
-    
-    def __init__(
-        self,
-        path: Union[str, Path],
-        columns: Optional[List[str]] = None,
-        delimiter: str = ',',
-        write_header: bool = True,
-        encoding: str = 'utf-8',
-        append: bool = False
-    ):
-        super().__init__(f"csv:{path}")
-        self.path = Path(path)
-        self.columns = columns
-        self.delimiter = delimiter
-        self.write_header = write_header
-        self.encoding = encoding
-        self.append = append
-        self._file = None
-        self._writer = None
-        self._header_written = False
-        
-    def open(self) -> None:
-        mode = 'a' if self.append else 'w'
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._file = open(self.path, mode, encoding=self.encoding, newline='')
-        self._writer = csv.writer(self._file, delimiter=self.delimiter)
-        self._start_time = time.time()
-        self._is_open = True
-        
-        # Don't write header if appending to existing file
-        if self.append and self.path.stat().st_size > 0:
-            self._header_written = True
-            
-    def close(self) -> None:
-        if self._file:
-            self._file.flush()
-            self._file.close()
-            self._file = None
-        self._writer = None
-        self._is_open = False
-        
-    def write(self, record: Dict[str, str]) -> None:
-        if not self._is_open:
-            raise RuntimeError("Sink not open")
-            
-        # Infer columns from first record if not specified
-        if self.columns is None:
-            self.columns = list(record.keys())
-            
-        # Write header if needed
-        if self.write_header and not self._header_written:
-            self._writer.writerow(self.columns)
-            self._header_written = True
-            
-        row = [record.get(col, '') for col in self.columns]
-        self._writer.writerow(row)
-        self._records_written += 1
-
-
-# ============================================================================
-# File Watcher for Incremental Processing
-# ============================================================================
-
-@dataclass
-class FileEvent:
-    """Event from file watcher."""
-    event_type: str  # 'created', 'modified', 'deleted'
-    path: Path
-    timestamp: float = field(default_factory=time.time)
-
-
-class FileWatcher:
-    """
-    Watch directory for file changes.
-    
-    Enables incremental processing of new files as they arrive.
-    Bee-inspired: like scout bees discovering new food sources.
-    """
-    
-    def __init__(
-        self,
-        directory: Union[str, Path],
-        pattern: str = "*",
-        poll_interval: float = 1.0,
-        process_existing: bool = True
-    ):
-        self.directory = Path(directory)
-        self.pattern = pattern
-        self.poll_interval = poll_interval
-        self.process_existing = process_existing
-        
-        self._running = False
-        self._thread: Optional[threading.Thread] = None
-        self._events: Queue = Queue()
-        self._known_files: Dict[Path, float] = {}  # path -> mtime
-        
-    def start(self) -> None:
-        """Start watching for file changes."""
-        if not self.directory.exists():
-            raise ConfigurationError(f"Watch directory not found: {self.directory}")
-            
-        self._running = True
-        
-        # Process existing files if requested
-        if self.process_existing:
-            for path in self.directory.glob(self.pattern):
-                if path.is_file():
-                    self._events.put(FileEvent('created', path))
-                    self._known_files[path] = path.stat().st_mtime
-                    
-        self._thread = threading.Thread(target=self._watch_loop, daemon=True)
-        self._thread.start()
-        
-    def stop(self) -> None:
-        """Stop watching."""
-        self._running = False
-        if self._thread:
-            self._thread.join(timeout=5.0)
-            
-    def get_event(self, timeout: float = 1.0) -> Optional[FileEvent]:
-        """Get next file event."""
-        try:
-            return self._events.get(timeout=timeout)
-        except Empty:
-            return None
-            
-    def _watch_loop(self) -> None:
-        """Main watch loop."""
-        while self._running:
-            try:
-                current_files = {
-                    p: p.stat().st_mtime 
-                    for p in self.directory.glob(self.pattern)
-                    if p.is_file()
-                }
-                
-                # Check for new files
-                for path, mtime in current_files.items():
-                    if path not in self._known_files:
-                        self._events.put(FileEvent('created', path))
-                    elif mtime > self._known_files[path]:
-                        self._events.put(FileEvent('modified', path))
-                        
-                # Check for deleted files
-                for path in list(self._known_files.keys()):
-                    if path not in current_files:
-                        self._events.put(FileEvent('deleted', path))
-                        del self._known_files[path]
-                        
-                self._known_files = current_files
-                
-            except Exception:
-                pass  # Ignore errors in watch loop
-                
-            time.sleep(self.poll_interval)
 
 
 # ============================================================================
@@ -734,222 +465,6 @@ class HTTPSource(DataSource[Dict[str, Any]]):
                 self._circuit.record_failure()
                 self._errors += 1
                 raise
-
-
-# ============================================================================
-# Simulated Message Queue (Kafka-like)
-# ============================================================================
-
-@dataclass
-class Message:
-    """Message in a topic partition."""
-    key: Optional[str]
-    value: Any
-    timestamp: float = field(default_factory=time.time)
-    partition: int = 0
-    offset: int = 0
-    headers: Dict[str, str] = field(default_factory=dict)
-
-
-class Topic:
-    """
-    In-memory topic with partitions.
-    
-    Simulates Kafka-like semantics for local development and testing.
-    """
-    
-    def __init__(self, name: str, num_partitions: int = 4):
-        self.name = name
-        self.num_partitions = num_partitions
-        self._partitions: List[List[Message]] = [[] for _ in range(num_partitions)]
-        self._locks = [threading.Lock() for _ in range(num_partitions)]
-        self._offsets: Dict[str, Dict[int, int]] = {}  # consumer_group -> partition -> offset
-        
-    def _get_partition(self, key: Optional[str]) -> int:
-        """Determine partition for a key."""
-        if key is None:
-            return 0  # Round-robin would be better but this is simple
-        return hash(key) % self.num_partitions
-        
-    def produce(self, key: Optional[str], value: Any, headers: Optional[Dict[str, str]] = None) -> Message:
-        """Produce message to topic."""
-        partition = self._get_partition(key)
-        
-        with self._locks[partition]:
-            offset = len(self._partitions[partition])
-            message = Message(
-                key=key,
-                value=value,
-                partition=partition,
-                offset=offset,
-                headers=headers or {}
-            )
-            self._partitions[partition].append(message)
-            return message
-            
-    def consume(
-        self,
-        consumer_group: str,
-        partition: int,
-        max_messages: int = 100,
-        timeout: float = 1.0
-    ) -> List[Message]:
-        """Consume messages from a partition."""
-        if partition >= self.num_partitions:
-            raise ValueError(f"Partition {partition} does not exist")
-            
-        # Get current offset for this consumer group
-        if consumer_group not in self._offsets:
-            self._offsets[consumer_group] = {i: 0 for i in range(self.num_partitions)}
-            
-        current_offset = self._offsets[consumer_group].get(partition, 0)
-        
-        with self._locks[partition]:
-            messages = self._partitions[partition][current_offset:current_offset + max_messages]
-            
-        if messages:
-            self._offsets[consumer_group][partition] = current_offset + len(messages)
-            
-        return messages
-        
-    def commit(self, consumer_group: str, partition: int, offset: int) -> None:
-        """Commit offset for consumer group."""
-        if consumer_group not in self._offsets:
-            self._offsets[consumer_group] = {}
-        self._offsets[consumer_group][partition] = offset
-        
-    def get_lag(self, consumer_group: str) -> Dict[int, int]:
-        """Get consumer lag per partition."""
-        if consumer_group not in self._offsets:
-            return {i: len(self._partitions[i]) for i in range(self.num_partitions)}
-            
-        lag = {}
-        for i in range(self.num_partitions):
-            current = self._offsets[consumer_group].get(i, 0)
-            lag[i] = len(self._partitions[i]) - current
-            
-        return lag
-
-
-class MessageBroker:
-    """
-    In-memory message broker for testing.
-    
-    Provides Kafka-like semantics without external dependencies.
-    """
-    
-    def __init__(self):
-        self._topics: Dict[str, Topic] = {}
-        self._lock = threading.Lock()
-        
-    def create_topic(self, name: str, num_partitions: int = 4) -> Topic:
-        """Create a new topic."""
-        with self._lock:
-            if name in self._topics:
-                raise ValueError(f"Topic {name} already exists")
-            topic = Topic(name, num_partitions)
-            self._topics[name] = topic
-            return topic
-            
-    def get_topic(self, name: str) -> Optional[Topic]:
-        """Get topic by name."""
-        return self._topics.get(name)
-        
-    def list_topics(self) -> List[str]:
-        """List all topics."""
-        return list(self._topics.keys())
-
-
-class MessageQueueSource(DataSource[Message]):
-    """
-    Message queue source for stream processing.
-    
-    Consumes from topic partitions with automatic offset management.
-    """
-    
-    def __init__(
-        self,
-        topic: Topic,
-        consumer_group: str,
-        partitions: Optional[List[int]] = None,
-        auto_commit: bool = True,
-        poll_timeout: float = 1.0
-    ):
-        super().__init__(f"mq:{topic.name}")
-        self.topic = topic
-        self.consumer_group = consumer_group
-        self.partitions = partitions or list(range(topic.num_partitions))
-        self.auto_commit = auto_commit
-        self.poll_timeout = poll_timeout
-        self._running = False
-        
-    def open(self) -> None:
-        self._running = True
-        self._start_time = time.time()
-        self._is_open = True
-        
-    def close(self) -> None:
-        self._running = False
-        self._is_open = False
-        
-    def read(self) -> Generator[Message, None, None]:
-        """Poll for messages from assigned partitions."""
-        if not self._is_open:
-            raise RuntimeError("Source not open")
-            
-        while self._running:
-            got_messages = False
-            
-            for partition in self.partitions:
-                messages = self.topic.consume(
-                    self.consumer_group,
-                    partition,
-                    max_messages=100,
-                    timeout=self.poll_timeout
-                )
-                
-                for msg in messages:
-                    self._records_read += 1
-                    yield msg
-                    
-                    if self.auto_commit:
-                        self.topic.commit(self.consumer_group, partition, msg.offset + 1)
-                        
-                if messages:
-                    got_messages = True
-                    
-            if not got_messages:
-                time.sleep(self.poll_timeout)
-
-
-class MessageQueueSink(DataSink[Dict[str, Any]]):
-    """
-    Message queue sink for producing records.
-    """
-    
-    def __init__(
-        self,
-        topic: Topic,
-        key_field: Optional[str] = None
-    ):
-        super().__init__(f"mq:{topic.name}")
-        self.topic = topic
-        self.key_field = key_field
-        
-    def open(self) -> None:
-        self._start_time = time.time()
-        self._is_open = True
-        
-    def close(self) -> None:
-        self._is_open = False
-        
-    def write(self, record: Dict[str, Any]) -> None:
-        if not self._is_open:
-            raise RuntimeError("Sink not open")
-            
-        key = record.get(self.key_field) if self.key_field else None
-        self.topic.produce(str(key) if key else None, record)
-        self._records_written += 1
 
 
 # ============================================================================
