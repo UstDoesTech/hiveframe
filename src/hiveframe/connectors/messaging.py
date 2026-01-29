@@ -169,8 +169,7 @@ class Topic:
         self,
         consumer_group: str,
         partition: int,
-        max_messages: int = 100,
-        timeout: float = 1.0
+        max_messages: int = 100
     ) -> List[Message]:
         """Consume messages from a partition."""
         if partition >= self.num_partitions:

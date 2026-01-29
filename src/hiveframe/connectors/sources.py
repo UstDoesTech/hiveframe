@@ -398,12 +398,6 @@ class HTTPSource(DataSource[Dict[str, Any]]):
                 f"Connection failed to {url}: {e.reason}",
                 host=urllib.parse.urlparse(url).netloc
             )
-        except TimeoutError:
-            raise HiveTimeoutError(
-                f"Request timed out: {url}",
-                timeout_seconds=self.config.timeout,
-                operation='http_request'
-            )
             
     def read(self) -> Generator[Dict[str, Any], None, None]:
         """Read from HTTP source with pagination support."""

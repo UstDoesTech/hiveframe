@@ -11,7 +11,7 @@ Supports:
 """
 
 # Import base classes
-from .sources import DataSource, T
+from .sources import DataSource
 from .sinks import DataSink
 
 # Import file sources and sinks
@@ -36,7 +36,6 @@ __all__ = [
     # Base classes
     'DataSource',
     'DataSink',
-    'T',
     
     # File sources
     'CSVSource',
