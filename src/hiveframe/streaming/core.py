@@ -1,7 +1,7 @@
 """
-HiveFrame Streaming
-===================
-Real-time stream processing using bee-inspired patterns.
+HiveFrame Streaming Core
+========================
+Basic stream processing using bee-inspired patterns.
 
 Key concepts:
 - Continuous foraging: Workers continuously process incoming data
@@ -14,13 +14,11 @@ import time
 from collections import deque
 from dataclasses import dataclass, field
 from typing import Any, AsyncIterator, Callable, Dict, List, Optional, Tuple
-from enum import Enum
 import threading
 from queue import Queue, Empty
 import random
-import math
 
-from .core import (
+from ..core import (
     BeeRole, WaggleDance, DanceFloor, ColonyState, 
     Pheromone, FoodSource, Bee
 )
@@ -46,10 +44,22 @@ class StreamPartitioner:
     - Probabilistic routing weighted by partition health
     - Dynamic rebalancing based on processing latency
     - Backpressure propagation through pheromone signals
+    
+    Can also operate in deterministic mode (hash-based) for
+    compatibility and testing purposes.
     """
     
-    def __init__(self, num_partitions: int = 8):
+    def __init__(self, num_partitions: int = 8, deterministic: bool = True):
+        """
+        Initialize partitioner.
+        
+        Args:
+            num_partitions: Number of partitions to distribute across
+            deterministic: If True, use hash-based partitioning (same key -> same partition).
+                          If False, use bee-inspired probabilistic routing.
+        """
         self.num_partitions = num_partitions
+        self.deterministic = deterministic
         self.partition_health: Dict[int, float] = {
             i: 1.0 for i in range(num_partitions)
         }
@@ -58,11 +68,30 @@ class StreamPartitioner:
         }
         self._lock = threading.Lock()
         
-    def partition(self, record: StreamRecord) -> int:
+    def partition(self, record: Any) -> int:
         """
-        Select partition using fitness-proportional selection.
-        Better-performing partitions receive more records.
+        Select partition for a record.
+        
+        In deterministic mode: uses hash-based partitioning (same key -> same partition).
+        In probabilistic mode: uses fitness-proportional selection weighted by partition health.
+        
+        Args:
+            record: Either a StreamRecord or a key value (str, int, etc.)
+            
+        Returns:
+            Partition index (0 to num_partitions-1)
         """
+        # Extract key from record
+        if isinstance(record, StreamRecord):
+            key = record.key
+        else:
+            key = record
+            
+        # Deterministic mode: simple hash-based partitioning
+        if self.deterministic:
+            return hash(key) % self.num_partitions
+            
+        # Probabilistic mode: bee-inspired fitness-proportional selection
         with self._lock:
             # Calculate weights from health scores
             weights = [self.partition_health[i] for i in range(self.num_partitions)]
@@ -70,7 +99,7 @@ class StreamPartitioner:
             
             if total == 0:
                 # All partitions unhealthy - random fallback
-                return hash(record.key) % self.num_partitions
+                return hash(key) % self.num_partitions
                 
             # Roulette wheel selection
             r = random.uniform(0, total)

@@ -40,6 +40,16 @@ Biomimicry Concepts:
 __version__ = '0.2.0-dev'
 __author__ = 'HiveFrame Contributors'
 
+# Utilities (new unified module)
+from .utils import (
+    ThreadSafeMixin,
+    ManagedResource,
+    Serializable,
+    Monitorable,
+    deprecated_param,
+)
+
+# Core bee-inspired components
 from .core import (
     HiveFrame,
     Bee,
@@ -52,6 +62,26 @@ from .core import (
     create_hive,
 )
 
+# Unified Aggregations (new module)
+from .aggregations import (
+    Aggregator,
+    CountAggregator,
+    SumAggregator,
+    AvgAggregator,
+    MinAggregator,
+    MaxAggregator,
+    CollectListAggregator,
+    CollectSetAggregator,
+    get_aggregator_registry,
+)
+
+# Dead Letter Queue (extracted from exceptions)
+from .dlq import (
+    DeadLetterQueue,
+    DeadLetterRecord,
+)
+
+# DataFrame API (from package)
 from .dataframe import (
     HiveDataFrame,
     Column,
@@ -72,16 +102,53 @@ from .dataframe import (
     collect_set,
 )
 
+# Unified Streaming (from package - combines basic and enhanced)
 from .streaming import (
+    # Core streaming
     HiveStream,
     AsyncHiveStream,
     StreamRecord,
     StreamPartitioner,
     StreamBuffer,
     StreamBee,
+    # Enhanced streaming - windowing
+    Window,
+    WindowType,
+    WindowedValue,
+    WindowAssigner,
+    TumblingWindowAssigner,
+    SlidingWindowAssigner,
+    SessionWindowAssigner,
+    tumbling_window,
+    sliding_window,
+    session_window,
+    # Enhanced streaming - watermarks
+    Watermark,
+    WatermarkGenerator,
+    BoundedOutOfOrdernessWatermarkGenerator,
+    PunctuatedWatermarkGenerator,
+    bounded_watermark,
+    # Enhanced streaming - state
+    Checkpoint,
+    StateBackend,
+    InMemoryStateBackend,
+    # Enhanced streaming - delivery
+    DeliveryGuarantee,
+    ProcessingContext,
+    IdempotencyStore,
+    # Enhanced streaming - processor
+    WindowAggregation,
+    EnhancedStreamProcessor,
+    # Enhanced streaming - aggregators
+    count_aggregator,
+    sum_aggregator,
+    avg_aggregator,
+    max_aggregator,
+    min_aggregator,
+    collect_aggregator,
 )
 
-# Production modules
+# Exceptions
 from .exceptions import (
     HiveFrameError,
     TransientError,
@@ -98,19 +165,24 @@ from .exceptions import (
     DeadLetterRecord,
 )
 
+# Resilience patterns (from package)
 from .resilience import (
     RetryPolicy,
     BackoffStrategy,
+    RetryState,
+    RetryContext,
     CircuitBreaker,
     CircuitState,
     CircuitBreakerConfig,
     Bulkhead,
+    TimeoutWrapper,
     ResilientExecutor,
     with_retry,
     with_circuit_breaker,
     with_timeout,
 )
 
+# Connectors
 from .connectors import (
     DataSource,
     DataSink,
@@ -126,6 +198,7 @@ from .connectors import (
     DataGenerator,
 )
 
+# Monitoring
 from .monitoring import (
     MetricsRegistry,
     Counter,
@@ -144,33 +217,13 @@ from .monitoring import (
     get_profiler,
 )
 
-from .streaming_enhanced import (
-    EnhancedStreamProcessor,
-    Window,
-    WindowAssigner,
-    TumblingWindowAssigner,
-    SlidingWindowAssigner,
-    SessionWindowAssigner,
-    Watermark,
-    WatermarkGenerator,
-    BoundedOutOfOrdernessWatermarkGenerator,
-    DeliveryGuarantee,
-    Checkpoint,
-    StateBackend,
-    InMemoryStateBackend,
-    IdempotencyStore,
-    tumbling_window,
-    sliding_window,
-    session_window,
-    bounded_watermark,
-    sum_aggregator,
-    count_aggregator,
-    avg_aggregator,
-    min_aggregator,
-    max_aggregator,
-)
-
 __all__ = [
+    # Utilities (new)
+    'ThreadSafeMixin',
+    'ManagedResource',
+    'Serializable',
+    'Monitorable',
+    'deprecated_param',
     # Core
     'HiveFrame',
     'Bee',
@@ -181,6 +234,16 @@ __all__ = [
     'Pheromone',
     'FoodSource',
     'create_hive',
+    # Aggregations (unified)
+    'Aggregator',
+    'CountAggregator',
+    'SumAggregator',
+    'AvgAggregator',
+    'MinAggregator',
+    'MaxAggregator',
+    'CollectListAggregator',
+    'CollectSetAggregator',
+    'get_aggregator_registry',
     # DataFrame
     'HiveDataFrame',
     'Column',
@@ -190,7 +253,7 @@ __all__ = [
     'DataType',
     'GroupedData',
     'createDataFrame',
-    # Aggregations
+    # DataFrame Aggregations (convenience)
     'sum_agg',
     'avg',
     'count',
@@ -199,13 +262,48 @@ __all__ = [
     'max_agg',
     'collect_list',
     'collect_set',
-    # Streaming
+    # Streaming - Core
     'HiveStream',
     'AsyncHiveStream',
     'StreamRecord',
     'StreamPartitioner',
     'StreamBuffer',
     'StreamBee',
+    # Streaming - Windows
+    'Window',
+    'WindowType',
+    'WindowedValue',
+    'WindowAssigner',
+    'TumblingWindowAssigner',
+    'SlidingWindowAssigner',
+    'SessionWindowAssigner',
+    'tumbling_window',
+    'sliding_window',
+    'session_window',
+    # Streaming - Watermarks
+    'Watermark',
+    'WatermarkGenerator',
+    'BoundedOutOfOrdernessWatermarkGenerator',
+    'PunctuatedWatermarkGenerator',
+    'bounded_watermark',
+    # Streaming - State
+    'Checkpoint',
+    'StateBackend',
+    'InMemoryStateBackend',
+    # Streaming - Delivery
+    'DeliveryGuarantee',
+    'ProcessingContext',
+    'IdempotencyStore',
+    # Streaming - Processor
+    'WindowAggregation',
+    'EnhancedStreamProcessor',
+    # Streaming - Aggregators (legacy functions)
+    'count_aggregator',
+    'sum_aggregator',
+    'avg_aggregator',
+    'max_aggregator',
+    'min_aggregator',
+    'collect_aggregator',
     # Exceptions
     'HiveFrameError',
     'TransientError',
@@ -218,15 +316,19 @@ __all__ = [
     'ConfigurationError',
     'DependencyError',
     'CircuitOpenError',
+    # Dead Letter Queue
     'DeadLetterQueue',
     'DeadLetterRecord',
     # Resilience
     'RetryPolicy',
     'BackoffStrategy',
+    'RetryState',
+    'RetryContext',
     'CircuitBreaker',
     'CircuitState',
     'CircuitBreakerConfig',
     'Bulkhead',
+    'TimeoutWrapper',
     'ResilientExecutor',
     'with_retry',
     'with_circuit_breaker',
@@ -260,28 +362,4 @@ __all__ = [
     'get_logger',
     'get_tracer',
     'get_profiler',
-    # Enhanced Streaming
-    'EnhancedStreamProcessor',
-    'Window',
-    'WindowAssigner',
-    'TumblingWindowAssigner',
-    'SlidingWindowAssigner',
-    'SessionWindowAssigner',
-    'Watermark',
-    'WatermarkGenerator',
-    'BoundedOutOfOrdernessWatermarkGenerator',
-    'DeliveryGuarantee',
-    'Checkpoint',
-    'StateBackend',
-    'InMemoryStateBackend',
-    'IdempotencyStore',
-    'tumbling_window',
-    'sliding_window',
-    'session_window',
-    'bounded_watermark',
-    'sum_aggregator',
-    'count_aggregator',
-    'avg_aggregator',
-    'min_aggregator',
-    'max_aggregator',
 ]
