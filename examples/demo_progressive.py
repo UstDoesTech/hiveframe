@@ -20,36 +20,41 @@ import time
 import random
 import threading
 import json
+import sys
+import os
 from typing import Any, Dict, List
 from dataclasses import dataclass
 
-# Core imports - relative since we're in the same package
-from .core import HiveFrame, ColonyState, BeeRole, create_hive
-from .dataframe import HiveDataFrame, col, avg, count, sum_agg
+# Add parent to path for imports when running as script
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# New production modules
-from .exceptions import (
+# Core imports
+from hiveframe.core import HiveFrame, ColonyState, BeeRole, create_hive, Pheromone
+from hiveframe.dataframe import HiveDataFrame, col, avg, count, sum_agg
+
+# Production modules
+from hiveframe.exceptions import (
     HiveFrameError, TransientError, ValidationError, 
     DeadLetterQueue, DeadLetterRecord
 )
-from .resilience import (
+from hiveframe.resilience import (
     RetryPolicy, CircuitBreaker, CircuitBreakerConfig,
     BackoffStrategy, with_retry, ResilientExecutor
 )
-from .connectors import (
+from hiveframe.connectors import (
     DataGenerator, CSVSource, JSONLSource, JSONLSink,
     MessageBroker, Topic, FileWatcher
 )
-from .monitoring import (
+from hiveframe.monitoring import (
     get_logger, get_registry, get_profiler,
     ColonyHealthMonitor, Logger, LogLevel
 )
-from .streaming_enhanced import (
+from hiveframe.streaming_enhanced import (
     EnhancedStreamProcessor, tumbling_window, 
     bounded_watermark, DeliveryGuarantee,
     count_aggregator, sum_aggregator
 )
-from .streaming import StreamRecord
+from hiveframe.streaming import StreamRecord
 
 
 # Configure logging
@@ -464,7 +469,6 @@ def demo_level_4_expert():
         colony.update_temperature('pressure_test', load)
         
         if load > 0.8:
-            from .core import Pheromone
             colony.emit_pheromone(
                 Pheromone(
                     signal_type='throttle',

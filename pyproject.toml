@@ -80,8 +80,11 @@ Repository = "https://github.com/hiveframe/hiveframe"
 Issues = "https://github.com/hiveframe/hiveframe/issues"
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 include = ["hiveframe*"]
+
+[tool.setuptools.package-data]
+hiveframe = ["py.typed"]
 
 [tool.black]
 line-length = 100
@@ -99,4 +102,8 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 asyncio_mode = "auto"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
