@@ -123,6 +123,13 @@ venv.bak/
 # mkdocs documentation
 /site
 
+# Docusaurus
+website/node_modules/
+website/build/
+website/.docusaurus/
+website/.cache-loader/
+website/package-lock.json
+
 # mypy
 .mypy_cache/
 .dmypy.json

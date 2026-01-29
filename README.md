@@ -4,6 +4,19 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Documentation](https://img.shields.io/badge/docs-Docusaurus-blue.svg)](https://ustdoestech.github.io/hiveframe/)
+
+---
+
+## 📚 Documentation
+
+Full documentation is available at **[ustdoestech.github.io/hiveframe](https://ustdoestech.github.io/hiveframe/)**
+
+Our documentation follows the [Diataxis](https://diataxis.fr/) framework:
+- **[Tutorials](https://ustdoestech.github.io/hiveframe/docs/tutorials/getting-started)** - Learning-oriented guides
+- **[How-to Guides](https://ustdoestech.github.io/hiveframe/docs/how-to-guides/overview)** - Problem-oriented recipes
+- **[Reference](https://ustdoestech.github.io/hiveframe/docs/reference/api-overview)** - Technical API documentation
+- **[Explanation](https://ustdoestech.github.io/hiveframe/docs/explanation/bee-colony-metaphor)** - Understanding-oriented discussions
 
 ---
 
