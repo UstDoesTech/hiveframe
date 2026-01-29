@@ -347,6 +347,12 @@ Contributions welcome! Areas of interest:
 - Additional swarm algorithms (PSO, ACO hybrid)
 - Visualization dashboard for colony state
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for our ambitious vision to build the world's first bio-inspired unified data intelligence platform — with the goal of matching and surpassing platforms like Databricks through the power of swarm intelligence.
+
 ## License
 
 MIT License - see LICENSE file.

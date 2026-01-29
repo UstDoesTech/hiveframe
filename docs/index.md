@@ -9,6 +9,7 @@ Welcome to the HiveFrame documentation. HiveFrame is a bee-inspired distributed 
 - [API Reference](api-reference.md) - Complete API documentation
 - [Examples](examples.md) - Code examples and tutorials
 - [Production Guide](production.md) - Deployment and monitoring
+- [Roadmap](../ROADMAP.md) - Our vision and future plans
 
 ## Quick Links
 
