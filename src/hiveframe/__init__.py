@@ -37,7 +37,7 @@ Biomimicry Concepts:
 - Adaptive Allocation: Self-organizing based on local stimuli
 """
 
-__version__ = '0.1.0'
+__version__ = '0.2.0-dev'
 __author__ = 'HiveFrame Contributors'
 
 from .core import (
