@@ -98,12 +98,14 @@ class PredicatePushdown(OptimizationRule):
     
     def applies_to(self, node: PlanNode) -> bool:
         """Applies when Filter is above Join, Scan, or Project."""
-        if node.node_type != NodeType.FILTER:
+        if node is None or node.node_type != NodeType.FILTER:
             return False
         if not node.children:
             return False
-        child_type = node.children[0].node_type
-        return child_type in (NodeType.JOIN, NodeType.PROJECT, NodeType.SCAN)
+        child = node.children[0]
+        if child is None:
+            return False
+        return child.node_type in (NodeType.JOIN, NodeType.PROJECT, NodeType.SCAN)
     
     def apply(self, node: PlanNode) -> PlanNode:
         """Push predicates down."""
