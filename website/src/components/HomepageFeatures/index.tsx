@@ -11,32 +11,32 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
+    title: 'Bee-Inspired Architecture',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Self-organizing worker bees coordinate through waggle dances, eliminating
+        single points of failure and enabling emergent load balancing.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Distributed Processing',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Process large datasets with quality-weighted work distribution, automatic
+        backpressure, and self-healing through the ABC algorithm.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Spark-Compatible API',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Familiar DataFrame and RDD-style APIs make migration from Apache Spark
+        straightforward while gaining bee colony coordination benefits.
       </>
     ),
   },
