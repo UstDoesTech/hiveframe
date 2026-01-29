@@ -12,7 +12,7 @@ import hashlib
 import urllib.request
 import urllib.error
 import urllib.parse
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import (
@@ -30,6 +30,7 @@ from ..resilience import (
     RetryPolicy, RetryContext, CircuitBreaker, CircuitBreakerConfig,
     BackoffStrategy
 )
+from ..utils import ManagedResource
 
 
 T = TypeVar('T')
@@ -39,7 +40,7 @@ T = TypeVar('T')
 # Base Connector Interface
 # ============================================================================
 
-class DataSource(ABC, Generic[T]):
+class DataSource(ManagedResource, Generic[T]):
     """
     Abstract base for all data sources.
     
@@ -49,49 +50,29 @@ class DataSource(ABC, Generic[T]):
     - Error handling and recovery
     - Metrics collection
     - Resource cleanup
+    
+    Extends ManagedResource for lifecycle management.
     """
     
     def __init__(self, name: str):
-        self.name = name
+        super().__init__(name)
         self._records_read = 0
-        self._errors = 0
-        self._start_time: Optional[float] = None
-        self._is_open = False
-        
-    @abstractmethod
-    def open(self) -> None:
-        """Open the data source for reading."""
-        pass
-        
-    @abstractmethod
-    def close(self) -> None:
-        """Close the data source and release resources."""
-        pass
         
     @abstractmethod
     def read(self) -> Generator[T, None, None]:
         """Read records from the source as a generator."""
         pass
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get source statistics (alias for get_metrics)."""
+        stats = super().get_stats()
+        stats['records_read'] = self._records_read
+        return stats
         
-    def __enter__(self):
-        self.open()
-        return self
-        
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-        return False
-        
+    # Alias for backward compatibility
     def get_metrics(self) -> Dict[str, Any]:
         """Get source metrics."""
-        elapsed = time.time() - self._start_time if self._start_time else 0
-        return {
-            'name': self.name,
-            'records_read': self._records_read,
-            'errors': self._errors,
-            'elapsed_seconds': elapsed,
-            'records_per_second': self._records_read / elapsed if elapsed > 0 else 0,
-            'is_open': self._is_open
-        }
+        return self.get_stats()
 
 
 # ============================================================================
@@ -132,7 +113,7 @@ class CSVSource(DataSource[Dict[str, str]]):
         self._file = None
         self._reader = None
         
-    def open(self) -> None:
+    def _do_open(self) -> None:
         if not self.path.exists():
             raise ConfigurationError(f"CSV file not found: {self.path}")
             
@@ -150,16 +131,12 @@ class CSVSource(DataSource[Dict[str, str]]):
                 self.columns = next(self._reader)
             except StopIteration:
                 raise DataError("CSV file is empty")
-                
-        self._start_time = time.time()
-        self._is_open = True
         
-    def close(self) -> None:
+    def _do_close(self) -> None:
         if self._file:
             self._file.close()
             self._file = None
         self._reader = None
-        self._is_open = False
         
     def read(self) -> Generator[Dict[str, str], None, None]:
         if not self._is_open:
@@ -212,19 +189,16 @@ class JSONLSource(DataSource[Dict[str, Any]]):
         self.skip_malformed = skip_malformed
         self._file = None
         
-    def open(self) -> None:
+    def _do_open(self) -> None:
         if not self.path.exists():
             raise ConfigurationError(f"JSONL file not found: {self.path}")
             
         self._file = open(self.path, 'r', encoding=self.encoding)
-        self._start_time = time.time()
-        self._is_open = True
         
-    def close(self) -> None:
+    def _do_close(self) -> None:
         if self._file:
             self._file.close()
             self._file = None
-        self._is_open = False
         
     def read(self) -> Generator[Dict[str, Any], None, None]:
         if not self._is_open:
@@ -271,7 +245,7 @@ class JSONSource(DataSource[Dict[str, Any]]):
         self.encoding = encoding
         self._data: List[Dict[str, Any]] = []
         
-    def open(self) -> None:
+    def _do_open(self) -> None:
         if not self.path.exists():
             raise ConfigurationError(f"JSON file not found: {self.path}")
             
@@ -286,13 +260,9 @@ class JSONSource(DataSource[Dict[str, Any]]):
             self._data = content
         else:
             raise DataError("JSON must be array or object with array field specified")
-            
-        self._start_time = time.time()
-        self._is_open = True
         
-    def close(self) -> None:
+    def _do_close(self) -> None:
         self._data = []
-        self._is_open = False
         
     def read(self) -> Generator[Dict[str, Any], None, None]:
         if not self._is_open:
@@ -344,18 +314,17 @@ class HTTPSource(DataSource[Dict[str, Any]]):
             CircuitBreakerConfig(failure_threshold=self.config.circuit_failure_threshold)
         )
         self._last_request_time = 0.0
-        self._lock = threading.Lock()
+        self._http_lock = threading.Lock()
         
-    def open(self) -> None:
-        self._start_time = time.time()
-        self._is_open = True
+    def _do_open(self) -> None:
+        pass  # HTTP connections are established per-request
         
-    def close(self) -> None:
-        self._is_open = False
+    def _do_close(self) -> None:
+        pass  # HTTP connections are closed per-request
         
     def _rate_limit(self) -> None:
         """Enforce rate limiting."""
-        with self._lock:
+        with self._http_lock:
             min_interval = 1.0 / self.config.rate_limit_per_second
             elapsed = time.time() - self._last_request_time
             
@@ -498,13 +467,11 @@ class DataGenerator(DataSource[Dict[str, Any]]):
         self.delay_variance = delay_variance
         self._generated = 0
         
-    def open(self) -> None:
+    def _do_open(self) -> None:
         self._generated = 0
-        self._start_time = time.time()
-        self._is_open = True
         
-    def close(self) -> None:
-        self._is_open = False
+    def _do_close(self) -> None:
+        pass  # No resources to clean up
         
     def _generate_value(self, field_type: str, index: int) -> Any:
         """Generate value for field type."""

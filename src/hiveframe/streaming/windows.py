@@ -11,6 +11,7 @@ Supports:
 
 import math
 import threading
+import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, Generic, List, TypeVar
@@ -85,13 +86,20 @@ class TumblingWindowAssigner(WindowAssigner):
     """
     
     def __init__(self, size_seconds: float = None, *, window_size: float = None):
-        # Support both parameter names for backward compatibility
-        if size_seconds is not None:
-            self.size_seconds = size_seconds
-        elif window_size is not None:
-            self.size_seconds = window_size
-        else:
-            raise ValueError("Must provide either size_seconds or window_size")
+        # Support both parameter names - window_size is deprecated
+        if window_size is not None:
+            warnings.warn(
+                "Parameter 'window_size' is deprecated and will be removed in v0.3.0. "
+                "Use 'size_seconds' instead.",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            if size_seconds is None:
+                size_seconds = window_size
+        
+        if size_seconds is None:
+            raise ValueError("Must provide size_seconds")
+        self.size_seconds = size_seconds
         
     def assign_windows(self, timestamp: float) -> List[Window]:
         window_start = math.floor(timestamp / self.size_seconds) * self.size_seconds
@@ -118,20 +126,34 @@ class SlidingWindowAssigner(WindowAssigner):
     
     def __init__(self, size_seconds: float = None, slide_seconds: float = None, 
                  *, window_size: float = None, slide_interval: float = None):
-        # Support both parameter names for backward compatibility
-        if size_seconds is not None:
-            self.size_seconds = size_seconds
-        elif window_size is not None:
-            self.size_seconds = window_size
-        else:
-            raise ValueError("Must provide either size_seconds or window_size")
+        # Support both parameter names - window_size and slide_interval are deprecated
+        if window_size is not None:
+            warnings.warn(
+                "Parameter 'window_size' is deprecated and will be removed in v0.3.0. "
+                "Use 'size_seconds' instead.",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            if size_seconds is None:
+                size_seconds = window_size
+        
+        if slide_interval is not None:
+            warnings.warn(
+                "Parameter 'slide_interval' is deprecated and will be removed in v0.3.0. "
+                "Use 'slide_seconds' instead.",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            if slide_seconds is None:
+                slide_seconds = slide_interval
+        
+        if size_seconds is None:
+            raise ValueError("Must provide size_seconds")
+        if slide_seconds is None:
+            raise ValueError("Must provide slide_seconds")
             
-        if slide_seconds is not None:
-            self.slide_seconds = slide_seconds
-        elif slide_interval is not None:
-            self.slide_seconds = slide_interval
-        else:
-            raise ValueError("Must provide either slide_seconds or slide_interval")
+        self.size_seconds = size_seconds
+        self.slide_seconds = slide_seconds
         
     def assign_windows(self, timestamp: float) -> List[Window]:
         windows = []
@@ -169,13 +191,20 @@ class SessionWindowAssigner(WindowAssigner):
     """
     
     def __init__(self, gap_seconds: float = None, *, gap: float = None):
-        # Support both parameter names for backward compatibility
-        if gap_seconds is not None:
-            self.gap_seconds = gap_seconds
-        elif gap is not None:
-            self.gap_seconds = gap
-        else:
-            raise ValueError("Must provide either gap_seconds or gap")
+        # Support both parameter names - gap is deprecated
+        if gap is not None:
+            warnings.warn(
+                "Parameter 'gap' is deprecated and will be removed in v0.3.0. "
+                "Use 'gap_seconds' instead.",
+                DeprecationWarning,
+                stacklevel=2
+            )
+            if gap_seconds is None:
+                gap_seconds = gap
+        
+        if gap_seconds is None:
+            raise ValueError("Must provide gap_seconds")
+        self.gap_seconds = gap_seconds
         self._sessions: Dict[Any, Window] = {}  # key -> current session window
         self._lock = threading.Lock()
         

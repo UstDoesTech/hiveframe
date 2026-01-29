@@ -7,9 +7,11 @@ Sink implementations for writing data to various destinations.
 import json
 import csv
 import time
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Dict, Generic, List, Optional, TypeVar
+
+from ..utils import ManagedResource
 
 
 T = TypeVar('T')
@@ -19,29 +21,17 @@ T = TypeVar('T')
 # Base Sink Interface
 # ============================================================================
 
-class DataSink(ABC, Generic[T]):
+class DataSink(ManagedResource, Generic[T]):
     """
     Abstract base for all data sinks.
     
     Provides a uniform interface for writing data to various destinations.
+    Extends ManagedResource for lifecycle management.
     """
     
     def __init__(self, name: str):
-        self.name = name
+        super().__init__(name)
         self._records_written = 0
-        self._errors = 0
-        self._start_time: Optional[float] = None
-        self._is_open = False
-        
-    @abstractmethod
-    def open(self) -> None:
-        """Open the sink for writing."""
-        pass
-        
-    @abstractmethod
-    def close(self) -> None:
-        """Close the sink and flush any buffers."""
-        pass
         
     @abstractmethod
     def write(self, record: T) -> None:
@@ -58,26 +48,17 @@ class DataSink(ABC, Generic[T]):
             except Exception:
                 self._errors += 1
         return written
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get sink statistics (alias for get_metrics)."""
+        stats = super().get_stats()
+        stats['records_written'] = self._records_written
+        return stats
         
-    def __enter__(self):
-        self.open()
-        return self
-        
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-        return False
-        
+    # Alias for backward compatibility
     def get_metrics(self) -> Dict[str, Any]:
         """Get sink metrics."""
-        elapsed = time.time() - self._start_time if self._start_time else 0
-        return {
-            'name': self.name,
-            'records_written': self._records_written,
-            'errors': self._errors,
-            'elapsed_seconds': elapsed,
-            'records_per_second': self._records_written / elapsed if elapsed > 0 else 0,
-            'is_open': self._is_open
-        }
+        return self.get_stats()
 
 
 # ============================================================================
@@ -99,19 +80,16 @@ class JSONLSink(DataSink[Dict[str, Any]]):
         self.append = append
         self._file = None
         
-    def open(self) -> None:
+    def _do_open(self) -> None:
         mode = 'a' if self.append else 'w'
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._file = open(self.path, mode, encoding=self.encoding)
-        self._start_time = time.time()
-        self._is_open = True
         
-    def close(self) -> None:
+    def _do_close(self) -> None:
         if self._file:
             self._file.flush()
             self._file.close()
             self._file = None
-        self._is_open = False
         
     def write(self, record: Dict[str, Any]) -> None:
         if not self._is_open:
@@ -144,25 +122,22 @@ class CSVSink(DataSink[Dict[str, str]]):
         self._writer = None
         self._header_written = False
         
-    def open(self) -> None:
+    def _do_open(self) -> None:
         mode = 'a' if self.append else 'w'
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._file = open(self.path, mode, encoding=self.encoding, newline='')
         self._writer = csv.writer(self._file, delimiter=self.delimiter)
-        self._start_time = time.time()
-        self._is_open = True
         
         # Don't write header if appending to existing file
         if self.append and self.path.stat().st_size > 0:
             self._header_written = True
             
-    def close(self) -> None:
+    def _do_close(self) -> None:
         if self._file:
             self._file.flush()
             self._file.close()
             self._file = None
         self._writer = None
-        self._is_open = False
         
     def write(self, record: Dict[str, str]) -> None:
         if not self._is_open:

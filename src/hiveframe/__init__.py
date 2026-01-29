@@ -40,6 +40,15 @@ Biomimicry Concepts:
 __version__ = '0.2.0-dev'
 __author__ = 'HiveFrame Contributors'
 
+# Utilities (new unified module)
+from .utils import (
+    ThreadSafeMixin,
+    ManagedResource,
+    Serializable,
+    Monitorable,
+    deprecated_param,
+)
+
 # Core bee-inspired components
 from .core import (
     HiveFrame,
@@ -51,6 +60,25 @@ from .core import (
     Pheromone,
     FoodSource,
     create_hive,
+)
+
+# Unified Aggregations (new module)
+from .aggregations import (
+    Aggregator,
+    CountAggregator,
+    SumAggregator,
+    AvgAggregator,
+    MinAggregator,
+    MaxAggregator,
+    CollectListAggregator,
+    CollectSetAggregator,
+    get_aggregator_registry,
+)
+
+# Dead Letter Queue (extracted from exceptions)
+from .dlq import (
+    DeadLetterQueue,
+    DeadLetterRecord,
 )
 
 # DataFrame API (from package)
@@ -190,6 +218,12 @@ from .monitoring import (
 )
 
 __all__ = [
+    # Utilities (new)
+    'ThreadSafeMixin',
+    'ManagedResource',
+    'Serializable',
+    'Monitorable',
+    'deprecated_param',
     # Core
     'HiveFrame',
     'Bee',
@@ -200,6 +234,16 @@ __all__ = [
     'Pheromone',
     'FoodSource',
     'create_hive',
+    # Aggregations (unified)
+    'Aggregator',
+    'CountAggregator',
+    'SumAggregator',
+    'AvgAggregator',
+    'MinAggregator',
+    'MaxAggregator',
+    'CollectListAggregator',
+    'CollectSetAggregator',
+    'get_aggregator_registry',
     # DataFrame
     'HiveDataFrame',
     'Column',
@@ -209,7 +253,7 @@ __all__ = [
     'DataType',
     'GroupedData',
     'createDataFrame',
-    # Aggregations
+    # DataFrame Aggregations (convenience)
     'sum_agg',
     'avg',
     'count',
@@ -253,7 +297,7 @@ __all__ = [
     # Streaming - Processor
     'WindowAggregation',
     'EnhancedStreamProcessor',
-    # Streaming - Aggregators
+    # Streaming - Aggregators (legacy functions)
     'count_aggregator',
     'sum_aggregator',
     'avg_aggregator',
@@ -272,6 +316,7 @@ __all__ = [
     'ConfigurationError',
     'DependencyError',
     'CircuitOpenError',
+    # Dead Letter Queue
     'DeadLetterQueue',
     'DeadLetterRecord',
     # Resilience

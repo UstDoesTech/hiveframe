@@ -9,10 +9,9 @@ import time
 import threading
 from collections import deque
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TypeVar
+from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TypeVar, TYPE_CHECKING
 
 from ..core import ColonyState
-from ..monitoring import get_logger, get_registry
 
 from .core import StreamRecord, StreamBuffer, StreamPartitioner
 from .windows import Window, WindowAssigner, TumblingWindowAssigner
@@ -20,12 +19,25 @@ from .watermarks import Watermark, WatermarkGenerator, BoundedOutOfOrdernessWate
 from .state import Checkpoint, InMemoryStateBackend
 from .delivery import DeliveryGuarantee, ProcessingContext, IdempotencyStore
 
+# Optional monitoring - use dependency injection for better decoupling
+if TYPE_CHECKING:
+    from ..monitoring import Logger, MetricsRegistry
 
-logger = get_logger("streaming.enhanced")
-metrics = get_registry()
 
 K = TypeVar('K')
 V = TypeVar('V')
+
+
+def _get_default_logger(name: str) -> 'Logger':
+    """Lazily get a logger instance."""
+    from ..monitoring import get_logger
+    return get_logger(name)
+
+
+def _get_default_registry() -> 'MetricsRegistry':
+    """Lazily get a metrics registry instance."""
+    from ..monitoring import get_registry
+    return get_registry()
 
 
 @dataclass
@@ -47,6 +59,8 @@ class EnhancedStreamProcessor:
     - Exactly-once processing (simulated)
     - Checkpointing
     - Colony-based adaptive scaling
+    
+    Monitoring is optional and can be injected via constructor for better testability.
     """
     
     def __init__(
@@ -57,7 +71,10 @@ class EnhancedStreamProcessor:
         delivery_guarantee: DeliveryGuarantee = DeliveryGuarantee.AT_LEAST_ONCE,
         checkpoint_interval_seconds: float = 60.0,
         late_data_handling: str = 'drop',  # 'drop', 'sideoutput', 'update'
-        allowed_lateness_seconds: float = 0
+        allowed_lateness_seconds: float = 0,
+        *,
+        logger: Optional['Logger'] = None,
+        metrics_registry: Optional['MetricsRegistry'] = None,
     ):
         self.num_workers = num_workers
         self.window_assigner = window_assigner or TumblingWindowAssigner(60.0)
@@ -88,15 +105,43 @@ class EnhancedStreamProcessor:
         # Exactly-once
         self._idempotency = IdempotencyStore()
         
-        # Metrics
-        self._records_processed = metrics.counter("stream_records_processed", "Total records processed")
-        self._late_records = metrics.counter("stream_late_records", "Late records received")
-        self._windows_triggered = metrics.counter("stream_windows_triggered", "Windows triggered")
-        self._processing_latency = metrics.histogram("stream_processing_latency", "Processing latency")
+        # Monitoring - use injected or default instances (lazy initialization)
+        self._logger = logger
+        self._metrics_registry = metrics_registry
+        self._metrics_initialized = False
         
         # Control
         self._running = False
         self._workers: List[threading.Thread] = []
+    
+    def _ensure_metrics(self) -> None:
+        """Lazily initialize metrics on first use."""
+        if self._metrics_initialized:
+            return
+        
+        # Get logger
+        if self._logger is None:
+            self._logger = _get_default_logger("streaming.enhanced")
+        
+        # Get metrics registry
+        if self._metrics_registry is None:
+            self._metrics_registry = _get_default_registry()
+        
+        # Create metrics
+        self._records_processed = self._metrics_registry.counter(
+            "stream_records_processed", "Total records processed"
+        )
+        self._late_records = self._metrics_registry.counter(
+            "stream_late_records", "Late records received"
+        )
+        self._windows_triggered = self._metrics_registry.counter(
+            "stream_windows_triggered", "Windows triggered"
+        )
+        self._processing_latency = self._metrics_registry.histogram(
+            "stream_processing_latency", "Processing latency"
+        )
+        
+        self._metrics_initialized = True
         
     def process_record(
         self,
@@ -111,6 +156,9 @@ class EnhancedStreamProcessor:
         
         Returns result if window triggered, None otherwise.
         """
+        # Ensure metrics are initialized
+        self._ensure_metrics()
+        
         # Support both 'aggregator' and 'agg' parameter names
         if aggregator is None and agg is not None:
             aggregator = agg
@@ -127,7 +175,7 @@ class EnhancedStreamProcessor:
             idem_key = ctx.generate_idempotency_key()
             
             if self._idempotency.is_duplicate(idem_key):
-                logger.debug("Duplicate record skipped", key=record.key)
+                self._logger.debug("Duplicate record skipped", key=record.key)
                 return None
                 
         # Update watermark
@@ -141,7 +189,7 @@ class EnhancedStreamProcessor:
             
             if self.late_data_handling == 'drop':
                 if record.timestamp < self._current_watermark.timestamp - self.allowed_lateness:
-                    logger.debug("Dropping late record", key=record.key)
+                    self._logger.debug("Dropping late record", key=record.key)
                     return None
             elif self.late_data_handling == 'sideoutput':
                 self._late_data.append(record)
@@ -242,7 +290,7 @@ class EnhancedStreamProcessor:
         self._state_backend.save_checkpoint(checkpoint)
         self._last_checkpoint = time.time()
         
-        logger.info("Checkpoint created", checkpoint_id=checkpoint_id)
+        self._logger.info("Checkpoint created", checkpoint_id=checkpoint_id)
         
         return checkpoint
         
@@ -257,12 +305,13 @@ class EnhancedStreamProcessor:
         self._current_watermark = Watermark(timestamp=checkpoint.watermark)
         self._last_checkpoint = checkpoint.timestamp
         
-        logger.info("Restored from checkpoint", checkpoint_id=checkpoint.checkpoint_id)
+        self._logger.info("Restored from checkpoint", checkpoint_id=checkpoint.checkpoint_id)
         
         return True
         
     def get_metrics(self) -> Dict[str, Any]:
         """Get current stream processor metrics."""
+        self._ensure_metrics()  # Ensure metrics are initialized
         return {
             'records_processed': self._records_processed.get(),
             'late_records': self._late_records.get(),
