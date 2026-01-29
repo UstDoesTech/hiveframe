@@ -48,6 +48,31 @@ dev = [
     "ruff>=0.1",
 ]
 
+# Optional connectors and integrations
+kafka = [
+    "kafka-python>=2.0",
+]
+postgres = [
+    "psycopg2-binary>=2.9",
+]
+http = [
+    "requests>=2.28",
+    "aiohttp>=3.8",
+]
+monitoring = [
+    "prometheus-client>=0.16",
+]
+
+# Bundle all optional production dependencies
+production = [
+    "hiveframe[kafka,postgres,http,monitoring]",
+]
+
+# All dependencies including dev
+all = [
+    "hiveframe[production,dev]",
+]
+
 [project.urls]
 Homepage = "https://github.com/hiveframe/hiveframe"
 Documentation = "https://hiveframe.readthedocs.io"
