@@ -217,6 +217,70 @@ from .monitoring import (
     get_profiler,
 )
 
+# SQL Engine (SwarmQL) - Phase 1
+from .sql import (
+    SwarmQLContext,
+    SQLCatalog,
+    SQLParser,
+    SQLStatement,
+    SQLTokenizer,
+    SQLExecutor,
+    QueryPlan,
+    PlanNode,
+)
+
+# Query Optimizer - Phase 1
+from .optimizer import (
+    QueryOptimizer,
+    OptimizedPlan,
+    PlanCandidate,
+    CostModel,
+    SwarmCostModel,
+    CostEstimate,
+    Statistics,
+    OptimizationRule,
+    PredicatePushdown,
+    ProjectionPruning,
+)
+
+# Storage (Parquet & Delta Lake) - Phase 1
+from .storage import (
+    ParquetReader,
+    ParquetWriter,
+    ParquetSchema,
+    read_parquet,
+    write_parquet,
+    DeltaTable,
+    DeltaTransaction,
+    DeltaLog,
+    read_delta,
+    write_delta,
+    FileFormat,
+    StorageOptions,
+    CompressionCodec,
+)
+
+# Kubernetes Support - Phase 1
+from .k8s import (
+    HiveCluster,
+    WorkerSpec,
+    ResourceRequirements,
+    ClusterStatus,
+    HiveOperator,
+    OperatorConfig,
+    generate_deployment,
+    generate_service,
+    generate_configmap,
+    generate_crd,
+)
+
+# Dashboard (Colony Dashboard) - Phase 1
+from .dashboard import (
+    Dashboard,
+    DashboardConfig,
+    DashboardAPI,
+)
+
 __all__ = [
     # Utilities (new)
     'ThreadSafeMixin',
@@ -362,4 +426,53 @@ __all__ = [
     'get_logger',
     'get_tracer',
     'get_profiler',
+    # SQL Engine (SwarmQL)
+    'SwarmQLContext',
+    'SQLCatalog',
+    'SQLParser',
+    'SQLStatement',
+    'SQLTokenizer',
+    'SQLExecutor',
+    'QueryPlan',
+    'PlanNode',
+    # Query Optimizer
+    'QueryOptimizer',
+    'OptimizedPlan',
+    'PlanCandidate',
+    'CostModel',
+    'SwarmCostModel',
+    'CostEstimate',
+    'Statistics',
+    'OptimizationRule',
+    'PredicatePushdown',
+    'ProjectionPruning',
+    # Storage (Parquet & Delta Lake)
+    'ParquetReader',
+    'ParquetWriter',
+    'ParquetSchema',
+    'read_parquet',
+    'write_parquet',
+    'DeltaTable',
+    'DeltaTransaction',
+    'DeltaLog',
+    'read_delta',
+    'write_delta',
+    'FileFormat',
+    'StorageOptions',
+    'CompressionCodec',
+    # Kubernetes Support
+    'HiveCluster',
+    'WorkerSpec',
+    'ResourceRequirements',
+    'ClusterStatus',
+    'HiveOperator',
+    'OperatorConfig',
+    'generate_deployment',
+    'generate_service',
+    'generate_configmap',
+    'generate_crd',
+    # Dashboard
+    'Dashboard',
+    'DashboardConfig',
+    'DashboardAPI',
 ]
