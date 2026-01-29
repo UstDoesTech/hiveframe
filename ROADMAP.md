@@ -35,11 +35,11 @@ Traditional data platforms are built on centralized architectures that create:
 | Resilience patterns (retry, circuit breaker) | ✅ Complete | Q1 2026 |
 | Connectors (CSV, JSON, HTTP) | ✅ Complete | Q1 2026 |
 | Prometheus metrics & tracing | ✅ Complete | Q1 2026 |
-| **SQL Engine (SwarmQL)** | 🔄 In Progress | Q2 2026 |
-| **Catalyst-equivalent query optimizer** | 📋 Planned | Q2 2026 |
-| **Parquet & Delta Lake support** | 📋 Planned | Q2 2026 |
-| **Kubernetes operator** | 📋 Planned | Q2 2026 |
-| **Web UI (Colony Dashboard)** | 📋 Planned | Q2 2026 |
+| **SQL Engine (SwarmQL)** | ✅ Complete | Q2 2026 |
+| **Catalyst-equivalent query optimizer** | ✅ Complete | Q2 2026 |
+| **Parquet & Delta Lake support** | ✅ Complete | Q2 2026 |
+| **Kubernetes operator** | ✅ Complete | Q2 2026 |
+| **Web UI (Colony Dashboard)** | ✅ Complete | Q2 2026 |
 
 ---
 
