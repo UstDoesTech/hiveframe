@@ -468,7 +468,8 @@ class HiveFrame:
         n_onlookers = int(self.num_workers * self.onlooker_ratio)
         n_scouts = self.num_workers - n_employed - n_onlookers
 
-        assert self.colony is not None
+        if self.colony is None:
+            raise RuntimeError("Colony must be initialized before creating bees")
 
         for i in range(n_employed):
             bees.append(

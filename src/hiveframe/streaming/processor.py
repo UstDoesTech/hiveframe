@@ -177,8 +177,8 @@ class EnhancedStreamProcessor:
             idem_key = ctx.generate_idempotency_key()
 
             if self._idempotency.is_duplicate(idem_key):
-                assert self._logger is not None
-                self._logger.debug("Duplicate record skipped", key=record.key)
+                if self._logger is not None:
+                    self._logger.debug("Duplicate record skipped", key=record.key)
                 return None
 
         # Update watermark
@@ -192,8 +192,8 @@ class EnhancedStreamProcessor:
 
             if self.late_data_handling == "drop":
                 if record.timestamp < self._current_watermark.timestamp - self.allowed_lateness:
-                    assert self._logger is not None
-                    self._logger.debug("Dropping late record", key=record.key)
+                    if self._logger is not None:
+                        self._logger.debug("Dropping late record", key=record.key)
                     return None
             elif self.late_data_handling == "sideoutput":
                 self._late_data.append(record)
@@ -292,8 +292,8 @@ class EnhancedStreamProcessor:
         self._state_backend.save_checkpoint(checkpoint)
         self._last_checkpoint = time.time()
 
-        assert self._logger is not None
-        self._logger.info("Checkpoint created", checkpoint_id=checkpoint_id)
+        if self._logger is not None:
+            self._logger.info("Checkpoint created", checkpoint_id=checkpoint_id)
 
         return checkpoint
 
@@ -308,8 +308,8 @@ class EnhancedStreamProcessor:
         self._current_watermark = Watermark(timestamp=checkpoint.watermark)
         self._last_checkpoint = checkpoint.timestamp
 
-        assert self._logger is not None
-        self._logger.info("Restored from checkpoint", checkpoint_id=checkpoint.checkpoint_id)
+        if self._logger is not None:
+            self._logger.info("Restored from checkpoint", checkpoint_id=checkpoint.checkpoint_id)
 
         return True
 

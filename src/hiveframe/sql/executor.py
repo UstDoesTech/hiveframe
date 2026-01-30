@@ -450,7 +450,10 @@ class SQLExecutor:
         if name == "CONCAT":
             args = [self._expr_to_column(a) for a in func.args]
             def concat_fn(row: Dict) -> Any:
-                parts = [str(arg.eval(row)) if arg.eval(row) is not None else "" for arg in args]
+                parts = []
+                for arg in args:
+                    val = arg.eval(row)
+                    parts.append(str(val) if val is not None else "")
                 return "".join(parts)
             return Column("concat", eval_fn=concat_fn)  # type: ignore
         if name == "SUBSTRING" or name == "SUBSTR":
