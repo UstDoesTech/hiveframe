@@ -65,7 +65,6 @@ class CacheEntry:
     @property
     def fitness(self) -> float:
         """Calculate fitness score for eviction decisions."""
-        time.time() - self.created_at
         recency_seconds = time.time() - self.last_accessed
 
         # Fitness combines frequency, recency, and pheromone

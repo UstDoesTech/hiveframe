@@ -301,7 +301,6 @@ class DictionaryEncoder:
     def decode(dictionary: bytes, indices: bytes, use_short: bool = False) -> List[Any]:
         """Decode dictionary-encoded values."""
         unique_values = json.loads(dictionary.decode("utf-8"))
-        len(unique_values)
 
         if use_short:
             idx_list = [
@@ -652,8 +651,6 @@ class HoneyStoreReader:
             # Read blocks until metadata
 
             while True:
-                f.tell()
-
                 # Try to read block header length
                 header_len_bytes = f.read(4)
                 if len(header_len_bytes) < 4:

@@ -190,7 +190,6 @@ def run_throughput_scaling_scenario(
         try:
             results_data = hive.process(data, lambda item: (process_item(item), 1.0))
             successful = len([r for r in results_data.values() if r is not None])
-            current_size - successful
 
         except Exception as e:
             logger.error(f"Processing failed: {e}")
@@ -340,7 +339,6 @@ def run_sustained_load_scenario(
         "Starting sustained load scenario", rps=records_per_second, duration=duration_seconds
     )
 
-    records_per_second * duration_seconds
     latency_tracker = LatencyTracker()
     memory_tracker = MemoryTracker()
 
@@ -360,7 +358,6 @@ def run_sustained_load_scenario(
         latency_tracker.record(time.perf_counter() - start)
         return result
 
-    HiveFrame(num_workers=num_workers)
     colony = ColonyState()
 
     memory_tracker.start()
