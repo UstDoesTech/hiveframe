@@ -413,10 +413,12 @@ class SQLExecutor:
             col_expr = self._expr_to_column(expr.expr)
             # For IN, we need to evaluate against constant list
             values = [self._eval_constant_expr(v) for v in expr.values]
+
             # Use a custom function since Column doesn't have isin
             def check_in(row: Dict) -> bool:
                 val = col_expr.eval(row)
                 return val in values
+
             return Column("in_check", eval_fn=check_in)  # type: ignore
 
         if isinstance(expr, CaseExpr):
@@ -432,59 +434,73 @@ class SQLExecutor:
         # String functions
         if name == "UPPER":
             arg = self._expr_to_column(func.args[0])
+
             # Use a custom function since Column doesn't have upper
             def upper_fn(row: Dict) -> Any:
                 val = arg.eval(row)
                 return str(val).upper() if val is not None else None
+
             return Column("upper", eval_fn=upper_fn)  # type: ignore
         if name == "LOWER":
             arg = self._expr_to_column(func.args[0])
+
             def lower_fn(row: Dict) -> Any:
                 val = arg.eval(row)
                 return str(val).lower() if val is not None else None
+
             return Column("lower", eval_fn=lower_fn)  # type: ignore
         if name == "LENGTH":
             arg = self._expr_to_column(func.args[0])
+
             def length_fn(row: Dict) -> Any:
                 val = arg.eval(row)
                 return len(str(val)) if val is not None else None
+
             return Column("length", eval_fn=length_fn)  # type: ignore
         if name == "CONCAT":
             args = [self._expr_to_column(a) for a in func.args]
+
             def concat_fn(row: Dict) -> Any:
                 parts = []
                 for arg in args:
                     val = arg.eval(row)
                     parts.append(str(val) if val is not None else "")
                 return "".join(parts)
+
             return Column("concat", eval_fn=concat_fn)  # type: ignore
         if name == "SUBSTRING" or name == "SUBSTR":
             s = self._expr_to_column(func.args[0])
             start = self._eval_constant_expr(func.args[1])
             length = self._eval_constant_expr(func.args[2]) if len(func.args) > 2 else None
+
             def substr_fn(row: Dict) -> Any:
                 val = s.eval(row)
                 if val is None:
                     return None
                 str_val = str(val)
                 if length is not None:
-                    return str_val[start:start+length]
+                    return str_val[start : start + length]
                 return str_val[start:]
+
             return Column("substring", eval_fn=substr_fn)  # type: ignore
 
         # Math functions
         if name == "ABS":
             arg = self._expr_to_column(func.args[0])
+
             def abs_fn(row: Dict) -> Any:
                 val = arg.eval(row)
                 return abs(val) if val is not None else None
+
             return Column("abs", eval_fn=abs_fn)  # type: ignore
         if name == "ROUND":
             arg = self._expr_to_column(func.args[0])
             decimals = self._eval_constant_expr(func.args[1]) if len(func.args) > 1 else 0
+
             def round_fn(row: Dict) -> Any:
                 val = arg.eval(row)
                 return round(val, decimals) if val is not None else None
+
             return Column("round", eval_fn=round_fn)  # type: ignore
 
         # Date functions

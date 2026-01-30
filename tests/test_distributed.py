@@ -8,7 +8,6 @@ Tests cover:
 - Locality-aware Scheduling
 """
 
-
 import pytest
 
 from hiveframe.distributed import (
