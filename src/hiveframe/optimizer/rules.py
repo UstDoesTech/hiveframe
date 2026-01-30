@@ -308,7 +308,7 @@ class ConstantFolding(OptimizationRule):
     def _evaluate_constant(self, pred: Any) -> bool:
         """Evaluate constant predicate."""
         if isinstance(pred, dict):
-            return pred.get("constant", True)
+            return pred.get("constant", True)  # type: ignore[no-any-return]
         if isinstance(pred, bool):
             return pred
         return True
@@ -424,7 +424,7 @@ class JoinReordering(OptimizationRule):
     def _estimate_size(self, node: PlanNode) -> int:
         """Estimate output size of a node."""
         # Simple heuristic - use properties or default
-        return node.properties.get("estimated_rows", 1000)
+        return node.properties.get("estimated_rows", 1000)  # type: ignore[no-any-return]
 
     def _find_condition(
         self, left: PlanNode, right: PlanNode, conditions: List[Any]
