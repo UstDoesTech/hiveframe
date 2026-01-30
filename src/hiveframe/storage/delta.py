@@ -15,19 +15,18 @@ This implementation provides core Delta Lake features:
 - Unified streaming and batch processing
 """
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Union, Iterator
 import json
-import os
-import uuid
 import time
+import uuid
+from dataclasses import dataclass, field
 from datetime import datetime
-from pathlib import Path
 from enum import Enum, auto
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 from ..dataframe import HiveDataFrame
-from .formats import FileFormat, CompressionCodec, StorageOptions, PartitionSpec, FileMetadata
-from .parquet import ParquetWriter, ParquetReader, ParquetSchema
+from .formats import StorageOptions
+from .parquet import ParquetReader, ParquetSchema, ParquetWriter
 
 
 class ActionType(Enum):

@@ -5,13 +5,12 @@ Dashboard Server
 HTTP server for the Colony Dashboard.
 """
 
-from dataclasses import dataclass
-from typing import Any, Dict, Optional
 import json
 import threading
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-import os
+from dataclasses import dataclass
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from typing import Optional
+from urllib.parse import urlparse
 
 from .api import DashboardAPI
 
@@ -32,20 +31,21 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             --text: #e9ecef;
             --text-muted: #adb5bd;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+                sans-serif;
             background: var(--bg-color);
             color: var(--text);
             min-height: 100vh;
         }
-        
+
         .header {
             background: linear-gradient(135deg, var(--card-bg), #0f3460);
             padding: 1.5rem 2rem;
@@ -54,20 +54,20 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             justify-content: space-between;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         .header h1 {
             font-size: 1.8rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .header .status {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .status-dot {
             width: 10px;
             height: 10px;
@@ -75,26 +75,26 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             background: var(--accent);
             animation: pulse 2s infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-        
+
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 1.5rem;
             padding: 1.5rem;
         }
-        
+
         .card {
             background: var(--card-bg);
             border-radius: 12px;
             padding: 1.5rem;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        
+
         .card h2 {
             font-size: 1.1rem;
             margin-bottom: 1rem;
@@ -103,50 +103,50 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .metric-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
         }
-        
+
         .metric {
             background: rgba(0,0,0,0.2);
             padding: 1rem;
             border-radius: 8px;
         }
-        
+
         .metric-label {
             font-size: 0.85rem;
             color: var(--text-muted);
             margin-bottom: 0.25rem;
         }
-        
+
         .metric-value {
             font-size: 1.8rem;
             font-weight: 600;
         }
-        
+
         .metric-value.temperature {
             color: var(--secondary);
         }
-        
+
         .metric-value.fitness {
             color: var(--accent);
         }
-        
+
         .worker-list {
             max-height: 300px;
             overflow-y: auto;
         }
-        
+
         .worker-item {
             display: flex;
             align-items: center;
             padding: 0.75rem;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        
+
         .worker-role {
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
@@ -154,25 +154,25 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             font-weight: 600;
             margin-right: 0.75rem;
         }
-        
+
         .role-employed { background: var(--primary); color: #000; }
         .role-onlooker { background: var(--accent); color: #000; }
         .role-scout { background: var(--secondary); color: #fff; }
-        
+
         .worker-id {
             flex: 1;
             font-family: monospace;
         }
-        
+
         .worker-status {
             font-size: 0.85rem;
             color: var(--text-muted);
         }
-        
+
         .sql-console {
             grid-column: 1 / -1;
         }
-        
+
         .sql-input {
             width: 100%;
             background: rgba(0,0,0,0.3);
@@ -185,18 +185,18 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             resize: vertical;
             min-height: 100px;
         }
-        
+
         .sql-input:focus {
             outline: none;
             border-color: var(--primary);
         }
-        
+
         .sql-actions {
             margin-top: 1rem;
             display: flex;
             gap: 0.5rem;
         }
-        
+
         .btn {
             padding: 0.5rem 1rem;
             border: none;
@@ -205,38 +205,38 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             font-weight: 600;
             transition: opacity 0.2s;
         }
-        
+
         .btn:hover { opacity: 0.8; }
-        
+
         .btn-primary {
             background: var(--primary);
             color: #000;
         }
-        
+
         .btn-secondary {
             background: rgba(255,255,255,0.1);
             color: var(--text);
         }
-        
+
         .results-table {
             width: 100%;
             margin-top: 1rem;
             border-collapse: collapse;
             font-size: 0.85rem;
         }
-        
+
         .results-table th {
             background: rgba(0,0,0,0.3);
             padding: 0.75rem;
             text-align: left;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
+
         .results-table td {
             padding: 0.5rem 0.75rem;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        
+
         .dance-item {
             display: flex;
             align-items: center;
@@ -246,7 +246,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             background: rgba(0,0,0,0.2);
             border-radius: 0 4px 4px 0;
         }
-        
+
         .dance-vigor {
             width: 60px;
             height: 8px;
@@ -255,19 +255,19 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             overflow: hidden;
             margin-left: auto;
         }
-        
+
         .dance-vigor-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--secondary), var(--primary));
             transition: width 0.3s;
         }
-        
+
         .chart-container {
             height: 150px;
             margin-top: 1rem;
             position: relative;
         }
-        
+
         .chart-placeholder {
             width: 100%;
             height: 100%;
@@ -288,7 +288,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             <span id="connection-status">Connected</span>
         </div>
     </div>
-    
+
     <div class="dashboard">
         <div class="card">
             <h2>📊 Colony Metrics</h2>
@@ -314,7 +314,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 <div class="chart-placeholder">📈 Metrics Chart</div>
             </div>
         </div>
-        
+
         <div class="card">
             <h2>🐝 Workers</h2>
             <div class="metric-grid" style="margin-bottom: 1rem;">
@@ -331,7 +331,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 <!-- Workers will be populated here -->
             </div>
         </div>
-        
+
         <div class="card">
             <h2>💃 Dance Floor</h2>
             <div class="metric-grid" style="margin-bottom: 1rem;">
@@ -348,14 +348,14 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 <!-- Dances will be populated here -->
             </div>
         </div>
-        
+
         <div class="card">
             <h2>📜 Recent Queries</h2>
             <div id="query-list">
                 <!-- Queries will be populated here -->
             </div>
         </div>
-        
+
         <div class="card sql-console">
             <h2>⌨️ SQL Console</h2>
             <textarea class="sql-input" id="sql-input" placeholder="Enter SQL query...
@@ -368,11 +368,11 @@ Example: SELECT * FROM users WHERE age > 21"></textarea>
             <div id="query-results"></div>
         </div>
     </div>
-    
+
     <script>
         // API base URL
         const API_BASE = '/api';
-        
+
         // Fetch data from API
         async function fetchAPI(endpoint) {
             try {
@@ -383,31 +383,31 @@ Example: SELECT * FROM users WHERE age > 21"></textarea>
                 return { success: false, error: e.message };
             }
         }
-        
+
         // Update metrics
         async function updateMetrics() {
             const result = await fetchAPI('/metrics');
             if (result.success) {
-                document.getElementById('metric-temp').textContent = 
+                document.getElementById('metric-temp').textContent =
                     result.data.temperature.toFixed(2);
-                document.getElementById('metric-fitness').textContent = 
+                document.getElementById('metric-fitness').textContent =
                     result.data.averageFitness.toFixed(2);
-                document.getElementById('metric-sources').textContent = 
+                document.getElementById('metric-sources').textContent =
                     result.data.activeFoodSources;
-                document.getElementById('metric-throughput').textContent = 
+                document.getElementById('metric-throughput').textContent =
                     result.data.throughput.toFixed(1) + '/s';
             }
         }
-        
+
         // Update workers
         async function updateWorkers() {
             const result = await fetchAPI('/workers');
             if (result.success) {
-                document.getElementById('worker-total').textContent = 
+                document.getElementById('worker-total').textContent =
                     result.data.totalWorkers;
-                document.getElementById('worker-active').textContent = 
+                document.getElementById('worker-active').textContent =
                     result.data.statusDistribution.active;
-                    
+
                 const list = document.getElementById('worker-list');
                 list.innerHTML = result.data.workers.map(w => `
                     <div class="worker-item">
@@ -418,16 +418,16 @@ Example: SELECT * FROM users WHERE age > 21"></textarea>
                 `).join('');
             }
         }
-        
+
         // Update dances
         async function updateDances() {
             const result = await fetchAPI('/dances');
             if (result.success) {
-                document.getElementById('dance-total').textContent = 
+                document.getElementById('dance-total').textContent =
                     result.data.totalDances;
-                document.getElementById('dance-vigor').textContent = 
+                document.getElementById('dance-vigor').textContent =
                     result.data.averageVigor.toFixed(2);
-                    
+
                 const list = document.getElementById('dance-list');
                 list.innerHTML = result.data.recentDances.map(d => `
                     <div class="dance-item">
@@ -439,7 +439,7 @@ Example: SELECT * FROM users WHERE age > 21"></textarea>
                 `).join('');
             }
         }
-        
+
         // Update queries
         async function updateQueries() {
             const result = await fetchAPI('/queries');
@@ -447,92 +447,97 @@ Example: SELECT * FROM users WHERE age > 21"></textarea>
                 const list = document.getElementById('query-list');
                 list.innerHTML = result.data.queries.map(q => `
                     <div class="worker-item">
-                        <span class="worker-role ${q.status === 'COMPLETED' ? 'role-onlooker' : 
-                                                    q.status === 'FAILED' ? 'role-scout' : 'role-employed'}">
+                        <span class="worker-role ${
+                            q.status === 'COMPLETED' ? 'role-onlooker' :
+                            q.status === 'FAILED' ? 'role-scout' : 'role-employed'
+                        }">
                             ${q.status}
                         </span>
                         <span class="worker-id">${q.sql}</span>
-                        ${q.duration ? `<span class="worker-status">${q.duration.toFixed(2)}s</span>` : ''}
+                        ${q.duration ?
+                            `<span class="worker-status">${q.duration.toFixed(2)}s</span>` : ''
+                        }
                     </div>
                 `).join('');
             }
         }
-        
+
         // Execute SQL query
         async function executeQuery() {
             const sql = document.getElementById('sql-input').value;
             if (!sql.trim()) return;
-            
+
             const response = await fetch(API_BASE + '/queries', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sql })
             });
-            
+
             const result = await response.json();
             const resultsDiv = document.getElementById('query-results');
-            
+
             if (result.success && result.data.rows) {
                 const columns = result.data.columns;
                 const rows = result.data.rows;
-                
+
                 let html = '<table class="results-table"><thead><tr>';
                 html += columns.map(c => `<th>${c}</th>`).join('');
                 html += '</tr></thead><tbody>';
-                html += rows.slice(0, 100).map(row => 
+                html += rows.slice(0, 100).map(row =>
                     '<tr>' + columns.map(c => `<td>${row[c] ?? ''}</td>`).join('') + '</tr>'
                 ).join('');
                 html += '</tbody></table>';
-                
+
                 if (result.data.truncated) {
                     html += `<p style="margin-top: 1rem; color: var(--text-muted);">
                         Showing 100 of ${result.data.totalRows} rows</p>`;
                 }
-                
+
                 resultsDiv.innerHTML = html;
             } else {
                 resultsDiv.innerHTML = `<p style="color: var(--secondary); margin-top: 1rem;">
                     Error: ${result.error || 'Unknown error'}</p>`;
             }
-            
+
             updateQueries();
         }
-        
+
         // Explain query
         async function explainQuery() {
             const sql = document.getElementById('sql-input').value;
             if (!sql.trim()) return;
-            
+
             const response = await fetch(API_BASE + '/queries/explain', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sql })
             });
-            
+
             const result = await response.json();
             const resultsDiv = document.getElementById('query-results');
-            
+
             if (result.success) {
-                resultsDiv.innerHTML = `<pre style="margin-top: 1rem; background: rgba(0,0,0,0.2); 
-                    padding: 1rem; border-radius: 8px; overflow-x: auto;">${result.data.plan}</pre>`;
+                resultsDiv.innerHTML = `<pre style="margin-top: 1rem; background: rgba(0,0,0,0.2);
+                    padding: 1rem; border-radius: 8px; overflow-x: auto;">
+                    ${result.data.plan}</pre>`;
             } else {
                 resultsDiv.innerHTML = `<p style="color: var(--secondary); margin-top: 1rem;">
                     Error: ${result.error}</p>`;
             }
         }
-        
+
         // Clear results
         function clearResults() {
             document.getElementById('query-results').innerHTML = '';
             document.getElementById('sql-input').value = '';
         }
-        
+
         // Initial load and periodic updates
         updateMetrics();
         updateWorkers();
         updateDances();
         updateQueries();
-        
+
         setInterval(updateMetrics, 5000);
         setInterval(updateWorkers, 5000);
         setInterval(updateDances, 5000);

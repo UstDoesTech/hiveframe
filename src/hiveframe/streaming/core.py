@@ -10,15 +10,15 @@ Key concepts:
 """
 
 import asyncio
+import random
+import threading
 import time
 from collections import deque
 from dataclasses import dataclass, field
+from queue import Empty, Queue
 from typing import Any, AsyncIterator, Callable, Dict, List, Optional, Tuple
-import threading
-from queue import Queue, Empty
-import random
 
-from ..core import BeeRole, WaggleDance, DanceFloor, ColonyState, Pheromone, FoodSource, Bee
+from ..core import BeeRole, ColonyState, Pheromone, WaggleDance
 
 
 @dataclass
@@ -289,7 +289,7 @@ class StreamBee:
                     self.colony.update_temperature(self.worker_id, latency)
                     self.processed_count += 1
 
-                except Exception as e:
+                except Exception:
                     self.error_count += 1
                     # Emit alarm pheromone
                     self.colony.emit_pheromone(

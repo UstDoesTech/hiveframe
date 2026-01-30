@@ -13,18 +13,13 @@ Key Features:
 - Nectar encoding for efficient null handling
 """
 
-import time
+import hashlib
 import json
 import struct
-import hashlib
-import tempfile
-import os
+import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Union, BinaryIO
 from enum import Enum, auto
-from collections import defaultdict
-import threading
-import math
+from typing import Any, BinaryIO, Dict, List, Optional, Tuple
 
 
 class EncodingType(Enum):
@@ -306,7 +301,6 @@ class DictionaryEncoder:
     def decode(dictionary: bytes, indices: bytes, use_short: bool = False) -> List[Any]:
         """Decode dictionary-encoded values."""
         unique_values = json.loads(dictionary.decode("utf-8"))
-        null_idx = len(unique_values)
 
         if use_short:
             idx_list = [
@@ -626,7 +620,7 @@ class HoneyStoreReader:
             # Verify magic bytes
             magic = f.read(len(self.MAGIC_BYTES))
             if magic != self.MAGIC_BYTES:
-                raise ValueError(f"Invalid HoneyStore file: wrong magic bytes")
+                raise ValueError("Invalid HoneyStore file: wrong magic bytes")
 
             # Read metadata offset
             metadata_offset = struct.unpack("<Q", f.read(8))[0]
@@ -655,11 +649,8 @@ class HoneyStoreReader:
             f.seek(len(self.MAGIC_BYTES) + 8)
 
             # Read blocks until metadata
-            metadata_offset = self.metadata.num_rows  # Actually get from file
 
             while True:
-                pos = f.tell()
-
                 # Try to read block header length
                 header_len_bytes = f.read(4)
                 if len(header_len_bytes) < 4:

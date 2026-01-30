@@ -12,16 +12,13 @@ Key Concepts:
 - Resource Sharing: Balanced utilization across the federation
 """
 
-import time
-import uuid
-import threading
-import hashlib
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Set
-from enum import Enum, auto
-from collections import defaultdict
-import random
 import math
+import random
+import threading
+import time
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Any, Callable, Dict, List, Optional, Set
 
 
 class FederationProtocol(Enum):

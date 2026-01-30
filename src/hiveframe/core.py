@@ -11,18 +11,15 @@ Key biomimicry concepts implemented:
 - Adaptive Task Allocation: Self-organizing based on local stimuli
 """
 
-import asyncio
-import random
-import time
-import hashlib
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Generic
-from enum import Enum, auto
-from collections import defaultdict
-import heapq
-import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import math
+import random
+import threading
+import time
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -351,7 +348,7 @@ class Bee:
 
             return dance
 
-        except Exception as e:
+        except Exception:
             # Failed processing - increment abandonment counter
             self.current_source.trials += 1
             return None

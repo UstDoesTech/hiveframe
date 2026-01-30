@@ -8,47 +8,46 @@ for bee-inspired distributed processing.
 """
 
 # Metrics
-from .metrics import (
-    MetricType,
-    MetricLabels,
-    Metric,
-    Counter,
-    Gauge,
-    Histogram,
-    Summary,
-    MetricsRegistry,
-    get_registry,
+# Health Monitoring
+from .health import (
+    ColonyHealthMonitor,
+    ColonyHealthReport,
+    WorkerHealthSnapshot,
 )
 
 # Logging
 from .logging import (
+    BufferedHandler,
+    ConsoleHandler,
+    Logger,
+    LogHandler,
     LogLevel,
     LogRecord,
-    LogHandler,
-    ConsoleHandler,
-    BufferedHandler,
-    Logger,
     get_logger,
 )
-
-# Health Monitoring
-from .health import (
-    WorkerHealthSnapshot,
-    ColonyHealthReport,
-    ColonyHealthMonitor,
-)
-
-# Distributed Tracing
-from .tracing import (
-    TraceSpan,
-    Tracer,
-    get_tracer,
+from .metrics import (
+    Counter,
+    Gauge,
+    Histogram,
+    Metric,
+    MetricLabels,
+    MetricsRegistry,
+    MetricType,
+    Summary,
+    get_registry,
 )
 
 # Performance Profiling
 from .profiling import (
     PerformanceProfiler,
     get_profiler,
+)
+
+# Distributed Tracing
+from .tracing import (
+    Tracer,
+    TraceSpan,
+    get_tracer,
 )
 
 __all__ = [

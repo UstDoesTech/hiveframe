@@ -16,63 +16,50 @@ Each level builds on the previous, demonstrating how the bee
 colony metaphor handles progressively harder challenges.
 """
 
-import time
-import random
-import threading
 import json
-import sys
 import os
-from typing import Any, Dict, List
-from dataclasses import dataclass
+import random
+import sys
+import time
+from typing import Any, Dict
 
 # Add parent to path for imports when running as script
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Core imports
-from hiveframe.core import HiveFrame, ColonyState, BeeRole, create_hive, Pheromone
-from hiveframe.dataframe import HiveDataFrame, col, avg, count, sum_agg
+from hiveframe.connectors import (
+    DataGenerator,
+    MessageBroker,
+)
+from hiveframe.core import ColonyState, Pheromone, create_hive
+from hiveframe.dataframe import HiveDataFrame, avg, col, count, sum_agg
 
 # Production modules
 from hiveframe.exceptions import (
-    HiveFrameError,
-    TransientError,
-    ValidationError,
     DeadLetterQueue,
     DeadLetterRecord,
-)
-from hiveframe.resilience import (
-    RetryPolicy,
-    CircuitBreaker,
-    CircuitBreakerConfig,
-    BackoffStrategy,
-    with_retry,
-    ResilientExecutor,
-)
-from hiveframe.connectors import (
-    DataGenerator,
-    CSVSource,
-    JSONLSource,
-    JSONLSink,
-    MessageBroker,
-    Topic,
-    FileWatcher,
+    TransientError,
+    ValidationError,
 )
 from hiveframe.monitoring import (
     get_logger,
-    get_registry,
     get_profiler,
-    ColonyHealthMonitor,
-    Logger,
-    LogLevel,
+    get_registry,
+)
+from hiveframe.resilience import (
+    BackoffStrategy,
+    CircuitBreaker,
+    CircuitBreakerConfig,
+    RetryPolicy,
+    with_retry,
 )
 from hiveframe.streaming import (
-    StreamRecord,
-    EnhancedStreamProcessor,
-    tumbling_window,
-    bounded_watermark,
     DeliveryGuarantee,
-    count_aggregator,
+    EnhancedStreamProcessor,
+    StreamRecord,
+    bounded_watermark,
     sum_aggregator,
+    tumbling_window,
 )
 
 # Configure logging
@@ -242,7 +229,7 @@ def demo_level_2_intermediate():
     print_subheader("2.3 Complex Transformations")
 
     # Add computed column (using lambda)
-    df_enhanced = df.withColumn("amount_bucket", col("amount"))  # Placeholder for transformation
+    df.withColumn("amount_bucket", col("amount"))  # Placeholder for transformation
 
     # Filter with multiple conditions
     high_value = df.filter(col("amount") > 500)
@@ -302,7 +289,7 @@ def demo_level_3_advanced():
         except TransientError:
             failures.append(i)
 
-    print(f"Total operations: 50")
+    print("Total operations: 50")
     print(f"Successful: {len(results)}")
     print(f"Failed after retries: {len(failures)}")
     print(f"Transient errors encountered: {transient_count[0]}")
@@ -413,7 +400,7 @@ def demo_level_4_expert():
         hive = create_hive(num_workers=8)
 
         start = time.time()
-        processed = hive.process(data, lambda x: (x["value"] ** 2, 1.0))
+        hive.process(data, lambda x: (x["value"] ** 2, 1.0))
         elapsed = time.time() - start
 
         throughput = size / elapsed

@@ -6,25 +6,25 @@ Executes SQL statements by converting them to HiveDataFrame operations.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple
 from enum import Enum, auto
+from typing import Any, Dict, List, Optional, Tuple
 
-from ..dataframe import HiveDataFrame, Column, col, lit, GroupedData
-from ..dataframe.aggregations import sum_agg, avg, count, count_all, min_agg, max_agg, collect_list
+from ..dataframe import Column, HiveDataFrame, col, lit
+from ..dataframe.aggregations import avg, count, count_all, max_agg, min_agg, sum_agg
 from .parser import (
-    SQLStatement,
-    Expression,
-    ColumnRef,
-    Literal,
-    FunctionCall,
-    BinaryOp,
-    UnaryOp,
     BetweenExpr,
-    InExpr,
+    BinaryOp,
     CaseExpr,
-    SelectColumn,
+    ColumnRef,
+    Expression,
+    FunctionCall,
+    InExpr,
     JoinClause,
+    Literal,
     OrderByItem,
+    SelectColumn,
+    SQLStatement,
+    UnaryOp,
 )
 
 
@@ -367,19 +367,21 @@ class SQLExecutor:
             right = self._expr_to_column(expr.right)
 
             ops = {
-                "+": lambda l, r: l + r,
-                "-": lambda l, r: l - r,
-                "*": lambda l, r: l * r,
-                "/": lambda l, r: l / r,
-                "=": lambda l, r: l == r,
-                "!=": lambda l, r: l != r,
-                "<": lambda l, r: l < r,
-                "<=": lambda l, r: l <= r,
-                ">": lambda l, r: l > r,
-                ">=": lambda l, r: l >= r,
-                "AND": lambda l, r: l & r,
-                "OR": lambda l, r: l | r,
-                "LIKE": lambda l, r: l.contains(r._value if hasattr(r, "_value") else str(r)),
+                "+": lambda lhs, rhs: lhs + rhs,
+                "-": lambda lhs, rhs: lhs - rhs,
+                "*": lambda lhs, rhs: lhs * rhs,
+                "/": lambda lhs, rhs: lhs / rhs,
+                "=": lambda lhs, rhs: lhs == rhs,
+                "!=": lambda lhs, rhs: lhs != rhs,
+                "<": lambda lhs, rhs: lhs < rhs,
+                "<=": lambda lhs, rhs: lhs <= rhs,
+                ">": lambda lhs, rhs: lhs > rhs,
+                ">=": lambda lhs, rhs: lhs >= rhs,
+                "AND": lambda lhs, rhs: lhs & rhs,
+                "OR": lambda lhs, rhs: lhs | rhs,
+                "LIKE": lambda lhs, rhs: lhs.contains(
+                    rhs._value if hasattr(rhs, "_value") else str(rhs)
+                ),
             }
 
             if expr.op in ops:
@@ -527,18 +529,18 @@ class SQLExecutor:
         if left is None or right is None:
             return None
         ops = {
-            "+": lambda l, r: l + r,
-            "-": lambda l, r: l - r,
-            "*": lambda l, r: l * r,
-            "/": lambda l, r: l / r if r != 0 else None,
-            "=": lambda l, r: l == r,
-            "!=": lambda l, r: l != r,
-            "<": lambda l, r: l < r,
-            "<=": lambda l, r: l <= r,
-            ">": lambda l, r: l > r,
-            ">=": lambda l, r: l >= r,
-            "AND": lambda l, r: l and r,
-            "OR": lambda l, r: l or r,
+            "+": lambda lhs, rhs: lhs + rhs,
+            "-": lambda lhs, rhs: lhs - rhs,
+            "*": lambda lhs, rhs: lhs * rhs,
+            "/": lambda lhs, rhs: lhs / rhs if rhs != 0 else None,
+            "=": lambda lhs, rhs: lhs == rhs,
+            "!=": lambda lhs, rhs: lhs != rhs,
+            "<": lambda lhs, rhs: lhs < rhs,
+            "<=": lambda lhs, rhs: lhs <= rhs,
+            ">": lambda lhs, rhs: lhs > rhs,
+            ">=": lambda lhs, rhs: lhs >= rhs,
+            "AND": lambda lhs, rhs: lhs and rhs,
+            "OR": lambda lhs, rhs: lhs or rhs,
         }
         if op in ops:
             return ops[op](left, right)

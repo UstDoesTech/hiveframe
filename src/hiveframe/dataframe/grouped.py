@@ -5,7 +5,8 @@ Grouped DataFrame for aggregation operations.
 """
 
 from __future__ import annotations
-from typing import Dict, List, TYPE_CHECKING
+
+from typing import TYPE_CHECKING, Dict, List
 
 from .aggregations import AggFunc, count_all
 

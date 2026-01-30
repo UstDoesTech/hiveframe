@@ -92,7 +92,15 @@ target-version = ['py39', 'py310', 'py311', 'py312']
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "N", "W"]
+ignore = [
+    "N802",  # Function name should be lowercase (intentional Spark-like camelCase)
+    "N818",  # Exception name should end with Error (intentional naming)
+    "E402",  # Module level import not at top (intentional for backward compatibility)
+    "F821",  # Undefined name (forward references in type hints)
+]
 
 [tool.mypy]
 python_version = "3.9"

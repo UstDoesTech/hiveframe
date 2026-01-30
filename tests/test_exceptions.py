@@ -14,51 +14,55 @@ Tests cover:
 - Dead Letter Queue functionality
 """
 
-import pytest
 import time
-from typing import Dict, Any
+
+import pytest
 
 from hiveframe.exceptions import (
-    # Base and enums
-    HiveFrameError,
-    ErrorSeverity,
-    ErrorCategory,
-    # Transient errors
-    TransientError,
-    NetworkError,
-    TimeoutError,
-    RateLimitError,
-    ConnectionError as HiveConnectionError,
-    # Data errors
-    DataError,
-    ValidationError,
-    SchemaError,
-    ParseError,
-    EncodingError,
-    NullValueError,
-    # Resource errors
-    ResourceError,
-    MemoryError as HiveMemoryError,
-    DiskSpaceError,
-    ConnectionPoolExhausted,
-    WorkerExhausted,
+    AggregationError,
+    CircuitOpenError,
     # Configuration errors
     ConfigurationError,
-    InvalidParameterError,
-    MissingConfigError,
-    # Dependency errors
-    DependencyError,
-    ServiceUnavailable,
-    CircuitOpenError,
-    UpstreamError,
-    # Processing errors
-    ProcessingError,
-    TransformError,
-    AggregationError,
-    JoinError,
+    ConnectionPoolExhausted,
+    # Data errors
+    DataError,
+    DeadLetterQueue,
     # DLQ
     DeadLetterRecord,
-    DeadLetterQueue,
+    # Dependency errors
+    DependencyError,
+    DiskSpaceError,
+    EncodingError,
+    ErrorCategory,
+    ErrorSeverity,
+    # Base and enums
+    HiveFrameError,
+    InvalidParameterError,
+    JoinError,
+    MissingConfigError,
+    NetworkError,
+    NullValueError,
+    ParseError,
+    # Processing errors
+    ProcessingError,
+    RateLimitError,
+    # Resource errors
+    ResourceError,
+    SchemaError,
+    ServiceUnavailable,
+    TimeoutError,
+    TransformError,
+    # Transient errors
+    TransientError,
+    UpstreamError,
+    ValidationError,
+    WorkerExhausted,
+)
+from hiveframe.exceptions import (
+    ConnectionError as HiveConnectionError,
+)
+from hiveframe.exceptions import (
+    MemoryError as HiveMemoryError,
 )
 
 # ============================================================================
@@ -108,7 +112,7 @@ class TestHiveFrameError:
 
         assert error.severity == ErrorSeverity.ERROR
         assert error.category == ErrorCategory.INTERNAL
-        assert error.retryable == False
+        assert not error.retryable
 
     def test_custom_values(self):
         """Test custom severity and category."""
@@ -121,7 +125,7 @@ class TestHiveFrameError:
 
         assert error.severity == ErrorSeverity.CRITICAL
         assert error.category == ErrorCategory.RESOURCE
-        assert error.retryable == True
+        assert error.retryable
 
     def test_details(self):
         """Test error details dictionary."""
@@ -161,7 +165,7 @@ class TestHiveFrameError:
         assert data["message"] == "Test error"
         assert data["severity"] == "WARNING"
         assert data["category"] == "DATA_QUALITY"
-        assert data["retryable"] == True
+        assert data["retryable"]
         assert data["details"]["field"] == "name"
         assert "timestamp" in data
 
@@ -186,7 +190,7 @@ class TestTransientErrors:
         error = TransientError("Temporary failure")
 
         assert error.category == ErrorCategory.TRANSIENT
-        assert error.retryable == True
+        assert error.retryable
         assert error.retry_after == 1.0
         assert error.max_retries == 3
 
@@ -202,7 +206,7 @@ class TestTransientErrors:
         error = NetworkError("Connection refused", endpoint="https://api.example.com")
 
         assert error.details["endpoint"] == "https://api.example.com"
-        assert error.retryable == True
+        assert error.retryable
 
     def test_timeout_error(self):
         """Test TimeoutError."""
@@ -250,7 +254,7 @@ class TestDataErrors:
         assert error.details["field"] == "age"
         assert error.details["expected"] == "positive integer"
         assert error.details["actual"] == "-5"
-        assert error.retryable == False
+        assert not error.retryable
 
     def test_schema_error(self):
         """Test SchemaError."""
@@ -309,7 +313,7 @@ class TestResourceErrors:
 
         assert error.details["required_bytes"] == 1073741824
         assert error.details["available_bytes"] == 536870912
-        assert error.retryable == True
+        assert error.retryable
 
     def test_disk_space_error(self):
         """Test DiskSpaceError."""
@@ -323,7 +327,7 @@ class TestResourceErrors:
         error = ConnectionPoolExhausted("No connections available", pool_size=10)
 
         assert error.details["pool_size"] == 10
-        assert error.retryable == True
+        assert error.retryable
 
     def test_worker_exhausted(self):
         """Test WorkerExhausted."""
@@ -347,7 +351,7 @@ class TestConfigurationErrors:
 
         assert error.category == ErrorCategory.CONFIGURATION
         assert error.severity == ErrorSeverity.FATAL
-        assert error.retryable == False
+        assert not error.retryable
 
     def test_invalid_parameter(self):
         """Test InvalidParameterError."""
@@ -391,7 +395,7 @@ class TestDependencyErrors:
 
         assert error.details["service_name"] == "payment-api"
         assert error.details["endpoint"] == "https://payments.example.com"
-        assert error.retryable == True
+        assert error.retryable
 
     def test_circuit_open(self):
         """Test CircuitOpenError."""
@@ -399,7 +403,7 @@ class TestDependencyErrors:
 
         assert error.details["service_name"] == "database"
         assert error.details["reset_time"] == 30.0
-        assert error.retryable == True
+        assert error.retryable
 
     def test_upstream_error(self):
         """Test UpstreamError."""
@@ -534,7 +538,7 @@ class TestDeadLetterQueue:
 
         result = dlq.push(record)
 
-        assert result == True
+        assert result
         assert dlq.get_stats()["size"] == 1
 
     def test_push_full_queue(self):
@@ -554,9 +558,9 @@ class TestDeadLetterQueue:
             result = dlq.push(record)
 
             if i < 2:
-                assert result == True
+                assert result
             else:
-                assert result == False
+                assert not result
 
     def test_pop_record(self):
         """Test popping records from DLQ."""
@@ -665,11 +669,11 @@ class TestDeadLetterQueue:
         # Add different error types
         types = [ValidationError, ParseError, ValidationError, SchemaError]
 
-        for i, ErrorClass in enumerate(types):
-            if ErrorClass == ValidationError:
-                error = ErrorClass(f"Error {i}", field="test")
+        for i, error_class in enumerate(types):
+            if error_class == ValidationError:
+                error = error_class(f"Error {i}", field="test")
             else:
-                error = ErrorClass(f"Error {i}")
+                error = error_class(f"Error {i}")
 
             record = DeadLetterRecord(
                 original_data={"id": i},
@@ -741,7 +745,7 @@ class TestExceptionHierarchy:
         ]
 
         for exc in transient_errors:
-            assert exc.retryable == True
+            assert exc.retryable
             assert exc.category == ErrorCategory.TRANSIENT
 
 

@@ -12,23 +12,17 @@ Scenarios:
 6. Extreme values (very large, very small, special floats)
 """
 
-import time
-import random
-import json
-from typing import Any, Dict, List, Optional, Tuple
-from dataclasses import dataclass, field
 import math
+import random
+import time
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
-from ..core import HiveFrame, ColonyState
-from ..dataframe import HiveDataFrame, DataType, Schema, ColumnDef
 from ..exceptions import (
-    ValidationError,
-    SchemaError,
-    ParseError,
-    EncodingError,
-    NullValueError,
     DeadLetterQueue,
     DeadLetterRecord,
+    NullValueError,
+    ValidationError,
 )
 from ..monitoring import get_logger, get_profiler
 
@@ -168,25 +162,27 @@ class DataQualityValidator:
         validated = {}
         corrections = []
 
-        for field, expected_type in self.schema.items():
-            value = record.get(field)
+        for field_name, expected_type in self.schema.items():
+            value = record.get(field_name)
 
             try:
-                validated_value, was_corrected = self.validate_type(value, expected_type, field)
-                validated[field] = validated_value
+                validated_value, was_corrected = self.validate_type(
+                    value, expected_type, field_name
+                )
+                validated[field_name] = validated_value
 
                 if was_corrected:
-                    corrections.append(f"{field}: {type(value).__name__} -> {expected_type}")
-                    self._record_issue(f"type_coercion:{field}")
+                    corrections.append(f"{field_name}: {type(value).__name__} -> {expected_type}")
+                    self._record_issue(f"type_coercion:{field_name}")
 
-            except ValidationError as e:
-                self._record_issue(f"validation_error:{field}")
+            except ValidationError:
+                self._record_issue(f"validation_error:{field_name}")
                 raise
 
         # Copy any extra fields not in schema
-        for field, value in record.items():
-            if field not in validated:
-                validated[field] = value
+        for field_key, value in record.items():
+            if field_key not in validated:
+                validated[field_key] = value
 
         return validated, corrections
 
@@ -507,16 +503,16 @@ def run_null_handling_scenario(num_records: int = 1000) -> DataQualityResult:
         valid = True
 
         # Check for various null patterns
-        for field, expected_type in schema.items():
-            value = record.get(field)
+        for field_name, expected_type in schema.items():
+            value = record.get(field_name)
 
             # Missing key
-            if field not in record:
+            if field_name not in record:
                 issues["missing_key"] += 1
-                if field == "required_field":
+                if field_name == "required_field":
                     valid = False
                 else:
-                    corrections.append(f"{field}: added default")
+                    corrections.append(f"{field_name}: added default")
                 continue
 
             # Explicit None
@@ -662,7 +658,7 @@ def run_unicode_encoding_scenario(num_records: int = 500) -> DataQualityResult:
                     scripts.add("Hebrew")
                 elif "LATIN" in name or char.isascii():
                     scripts.add("Latin")
-            except:
+            except Exception:
                 pass
 
         if len(scripts) > 1:

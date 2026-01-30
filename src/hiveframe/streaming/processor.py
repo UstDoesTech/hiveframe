@@ -5,19 +5,18 @@ Production-grade stream processor with windowing, watermarks,
 and delivery guarantees.
 """
 
-import time
 import threading
+import time
 from collections import deque
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generic, List, Optional, Tuple, TypeVar
 
 from ..core import ColonyState
-
-from .core import StreamRecord, StreamBuffer, StreamPartitioner
-from .windows import Window, WindowAssigner, TumblingWindowAssigner
-from .watermarks import Watermark, WatermarkGenerator, BoundedOutOfOrdernessWatermarkGenerator
+from .core import StreamBuffer, StreamPartitioner, StreamRecord
+from .delivery import DeliveryGuarantee, IdempotencyStore, ProcessingContext
 from .state import Checkpoint, InMemoryStateBackend
-from .delivery import DeliveryGuarantee, ProcessingContext, IdempotencyStore
+from .watermarks import BoundedOutOfOrdernessWatermarkGenerator, Watermark, WatermarkGenerator
+from .windows import TumblingWindowAssigner, Window, WindowAssigner
 
 # Optional monitoring - use dependency injection for better decoupling
 if TYPE_CHECKING:
@@ -202,7 +201,6 @@ class EnhancedStreamProcessor:
         # Assign to windows
         windows = self.window_assigner.assign_windows(record.timestamp)
 
-        results = []
         with self._window_lock:
             for window in windows:
                 state_key = (record.key, window)
@@ -243,7 +241,6 @@ class EnhancedStreamProcessor:
         if watermark.timestamp <= self._current_watermark.timestamp:
             return []
 
-        old_watermark = self._current_watermark
         self._current_watermark = watermark
 
         triggered = []

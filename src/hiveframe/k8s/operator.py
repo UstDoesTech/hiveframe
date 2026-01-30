@@ -5,13 +5,13 @@ HiveFrame Kubernetes Operator
 Operator for managing HiveFrame clusters on Kubernetes.
 """
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
 import json
 import subprocess
 import time
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
-from .cluster import HiveCluster, ClusterStatus, ClusterPhase
+from .cluster import ClusterPhase, ClusterStatus, HiveCluster
 from .manifests import generate_crd, generate_rbac, to_yaml
 
 
@@ -444,7 +444,7 @@ class HiveOperator:
 
         result = self._kubectl(
             "logs",
-            f"-l",
+            "-l",
             f"app.kubernetes.io/instance={name}",
             "-n",
             namespace,

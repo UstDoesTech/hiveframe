@@ -7,27 +7,27 @@ Tests cover:
 - Storage formats and options
 """
 
-import pytest
-import tempfile
 import os
-from typing import List, Dict, Any
+import tempfile
 from pathlib import Path
+from typing import Any, Dict, List
+
+import pytest
 
 from hiveframe import HiveDataFrame
 from hiveframe.storage import (
-    ParquetReader,
-    ParquetWriter,
-    ParquetSchema,
-    read_parquet,
-    write_parquet,
-    DeltaTable,
-    DeltaTransaction,
-    DeltaLog,
-    read_delta,
-    write_delta,
-    FileFormat,
-    StorageOptions,
     CompressionCodec,
+    DeltaLog,
+    DeltaTable,
+    FileFormat,
+    ParquetReader,
+    ParquetSchema,
+    ParquetWriter,
+    StorageOptions,
+    read_delta,
+    read_parquet,
+    write_delta,
+    write_parquet,
 )
 
 
@@ -39,8 +39,8 @@ class TestStorageOptions:
         options = StorageOptions()
 
         assert options.compression == CompressionCodec.SNAPPY
-        assert options.predicate_pushdown == True
-        assert options.column_pruning == True
+        assert options.predicate_pushdown
+        assert options.column_pruning
 
     def test_custom_options(self):
         """Test custom storage options."""

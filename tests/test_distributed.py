@@ -8,41 +8,31 @@ Tests cover:
 - Locality-aware Scheduling
 """
 
+
 import pytest
-import time
-import threading
-from typing import List, Dict, Any
 
 from hiveframe.distributed import (
-    # Federation
-    HiveFederation,
-    FederatedHive,
-    FederationCoordinator,
-    HiveRegistry,
-    FederationProtocol,
-    HiveHealth,
     # Partitioning
     AdaptivePartitioner,
-    PartitionStrategy,
-    PartitionState,
-    FitnessPartitioner,
-    PartitionSplitter,
-    PartitionMerger,
-    # Speculative Execution
-    SpeculativeExecutor,
-    SpeculativeConfig,
-    TaskTracker,
-    SlowTaskDetector,
+    FederatedHive,
+    HiveFederation,
+    HiveHealth,
+    HiveRegistry,
     # Locality
     LocalityAwareScheduler,
-    DataLocality,
     LocalityLevel,
-    LocalityHint,
+    PartitionSplitter,
+    PartitionState,
+    PartitionStrategy,
+    SpeculativeConfig,
+    # Speculative Execution
+    SpeculativeExecutor,
+    TaskTracker,
 )
+from hiveframe.distributed.locality import NetworkTopology
 
 # Import Partition directly for tests
 from hiveframe.distributed.partitioning import Partition
-from hiveframe.distributed.locality import NetworkTopology
 from hiveframe.distributed.speculative import TaskState
 
 

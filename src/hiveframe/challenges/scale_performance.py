@@ -11,17 +11,16 @@ Scenarios:
 5. Sustained high-load operation
 """
 
-import time
-import random
-import threading
 import gc
-from typing import Any, Dict, List, Tuple
-from dataclasses import dataclass, field
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import random
 import statistics
+import threading
+import time
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
 
-from ..core import HiveFrame, ColonyState, Bee, BeeRole, FoodSource
-from ..monitoring import get_logger, get_registry, get_profiler, Histogram, Counter, Gauge
+from ..core import ColonyState, HiveFrame
+from ..monitoring import get_logger, get_profiler, get_registry
 
 logger = get_logger("challenge.scale")
 metrics = get_registry()
@@ -170,7 +169,6 @@ def run_throughput_scaling_scenario(
         memory_tracker.start()
 
         successful = 0
-        failed = 0
         backpressure_events = [0]
 
         def process_item(item: Dict) -> Dict:
@@ -192,11 +190,9 @@ def run_throughput_scaling_scenario(
         try:
             results_data = hive.process(data, lambda item: (process_item(item), 1.0))
             successful = len([r for r in results_data.values() if r is not None])
-            failed = current_size - successful
 
         except Exception as e:
             logger.error(f"Processing failed: {e}")
-            failed = current_size
 
         elapsed = time.time() - start_time
         peak_memory = memory_tracker.stop()
@@ -343,7 +339,6 @@ def run_sustained_load_scenario(
         "Starting sustained load scenario", rps=records_per_second, duration=duration_seconds
     )
 
-    total_records = records_per_second * duration_seconds
     latency_tracker = LatencyTracker()
     memory_tracker = MemoryTracker()
 
@@ -363,7 +358,6 @@ def run_sustained_load_scenario(
         latency_tracker.record(time.perf_counter() - start)
         return result
 
-    hive = HiveFrame(num_workers=num_workers)
     colony = ColonyState()
 
     memory_tracker.start()
@@ -382,7 +376,7 @@ def run_sustained_load_scenario(
         # Process batch
         for record in batch:
             try:
-                result = process_record(record)
+                process_record(record)
                 successful[0] += 1
                 records_since_sample += 1
             except Exception:

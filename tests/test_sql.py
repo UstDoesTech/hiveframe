@@ -8,15 +8,16 @@ Tests cover:
 - Common SQL operations
 """
 
+from typing import Any, Dict, List
+
 import pytest
-from typing import List, Dict, Any
 
 from hiveframe import HiveDataFrame
 from hiveframe.sql import (
-    SwarmQLContext,
+    SQLCatalog,
     SQLParser,
     SQLTokenizer,
-    SQLCatalog,
+    SwarmQLContext,
 )
 
 
@@ -115,7 +116,7 @@ class TestSQLParser:
         stmt = parser.parse()
 
         assert len(stmt.order_by) == 1
-        assert stmt.order_by[0].ascending == False
+        assert not stmt.order_by[0].ascending
 
     def test_parse_limit(self):
         """Test parsing LIMIT."""

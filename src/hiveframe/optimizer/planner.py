@@ -6,20 +6,17 @@ Main query optimizer that combines rule-based and cost-based optimization
 using bee-inspired swarm intelligence.
 """
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set
 import random
-import math
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional
 
+from .cost import CostEstimate, CostModel, Statistics, SwarmCostModel
 from .rules import (
-    PlanNode,
     NodeType,
     OptimizationRule,
+    PlanNode,
     get_default_rules,
-    PredicatePushdown,
-    ProjectionPruning,
 )
-from .cost import CostModel, SwarmCostModel, CostEstimate, Statistics
 
 
 @dataclass

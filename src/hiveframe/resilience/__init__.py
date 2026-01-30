@@ -11,29 +11,25 @@ Provides:
 - Combined resilient executor
 """
 
-from .retry import (
-    BackoffStrategy,
-    RetryPolicy,
-    RetryState,
-    RetryContext,
-    with_retry,
-)
-
+from .bulkhead import Bulkhead
 from .circuit_breaker import (
-    CircuitState,
-    CircuitBreakerConfig,
     CircuitBreaker,
+    CircuitBreakerConfig,
+    CircuitState,
     with_circuit_breaker,
 )
-
-from .bulkhead import Bulkhead
-
+from .executor import ResilientExecutor
+from .retry import (
+    BackoffStrategy,
+    RetryContext,
+    RetryPolicy,
+    RetryState,
+    with_retry,
+)
 from .timeout import (
     TimeoutWrapper,
     with_timeout,
 )
-
-from .executor import ResilientExecutor
 
 __all__ = [
     # Retry

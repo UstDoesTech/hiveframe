@@ -10,23 +10,20 @@ pyarrow is not available, with full functionality when pyarrow
 is installed.
 """
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Union, Iterator
 import json
-import struct
 import os
-from pathlib import Path
+from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 from ..dataframe import HiveDataFrame
-from ..dataframe.schema import Schema, DataType
+from ..dataframe.schema import DataType, Schema
 from .formats import (
-    FileFormat,
     CompressionCodec,
-    StorageOptions,
-    PartitionSpec,
+    FileFormat,
     FileMetadata,
-    ColumnStats,
+    StorageOptions,
 )
 
 

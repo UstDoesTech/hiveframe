@@ -10,25 +10,19 @@ Tests cover:
 - Schema inference and validation
 """
 
+from typing import Any, Dict, List
+
 import pytest
-from typing import List, Dict, Any
 
 from hiveframe import (
     HiveDataFrame,
-    Column,
-    col,
-    lit,
-    Schema,
-    DataType,
-    GroupedData,
-    sum_agg,
     avg,
+    col,
     count,
-    count_all,
-    min_agg,
+    lit,
     max_agg,
-    collect_list,
-    collect_set,
+    min_agg,
+    sum_agg,
 )
 
 
@@ -78,10 +72,10 @@ class TestColumnOperations:
 
     def test_lit_creation(self):
         """Test creating literal column."""
-        l = lit(42)
+        literal_col = lit(42)
 
         # Literal should evaluate to the constant value
-        result = l.eval({})
+        result = literal_col.eval({})
         assert result == 42
 
     def test_column_comparison_eq(self):
@@ -89,16 +83,16 @@ class TestColumnOperations:
         c = col("status")
         expr = c == "active"
 
-        assert expr.eval({"status": "active"}) == True
-        assert expr.eval({"status": "inactive"}) == False
+        assert expr.eval({"status": "active"})
+        assert not expr.eval({"status": "inactive"})
 
     def test_column_comparison_gt(self):
         """Test column greater-than comparison."""
         c = col("age")
         expr = c > 25
 
-        assert expr.eval({"age": 30}) == True
-        assert expr.eval({"age": 20}) == False
+        assert expr.eval({"age": 30})
+        assert not expr.eval({"age": 20})
 
     def test_column_arithmetic(self):
         """Test column arithmetic operations."""

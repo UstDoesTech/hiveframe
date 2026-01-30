@@ -4,16 +4,16 @@ HiveFrame Messaging
 File watching and message queue implementations.
 """
 
-import time
 import threading
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from queue import Empty, Queue
 from typing import Any, Dict, Generator, List, Optional
-from queue import Queue, Empty
 
-from .sources import DataSource
-from .sinks import DataSink
 from ..exceptions import ConfigurationError
+from .sinks import DataSink
+from .sources import DataSource
 
 # ============================================================================
 # File Watcher for Incremental Processing

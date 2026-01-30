@@ -7,19 +7,19 @@ These functions wrap the unified aggregation framework for use with
 DataFrame's Column-based API.
 """
 
-from typing import Any, Callable, Dict, List
+from typing import Any, Dict, List
 
-from .columns import Column
 from ..aggregations import (
     Aggregator,
-    CountAggregator,
-    SumAggregator,
     AvgAggregator,
-    MinAggregator,
-    MaxAggregator,
     CollectListAggregator,
     CollectSetAggregator,
+    CountAggregator,
+    MaxAggregator,
+    MinAggregator,
+    SumAggregator,
 )
+from .columns import Column
 
 
 class AggFunc:

@@ -27,21 +27,21 @@ Usage:
 """
 
 from .cluster import (
-    HiveCluster,
-    WorkerSpec,
-    ResourceRequirements,
-    ClusterStatus,
     ClusterPhase,
+    ClusterStatus,
+    HiveCluster,
+    ResourceRequirements,
+    WorkerSpec,
+)
+from .manifests import (
+    generate_configmap,
+    generate_crd,
+    generate_deployment,
+    generate_service,
 )
 from .operator import (
     HiveOperator,
     OperatorConfig,
-)
-from .manifests import (
-    generate_deployment,
-    generate_service,
-    generate_configmap,
-    generate_crd,
 )
 
 __all__ = [

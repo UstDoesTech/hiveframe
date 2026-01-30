@@ -6,8 +6,8 @@ UI components for the Colony Dashboard.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 
 @dataclass

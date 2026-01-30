@@ -14,8 +14,8 @@ import threading
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, Generic, List, TypeVar
 from enum import Enum, auto
+from typing import Any, Dict, Generic, List, TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")

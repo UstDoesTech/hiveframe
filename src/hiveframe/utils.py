@@ -9,8 +9,7 @@ import time
 import warnings
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Optional, TypeVar, Protocol, runtime_checkable
+from typing import Any, Dict, Optional, Protocol, TypeVar, runtime_checkable
 
 T = TypeVar("T")
 R = TypeVar("R")

@@ -16,34 +16,34 @@ This module is part of Phase 2: Swarm Intelligence.
 """
 
 from .federation import (
-    HiveFederation,
     FederatedHive,
     FederationCoordinator,
-    HiveRegistry,
     FederationProtocol,
+    HiveFederation,
     HiveHealth,
+    HiveRegistry,
+)
+from .locality import (
+    CrossDatacenterManager,
+    DataLocality,
+    LocalityAwareScheduler,
+    LocalityHint,
+    LocalityLevel,
 )
 from .partitioning import (
     AdaptivePartitioner,
-    PartitionStrategy,
-    PartitionState,
     FitnessPartitioner,
-    PartitionSplitter,
     PartitionMerger,
+    PartitionSplitter,
+    PartitionState,
+    PartitionStrategy,
 )
 from .speculative import (
-    SpeculativeExecutor,
     ScoutTaskRunner,
-    TaskTracker,
     SlowTaskDetector,
     SpeculativeConfig,
-)
-from .locality import (
-    LocalityAwareScheduler,
-    DataLocality,
-    LocalityLevel,
-    LocalityHint,
-    CrossDatacenterManager,
+    SpeculativeExecutor,
+    TaskTracker,
 )
 
 __all__ = [

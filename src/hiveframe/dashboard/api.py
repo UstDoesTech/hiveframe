@@ -5,20 +5,20 @@ Dashboard API
 REST API endpoints for the Colony Dashboard.
 """
 
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Callable
-from datetime import datetime
 import json
 import uuid
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, Callable, Dict, Optional
 
 from .components import (
     ColonyMetricsPanel,
-    WorkerStatusPanel,
     DanceFloorPanel,
-    QueryHistoryPanel,
-    WorkerInfo,
     DanceInfo,
+    QueryHistoryPanel,
     QueryInfo,
+    WorkerInfo,
+    WorkerStatusPanel,
 )
 
 

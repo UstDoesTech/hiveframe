@@ -5,8 +5,8 @@ Timeout enforcement for operations.
 """
 
 import threading
-from typing import Callable, TypeVar
 from functools import wraps
+from typing import Callable, TypeVar
 
 from ..exceptions import TimeoutError as HiveTimeoutError
 

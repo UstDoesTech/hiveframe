@@ -12,22 +12,19 @@ Tests cover:
 - Metrics collection on connectors
 """
 
-import pytest
 import json
 import tempfile
-import os
 from pathlib import Path
-from typing import Dict, Any, List
+
+import pytest
 
 from hiveframe.connectors import (
-    DataSource,
-    DataSink,
-    CSVSource,
-    JSONSource,
-    JSONLSource,
-    JSONLSink,
     CSVSink,
+    CSVSource,
     HTTPSource,
+    JSONLSink,
+    JSONLSource,
+    JSONSource,
     MessageBroker,
     # MessageProducer, MessageConsumer,  # Not yet implemented
     # ChangeDataCaptureSource, CDCEvent  # Not yet implemented
@@ -36,8 +33,6 @@ from hiveframe.exceptions import (
     ConfigurationError,
     DataError,
     ParseError,
-    RateLimitError,
-    NetworkError,
 )
 
 # ============================================================================
@@ -195,11 +190,11 @@ class TestCSVSource:
 
         assert metrics["records_read"] == 3
         assert metrics["errors"] == 0
-        assert metrics["is_open"] == True  # Still True during context manager
+        assert metrics["is_open"]  # Still True during context manager
 
         # Check that it's closed after context manager
         metrics_after = source.get_metrics()
-        assert metrics_after["is_open"] == False
+        assert not metrics_after["is_open"]
 
     def test_csv_context_manager(self, sample_csv_file):
         """Test CSV source context manager properly closes."""

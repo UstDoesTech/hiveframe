@@ -5,11 +5,10 @@ Robust error handling with categorized exceptions for retry logic,
 dead letter queues, and graceful degradation.
 """
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, List
-from enum import Enum, auto
 import time
 import traceback
+from enum import Enum, auto
+from typing import Any, Dict, List, Optional
 
 
 class ErrorSeverity(Enum):

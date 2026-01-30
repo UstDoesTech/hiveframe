@@ -6,12 +6,12 @@ Bee-inspired cost estimation for query optimization.
 Uses fitness functions instead of traditional cost models.
 """
 
+import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
-import math
 
-from .rules import PlanNode, NodeType
+from .rules import NodeType, PlanNode
 
 
 @dataclass

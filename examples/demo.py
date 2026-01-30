@@ -9,48 +9,39 @@ and compares performance to traditional approaches.
 Run: python demo.py
 """
 
-import sys
 import os
-import time
 import random
-import statistics
-from typing import List, Dict, Any
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import json
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, List
 
 # Add parent to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from hiveframe import (
-    HiveFrame,
     HiveDataFrame,
     HiveStream,
-    col,
-    lit,
-    sum_agg,
     avg,
+    col,
     count,
-    max_agg,
-    min_agg,
     create_hive,
-    BeeRole,
+    max_agg,
+    sum_agg,
 )
 
 # SQL support
 from hiveframe.sql import SwarmQLContext
 
 # Storage support
-from hiveframe.storage import read_parquet, write_parquet, DeltaTable
-
 # Advanced streaming
 from hiveframe.streaming import (
-    sliding_window,
-    session_window,
-    tumbling_window,
-    bounded_watermark,
     DeliveryGuarantee,
     EnhancedStreamProcessor,
     StreamRecord,
+    bounded_watermark,
+    sliding_window,
+    tumbling_window,
 )
 
 
@@ -96,10 +87,10 @@ def demo_core_api():
 
     # Create a hive with 8 workers
     hive = create_hive(num_workers=8)
-    print(f"Created HiveFrame with 8 workers")
-    print(f"  - Employed bees: 50% (exploit assigned partitions)")
-    print(f"  - Onlooker bees: 40% (reinforce quality solutions)")
-    print(f"  - Scout bees: 10% (explore new territory)")
+    print("Created HiveFrame with 8 workers")
+    print("  - Employed bees: 50% (exploit assigned partitions)")
+    print("  - Onlooker bees: 40% (reinforce quality solutions)")
+    print("  - Scout bees: 10% (explore new territory)")
 
     # Sample data
     data = list(range(100))
@@ -347,13 +338,13 @@ def benchmark_comparison():
 
         # Traditional
         start = time.time()
-        trad_result = traditional_map(data, heavy_transform, num_workers)
+        traditional_map(data, heavy_transform, num_workers)
         trad_time = time.time() - start
         print(f"  Traditional ThreadPool: {trad_time:.4f}s")
 
         # HiveFrame
         start = time.time()
-        hive_result = hive.map(data, heavy_transform)
+        hive.map(data, heavy_transform)
         hive_time = time.time() - start
         print(f"  HiveFrame:              {hive_time:.4f}s")
 
@@ -372,7 +363,8 @@ def benchmark_comparison():
 
         print_subheader("FILTER Operation")
 
-        predicate = lambda x: x % 3 == 0
+        def predicate(x):
+            return x % 3 == 0
 
         # Traditional
         start = time.time()
@@ -403,13 +395,16 @@ def benchmark_comparison():
     print_header("Benchmark Summary")
 
     print(
-        f"{'Size':>10} | {'Operation':>10} | {'Traditional':>12} | {'HiveFrame':>12} | {'Speedup':>8}"
+        f"{'Size':>10} | {'Operation':>10} | {'Traditional':>12} | "
+        f"{'HiveFrame':>12} | {'Speedup':>8}"
     )
     print("-" * 60)
 
     for r in results_table:
         print(
-            f"{r['size']:>10,} | {r['operation']:>10} | {r['traditional']:>12.4f}s | {r['hiveframe']:>12.4f}s | {r['speedup']:>7.2f}x"
+            f"{r['size']:>10,} | {r['operation']:>10} | "
+            f"{r['traditional']:>12.4f}s | {r['hiveframe']:>12.4f}s | "
+            f"{r['speedup']:>7.2f}x"
         )
 
     print("\nNote: HiveFrame's advantage increases with:")
@@ -427,11 +422,10 @@ def demo_colony_behavior():
     """Demonstrate the bee colony behavior in action."""
     print_header("DEMO 5: Colony Behavior Visualization")
 
-    from hiveframe.core import ColonyState, Bee, BeeRole, DanceFloor
+    from hiveframe.core import Bee, BeeRole, ColonyState
 
     # Create a colony
     colony = ColonyState(abandonment_limit=5)
-    dance_floor = colony.dance_floor
 
     print("Creating colony with food sources (data partitions)...")
 
@@ -459,9 +453,9 @@ def demo_colony_behavior():
         bees.append(Bee(f"scout_{i}", BeeRole.SCOUT, colony, process_fn))
 
     print(f"\nColony composition: {len(bees)} bees")
-    print(f"  - Employed: 4 (exploit)")
-    print(f"  - Onlooker: 3 (reinforce)")
-    print(f"  - Scout: 1 (explore)")
+    print("  - Employed: 4 (exploit)")
+    print("  - Onlooker: 3 (reinforce)")
+    print("  - Scout: 1 (explore)")
 
     for cycle in range(5):
         print(f"\n--- Cycle {cycle + 1} ---")
@@ -546,8 +540,8 @@ def demo_sql_engine():
 
     print_subheader("Aggregation Query")
     result = ctx.sql("""
-        SELECT city, COUNT(*) as user_count, AVG(age) as avg_age 
-        FROM users 
+        SELECT city, COUNT(*) as user_count, AVG(age) as avg_age
+        FROM users
         GROUP BY city
     """)
     result.show()
@@ -698,7 +692,7 @@ def demo_advanced_streaming():
         processor.process_record(record, aggregator=lambda acc, v: acc + 1, initial_value=0)
 
     metrics = processor.get_metrics()
-    print(f"\nStream Metrics:")
+    print("\nStream Metrics:")
     print(f"  Records processed: {metrics['records_processed']}")
     print(f"  Late records: {metrics['late_records']}")
     print(f"  Active windows: {metrics['active_windows']}")
@@ -724,7 +718,8 @@ def demo_advanced_streaming():
     sliding_metrics = sliding_processor.get_metrics()
     print(f"Sliding window processed: {sliding_metrics['records_processed']} records")
     print(
-        f"Exactly-once guarantee active: {sliding_processor.delivery_guarantee == DeliveryGuarantee.EXACTLY_ONCE}"
+        f"Exactly-once guarantee active: "
+        f"{sliding_processor.delivery_guarantee == DeliveryGuarantee.EXACTLY_ONCE}"
     )
 
 

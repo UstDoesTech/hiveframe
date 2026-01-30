@@ -4,12 +4,12 @@ HiveFrame Resilience - Circuit Breaker
 Circuit breaker pattern for cascading failure prevention.
 """
 
-import time
 import threading
+import time
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional, TypeVar
 from enum import Enum, auto
 from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, TypeVar
 
 from ..exceptions import CircuitOpenError
 
@@ -89,7 +89,7 @@ class CircuitBreaker:
         for listener in self._listeners:
             try:
                 listener(old_state, new_state)
-            except:
+            except Exception:
                 pass
 
     def add_state_listener(self, listener: Callable[[CircuitState, CircuitState], None]) -> None:
@@ -150,7 +150,7 @@ class CircuitBreaker:
             result = func(*args, **kwargs)
             self.record_success()
             return result
-        except Exception as e:
+        except Exception:
             self.record_failure()
             raise
 

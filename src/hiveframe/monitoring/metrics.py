@@ -11,15 +11,14 @@ Provides:
 - MetricsRegistry: Central registry for all metrics
 """
 
-import time
 import threading
-import statistics
+import time
 from abc import ABC, abstractmethod
 from collections import defaultdict, deque
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
-from enum import Enum, auto
 from contextlib import contextmanager
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Any, Dict, List, Optional
 
 
 class MetricType(Enum):

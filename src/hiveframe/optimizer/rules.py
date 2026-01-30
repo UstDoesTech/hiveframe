@@ -7,8 +7,8 @@ Rule-based transformations for query plan optimization.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
 from enum import Enum, auto
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 
 class NodeType(Enum):
