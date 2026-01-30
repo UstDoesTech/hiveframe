@@ -4,12 +4,11 @@ HiveFrame Dead Letter Queue
 Storage and management of failed records for debugging and reprocessing.
 """
 
-import threading
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
 import time
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from .utils import ThreadSafeMixin, Monitorable
+from .utils import Monitorable, ThreadSafeMixin
 
 # Forward reference to avoid circular import
 if TYPE_CHECKING:

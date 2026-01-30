@@ -12,23 +12,17 @@ Scenarios:
 6. Extreme values (very large, very small, special floats)
 """
 
-import time
-import random
-import json
-from typing import Any, Dict, List, Optional, Tuple
-from dataclasses import dataclass, field
 import math
+import random
+import time
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
 
-from ..core import HiveFrame, ColonyState
-from ..dataframe import HiveDataFrame, DataType, Schema, ColumnDef
 from ..exceptions import (
-    ValidationError,
-    SchemaError,
-    ParseError,
-    EncodingError,
-    NullValueError,
     DeadLetterQueue,
     DeadLetterRecord,
+    NullValueError,
+    ValidationError,
 )
 from ..monitoring import get_logger, get_profiler
 
@@ -179,7 +173,7 @@ class DataQualityValidator:
                     corrections.append(f"{field}: {type(value).__name__} -> {expected_type}")
                     self._record_issue(f"type_coercion:{field}")
 
-            except ValidationError as e:
+            except ValidationError:
                 self._record_issue(f"validation_error:{field}")
                 raise
 

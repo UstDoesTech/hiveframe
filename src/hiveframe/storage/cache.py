@@ -12,16 +12,15 @@ Key Concepts:
 - Adaptive Cache Sizing: Cache sizes adjust based on workload
 """
 
-import time
 import hashlib
-import threading
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
-from enum import Enum, auto
-from collections import defaultdict, OrderedDict
 import math
-import heapq
 import random
+import threading
+import time
+from collections import defaultdict
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 
 class EvictionPolicy(Enum):
@@ -66,7 +65,7 @@ class CacheEntry:
     @property
     def fitness(self) -> float:
         """Calculate fitness score for eviction decisions."""
-        age_seconds = time.time() - self.created_at
+        time.time() - self.created_at
         recency_seconds = time.time() - self.last_accessed
 
         # Fitness combines frequency, recency, and pheromone

@@ -15,26 +15,25 @@ Features demonstrated:
 Run: python demo_storage.py
 """
 
-import sys
 import os
-import time
 import random
-import tempfile
 import shutil
-from typing import List, Dict, Any
+import sys
+import tempfile
+import time
 from datetime import datetime
+from typing import Any, Dict, List
 
 # Add parent to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from hiveframe import HiveDataFrame, col
+from hiveframe import HiveDataFrame
 from hiveframe.storage import (
-    read_parquet,
-    write_parquet,
     DeltaTable,
     read_delta,
+    read_parquet,
     write_delta,
-    StorageOptions,
+    write_parquet,
 )
 
 
@@ -148,7 +147,7 @@ def demo_parquet_operations():
 
     finally:
         shutil.rmtree(temp_dir)
-        print(f"\nCleaned up temp directory")
+        print("\nCleaned up temp directory")
 
 
 def demo_delta_table_basics():
@@ -198,13 +197,13 @@ def demo_delta_table_basics():
         elapsed = time.time() - start
 
         df_updated = read_delta(delta_path)
-        print(f"Appended 50 events")
+        print("Appended 50 events")
         print(f"Total records now: {df_updated.count()}")
         print(f"Append time: {elapsed*1000:.2f}ms")
 
     finally:
         shutil.rmtree(temp_dir)
-        print(f"\nCleaned up temp directory")
+        print("\nCleaned up temp directory")
 
 
 def demo_delta_crud():
@@ -262,7 +261,7 @@ def demo_delta_crud():
 
     finally:
         shutil.rmtree(temp_dir)
-        print(f"\nCleaned up temp directory")
+        print("\nCleaned up temp directory")
 
 
 def demo_time_travel():
@@ -345,7 +344,7 @@ def demo_time_travel():
 
     finally:
         shutil.rmtree(temp_dir)
-        print(f"\nCleaned up temp directory")
+        print("\nCleaned up temp directory")
 
 
 def demo_transactions():
@@ -396,7 +395,7 @@ def demo_transactions():
 
     finally:
         shutil.rmtree(temp_dir)
-        print(f"\nCleaned up temp directory")
+        print("\nCleaned up temp directory")
 
 
 def demo_performance():
@@ -449,8 +448,8 @@ def demo_performance():
                 / 1024
             )
 
-            print(f"  Format      | Write (ms) | Read (ms) | Size (KB)")
-            print(f"  ------------|------------|-----------|----------")
+            print("  Format      | Write (ms) | Read (ms) | Size (KB)")
+            print("  ------------|------------|-----------|----------")
             print(
                 f"  Parquet     | {parquet_write*1000:>10.2f} | {parquet_read*1000:>9.2f} | {parquet_size:>8.2f}"
             )
@@ -460,7 +459,7 @@ def demo_performance():
 
     finally:
         shutil.rmtree(temp_dir)
-        print(f"\nCleaned up temp directory")
+        print("\nCleaned up temp directory")
 
 
 # =============================================================================

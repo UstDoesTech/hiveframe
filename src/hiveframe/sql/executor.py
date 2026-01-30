@@ -6,25 +6,25 @@ Executes SQL statements by converting them to HiveDataFrame operations.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple
 from enum import Enum, auto
+from typing import Any, Dict, List, Optional, Tuple
 
-from ..dataframe import HiveDataFrame, Column, col, lit, GroupedData
-from ..dataframe.aggregations import sum_agg, avg, count, count_all, min_agg, max_agg, collect_list
+from ..dataframe import Column, HiveDataFrame, col, lit
+from ..dataframe.aggregations import avg, count, count_all, max_agg, min_agg, sum_agg
 from .parser import (
-    SQLStatement,
-    Expression,
-    ColumnRef,
-    Literal,
-    FunctionCall,
-    BinaryOp,
-    UnaryOp,
     BetweenExpr,
-    InExpr,
+    BinaryOp,
     CaseExpr,
-    SelectColumn,
+    ColumnRef,
+    Expression,
+    FunctionCall,
+    InExpr,
     JoinClause,
+    Literal,
     OrderByItem,
+    SelectColumn,
+    SQLStatement,
+    UnaryOp,
 )
 
 

@@ -11,30 +11,28 @@ Scenarios:
 5. Poison pill detection and isolation
 """
 
-import time
 import random
 import threading
-from typing import Any, Dict, List, Tuple
-from dataclasses import dataclass, field
+import time
+from dataclasses import dataclass
+from typing import Dict, List
 
-from ..core import HiveFrame, ColonyState, BeeRole
 from ..exceptions import (
-    HiveFrameError,
-    TransientError,
-    ValidationError,
-    ProcessingError,
     DeadLetterQueue,
     DeadLetterRecord,
+    HiveFrameError,
+    ProcessingError,
+    TransientError,
+    ValidationError,
 )
+from ..monitoring import get_logger, get_profiler, get_registry
 from ..resilience import (
-    RetryPolicy,
+    BackoffStrategy,
     CircuitBreaker,
     CircuitBreakerConfig,
-    BackoffStrategy,
+    RetryPolicy,
     with_retry,
-    ResilientExecutor,
 )
-from ..monitoring import get_logger, get_registry, get_profiler
 
 logger = get_logger("challenge.errors")
 metrics = get_registry()
@@ -189,7 +187,6 @@ def run_transient_recovery_scenario(
 
     successful = 0
     failed = 0
-    retries_used = 0
     records = [{"id": f"rec_{i}", "value": i} for i in range(num_records)]
 
     start_time = time.time()
@@ -202,9 +199,9 @@ def run_transient_recovery_scenario(
     for record in records:
         try:
             with profiler.profile("transient_recovery_process"):
-                result = process_with_retry(record)
+                process_with_retry(record)
             successful += 1
-        except HiveFrameError as e:
+        except HiveFrameError:
             failed += 1
             logger.debug("Record failed after retries", record_id=record["id"])
 
@@ -265,7 +262,7 @@ def run_dead_letter_scenario(
         try:
             with profiler.profile("dlq_process"):
                 injector.maybe_inject_error(record["id"])
-                result = {"id": record["id"], "result": record["value"] * 2}
+                {"id": record["id"], "result": record["value"] * 2}
             successful += 1
         except HiveFrameError as e:
             failed += 1
@@ -366,7 +363,7 @@ def run_circuit_breaker_scenario(
     for record in records:
         try:
             with profiler.profile("circuit_breaker_process"):
-                result = circuit.call(risky_operation, record)
+                circuit.call(risky_operation, record)
             successful += 1
         except TransientError:
             failed_by_error += 1
@@ -460,7 +457,7 @@ def run_mixed_error_scenario(num_records: int = 1000) -> ScenarioResult:
                 # Try processing
                 with profiler.profile("mixed_error_process"):
                     injector.maybe_inject_error(record["id"])
-                    result = {"id": record["id"], "result": record["value"] * 2}
+                    {"id": record["id"], "result": record["value"] * 2}
 
                 circuit.record_success()
                 success = True
@@ -557,7 +554,7 @@ def run_poison_pill_scenario(num_records: int = 1000, poison_rate: float = 0.02)
                     raise ValidationError(
                         f"Poison pill: {record['id']}", field="poison", expected=False, actual=True
                     )
-                result = {"id": record["id"], "result": record["value"] * 2}
+                {"id": record["id"], "result": record["value"] * 2}
             successful += 1
 
         except ValidationError as e:

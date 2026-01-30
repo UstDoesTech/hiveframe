@@ -4,9 +4,8 @@ HiveFrame Data Sinks
 Sink implementations for writing data to various destinations.
 """
 
-import json
 import csv
-import time
+import json
 from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Dict, Generic, List, Optional, TypeVar

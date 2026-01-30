@@ -7,21 +7,21 @@ Tests cover:
 - Plan optimization
 """
 
+
 import pytest
-from typing import Dict, Any
 
 from hiveframe.optimizer import (
-    QueryOptimizer,
-    OptimizedPlan,
+    ConstantFolding,
     CostEstimate,
-    SwarmCostModel,
-    Statistics,
+    FilterCombination,
+    OptimizedPlan,
     PredicatePushdown,
     ProjectionPruning,
-    ConstantFolding,
-    FilterCombination,
+    QueryOptimizer,
+    Statistics,
+    SwarmCostModel,
 )
-from hiveframe.optimizer.rules import PlanNode, NodeType
+from hiveframe.optimizer.rules import NodeType, PlanNode
 
 
 class TestOptimizationRules:

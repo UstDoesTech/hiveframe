@@ -7,38 +7,29 @@ Tests cover:
 - Caching Swarm
 """
 
-import pytest
-import tempfile
 import os
+import tempfile
 import time
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+import pytest
 
 from hiveframe.storage import (
-    # HoneyStore
-    HoneyStoreWriter,
-    HoneyStoreReader,
-    HoneyStoreMetadata,
-    write_honeystore,
-    read_honeystore,
-    ColumnMetadata,
-    EncodingType,
-    NectarEncoder,
-    DictionaryEncoder,
-    RLEEncoder,
-    # Iceberg
-    IcebergTable,
-    IcebergSchema,
-    IcebergField,
-    PartitionField,
-    read_iceberg,
-    write_iceberg,
+    CacheEntry,
     # Caching
     CachingSwarm,
+    DictionaryEncoder,
+    HoneyStoreReader,
+    # HoneyStore
+    HoneyStoreWriter,
+    IcebergField,
+    IcebergTable,
+    NectarEncoder,
     PheromoneCache,
-    CacheEntry,
     PheromoneTrail,
-    EvictionPolicy,
-    SwarmPrefetcher,
+    RLEEncoder,
+    read_honeystore,
+    write_honeystore,
 )
 
 
@@ -276,7 +267,7 @@ class TestIcebergField:
 
         assert restored.field_id == 1
         assert restored.name == "test"
-        assert restored.required == True
+        assert restored.required
 
 
 class TestPheromoneCache:

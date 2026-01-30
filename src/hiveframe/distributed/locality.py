@@ -12,14 +12,14 @@ Key Concepts:
 - Adaptive Placement: Learn optimal placement over time
 """
 
-import time
-import threading
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
-from enum import Enum, auto
-from collections import defaultdict
 import math
 import random
+import threading
+import time
+from collections import defaultdict
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class LocalityLevel(Enum):

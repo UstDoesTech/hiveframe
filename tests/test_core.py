@@ -10,19 +10,18 @@ Tests cover:
 - Task distribution and load balancing
 """
 
-import pytest
 import time
-from typing import List, Dict, Any
+
+import pytest
 
 from hiveframe import (
-    HiveFrame,
-    create_hive,
     BeeRole,
     ColonyState,
-    Pheromone,
-    WaggleDance,
     DanceFloor,
     FoodSource,
+    Pheromone,
+    WaggleDance,
+    create_hive,
 )
 
 

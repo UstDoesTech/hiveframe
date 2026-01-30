@@ -7,10 +7,10 @@ Main entry point for SwarmQL SQL engine.
 
 from typing import Any, Dict, List, Optional
 
+from ..core import create_hive
 from ..dataframe import HiveDataFrame
-from ..core import HiveFrame, create_hive
-from .parser import SQLParser, SQLTokenizer, SQLStatement
-from .executor import SQLExecutor, SQLCatalog
+from .executor import SQLCatalog, SQLExecutor
+from .parser import SQLParser, SQLStatement, SQLTokenizer
 
 
 class SwarmQLContext:

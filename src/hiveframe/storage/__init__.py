@@ -17,70 +17,69 @@ Phase 2 Additions:
 - Caching Swarm: Distributed intelligent caching with pheromone trails
 """
 
-from .parquet import (
-    ParquetReader,
-    ParquetWriter,
-    ParquetSchema,
-    read_parquet,
-    write_parquet,
+# Phase 2: Caching Swarm
+from .cache import (
+    CacheEntry,
+    CacheLevel,
+    CacheStatistics,
+    CachingSwarm,
+    DistributedCacheNode,
+    EvictionPolicy,
+    PheromoneCache,
+    PheromoneTrail,
+    SwarmPrefetcher,
 )
 from .delta import (
+    DeltaLog,
     DeltaTable,
     DeltaTransaction,
-    DeltaLog,
     read_delta,
     write_delta,
 )
 from .formats import (
-    FileFormat,
-    StorageOptions,
-    PartitionSpec,
     CompressionCodec,
+    FileFormat,
+    PartitionSpec,
+    StorageOptions,
 )
 
 # Phase 2: HoneyStore native columnar format
 from .honeystore import (
-    HoneyStoreWriter,
-    HoneyStoreReader,
-    HoneyStoreMetadata,
-    HoneycombBlock,
     ColumnMetadata,
-    EncodingType,
-    NectarEncoder,
     DictionaryEncoder,
+    EncodingType,
+    HoneycombBlock,
+    HoneyStoreMetadata,
+    HoneyStoreReader,
+    HoneyStoreWriter,
+    NectarEncoder,
     RLEEncoder,
-    write_honeystore,
     read_honeystore,
+    write_honeystore,
 )
 
 # Phase 2: Apache Iceberg support
 from .iceberg import (
-    IcebergTable,
-    IcebergSchema,
-    IcebergField,
+    DataFile,
     IcebergDataType,
+    IcebergField,
+    IcebergSchema,
+    IcebergTable,
+    ManifestFile,
     PartitionField,
     PartitionTransform,
+    SchemaEvolution,
     Snapshot,
     TableMetadata,
-    ManifestFile,
-    DataFile,
-    SchemaEvolution,
     read_iceberg,
     write_iceberg,
 )
-
-# Phase 2: Caching Swarm
-from .cache import (
-    CachingSwarm,
-    PheromoneCache,
-    CacheEntry,
-    PheromoneTrail,
-    EvictionPolicy,
-    CacheLevel,
-    CacheStatistics,
-    SwarmPrefetcher,
-    DistributedCacheNode,
+from .parquet import (
+    ParquetReader,
+    ParquetSchema,
+    ParquetWriter,
+    read_parquet,
+    write_parquet,
 )
 
 __all__ = [

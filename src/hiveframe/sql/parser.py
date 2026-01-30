@@ -8,8 +8,7 @@ Converts SQL strings into structured AST representations.
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Tuple, Union
-import re
+from typing import Any, List, Optional, Tuple
 
 
 class TokenType(Enum):

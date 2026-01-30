@@ -11,8 +11,8 @@ Health indicators:
 - Abandonment rate: Food source quality
 """
 
-import time
 import threading
+import time
 from collections import deque
 from dataclasses import dataclass
 from typing import List, Optional
@@ -136,9 +136,6 @@ class ColonyHealthMonitor:
         workers = []
         alerts = []
 
-        total_processed = 0
-        total_errors = 0
-        total_load = 0
 
         # Collect worker stats (simulated - in real implementation
         # this would query actual worker state)

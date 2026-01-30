@@ -5,9 +5,10 @@ Column expressions and data types for DataFrame operations.
 """
 
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional
 from enum import Enum, auto
+from typing import Any, Callable, Dict, Optional
 
 
 class DataType(Enum):

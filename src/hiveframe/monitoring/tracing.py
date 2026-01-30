@@ -6,12 +6,12 @@ Distributed tracing for colony operations.
 Tracks execution flow across workers and partitions.
 """
 
-import time
 import threading
+import time
 from collections import defaultdict
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
-from contextlib import contextmanager
 
 
 @dataclass

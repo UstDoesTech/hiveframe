@@ -13,13 +13,13 @@ Key Features:
 - Skew handling
 """
 
-import time
-import threading
 import math
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
-from enum import Enum, auto
+import threading
+import time
 from collections import defaultdict
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 
 class AdaptationTrigger(Enum):

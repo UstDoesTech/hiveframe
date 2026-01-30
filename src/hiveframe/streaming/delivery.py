@@ -5,11 +5,11 @@ Delivery guarantee support for exactly-once, at-least-once, and at-most-once sem
 """
 
 import hashlib
-import time
 import threading
+import time
 from dataclasses import dataclass
-from typing import Dict, Optional
 from enum import Enum, auto
+from typing import Dict, Optional
 
 from .core import StreamRecord
 

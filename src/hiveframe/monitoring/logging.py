@@ -10,16 +10,16 @@ Features:
 - Level filtering
 """
 
-import time
-import threading
 import json
+import sys
+import threading
+import time
 import traceback
 from abc import ABC, abstractmethod
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
 from enum import Enum
-import sys
+from typing import Any, Dict, List, Optional
 
 
 class LogLevel(Enum):

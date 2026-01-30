@@ -4,8 +4,8 @@ HiveFrame Streaming Watermarks
 Watermark support for tracking event-time progress and late data handling.
 """
 
-import time
 import threading
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, Optional

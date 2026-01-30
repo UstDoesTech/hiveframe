@@ -11,42 +11,36 @@ Tests cover:
 - Colony health monitor
 """
 
-import pytest
-import time
 import threading
-from typing import Dict, Any
-from io import StringIO
+import time
+
+import pytest
 
 from hiveframe.monitoring import (
-    # Metrics
-    MetricType,
-    MetricLabels,
-    Metric,
+    BufferedHandler,
+    ColonyHealthReport,
     Counter,
     Gauge,
     Histogram,
-    Summary,
-    MetricsRegistry,
-    get_registry,
-    # Logging
+    Logger,
     LogLevel,
     LogRecord,
-    LogHandler,
-    ConsoleHandler,
-    BufferedHandler,
-    Logger,
-    get_logger,
-    # Tracing
-    TraceSpan,
-    Tracer,
-    get_tracer,
-    # Health monitoring
-    WorkerHealthSnapshot,
-    ColonyHealthReport,
-    ColonyHealthMonitor,
+    MetricLabels,
+    MetricsRegistry,
+    # Metrics
+    MetricType,
     # Profiler
     PerformanceProfiler,
+    Summary,
+    Tracer,
+    # Tracing
+    TraceSpan,
+    # Health monitoring
+    WorkerHealthSnapshot,
+    get_logger,
     get_profiler,
+    get_registry,
+    get_tracer,
 )
 
 # ============================================================================
@@ -725,8 +719,8 @@ class TestTracer:
         tracer = Tracer()
 
         parent = tracer.start_trace("parent")
-        child1 = tracer.start_span(parent.trace_id, "child1", parent.span_id)
-        child2 = tracer.start_span(parent.trace_id, "child2", parent.span_id)
+        tracer.start_span(parent.trace_id, "child1", parent.span_id)
+        tracer.start_span(parent.trace_id, "child2", parent.span_id)
 
         spans = tracer.get_trace(parent.trace_id)
 

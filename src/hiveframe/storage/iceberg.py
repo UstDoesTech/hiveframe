@@ -14,15 +14,14 @@ Key Features:
 - Manifest-based metadata
 """
 
-import time
 import json
-import uuid
 import os
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
-from enum import Enum, auto
-from pathlib import Path
 import threading
+import time
+import uuid
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class IcebergDataType(Enum):

@@ -4,15 +4,14 @@ HiveFrame Resilience - Resilient Executor
 Combined resilience patterns for robust execution.
 """
 
-import time
 import threading
+import time
 from typing import Any, Callable, Dict, Optional, TypeVar
 
 from ..exceptions import CircuitOpenError, WorkerExhausted
-
-from .retry import RetryPolicy, RetryState
-from .circuit_breaker import CircuitBreaker, CircuitBreakerConfig
 from .bulkhead import Bulkhead
+from .circuit_breaker import CircuitBreaker, CircuitBreakerConfig
+from .retry import RetryPolicy, RetryState
 from .timeout import TimeoutWrapper
 
 T = TypeVar("T")

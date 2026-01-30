@@ -9,23 +9,22 @@ Tests cover:
 - Resilient executor composition
 """
 
-import pytest
 import time
-from typing import Callable
+
+import pytest
 
 from hiveframe import (
-    RetryPolicy,
     BackoffStrategy,
-    CircuitBreaker,
-    CircuitState,
-    CircuitBreakerConfig,
     Bulkhead,
-    ResilientExecutor,
-    with_retry,
-    with_circuit_breaker,
-    with_timeout,
-    TransientError,
+    CircuitBreaker,
+    CircuitBreakerConfig,
     CircuitOpenError,
+    CircuitState,
+    ResilientExecutor,
+    RetryPolicy,
+    TransientError,
+    with_retry,
+    with_timeout,
 )
 
 

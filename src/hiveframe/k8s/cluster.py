@@ -6,7 +6,7 @@ Defines the HiveFrame cluster specification for Kubernetes deployment.
 """
 
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 
@@ -279,9 +279,9 @@ class HiveCluster:
             List of Kubernetes resource dictionaries
         """
         from .manifests import (
+            generate_configmap,
             generate_deployment,
             generate_service,
-            generate_configmap,
         )
 
         manifests = []

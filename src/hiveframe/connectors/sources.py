@@ -4,37 +4,36 @@ HiveFrame Data Sources
 Source implementations for reading data from various sources.
 """
 
-import json
 import csv
-import time
-import threading
 import hashlib
-import urllib.request
+import json
+import threading
+import time
 import urllib.error
 import urllib.parse
+import urllib.request
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, Generator, Generic, List, Optional, TypeVar
-from queue import Queue, Empty
 
 from ..exceptions import (
-    TransientError,
-    NetworkError,
-    ParseError,
-    ValidationError,
-    RateLimitError,
-    ConnectionError as HiveConnectionError,
-    TimeoutError as HiveTimeoutError,
     ConfigurationError,
     DataError,
+    NetworkError,
+    ParseError,
+    RateLimitError,
+    TransientError,
+)
+from ..exceptions import (
+    ConnectionError as HiveConnectionError,
 )
 from ..resilience import (
-    RetryPolicy,
-    RetryContext,
+    BackoffStrategy,
     CircuitBreaker,
     CircuitBreakerConfig,
-    BackoffStrategy,
+    RetryContext,
+    RetryPolicy,
 )
 from ..utils import ManagedResource
 
@@ -410,7 +409,7 @@ class HTTPSource(DataSource[Dict[str, Any]]):
                 else:
                     url = None
 
-            except Exception as e:
+            except Exception:
                 self._circuit.record_failure()
                 self._errors += 1
                 raise

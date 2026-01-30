@@ -5,7 +5,8 @@ Kubernetes Manifests Generator
 Generates Kubernetes manifests for HiveFrame clusters.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
+
 import yaml
 
 

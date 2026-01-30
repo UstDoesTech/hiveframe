@@ -16,16 +16,16 @@ Features demonstrated:
 Run: python demo_sql.py
 """
 
-import sys
 import os
-import time
 import random
-from typing import List, Dict, Any
+import sys
+import time
+from typing import Any, Dict, List
 
 # Add parent to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from hiveframe import HiveDataFrame, col, avg, count
+from hiveframe import HiveDataFrame
 from hiveframe.sql import SwarmQLContext
 
 
@@ -168,8 +168,8 @@ def demo_aggregations():
     print("Query: SELECT city, COUNT(*) as user_count FROM users GROUP BY city\n")
 
     result = ctx.sql("""
-        SELECT city, COUNT(*) as user_count 
-        FROM users 
+        SELECT city, COUNT(*) as user_count
+        FROM users
         GROUP BY city
     """)
     result.show()
@@ -179,8 +179,8 @@ def demo_aggregations():
     print("Query: SELECT category, SUM(amount) as total_revenue FROM orders GROUP BY category\n")
 
     result = ctx.sql("""
-        SELECT category, SUM(amount) as total_revenue 
-        FROM orders 
+        SELECT category, SUM(amount) as total_revenue
+        FROM orders
         GROUP BY category
     """)
     result.show()
@@ -190,8 +190,8 @@ def demo_aggregations():
     print("Query: SELECT status, AVG(amount) as avg_order_value FROM orders GROUP BY status\n")
 
     result = ctx.sql("""
-        SELECT status, AVG(amount) as avg_order_value 
-        FROM orders 
+        SELECT status, AVG(amount) as avg_order_value
+        FROM orders
         GROUP BY status
     """)
     result.show()
@@ -203,8 +203,8 @@ def demo_aggregations():
     )
 
     result = ctx.sql("""
-        SELECT category, COUNT(*) as order_count, SUM(amount) as total, AVG(amount) as average 
-        FROM orders 
+        SELECT category, COUNT(*) as order_count, SUM(amount) as total, AVG(amount) as average
+        FROM orders
         GROUP BY category
     """)
     result.show()
@@ -216,9 +216,9 @@ def demo_aggregations():
     )
 
     result = ctx.sql("""
-        SELECT category, COUNT(*) as high_value_orders 
-        FROM orders 
-        WHERE amount > 200 
+        SELECT category, COUNT(*) as high_value_orders
+        FROM orders
+        WHERE amount > 200
         GROUP BY category
     """)
     result.show()
@@ -255,9 +255,9 @@ def demo_query_plans():
     # Complex query plan
     print_subheader("3. Complex Query Plan")
     query = """
-        SELECT category, status, SUM(amount) 
-        FROM orders 
-        WHERE amount > 50 
+        SELECT category, status, SUM(amount)
+        FROM orders
+        WHERE amount > 50
         GROUP BY category, status
     """
     print(f"Query: {query}\n")

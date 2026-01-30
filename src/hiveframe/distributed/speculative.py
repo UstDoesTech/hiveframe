@@ -12,15 +12,14 @@ Key Concepts:
 - Adaptive Speculation: Learn which tasks benefit from speculation
 """
 
-import time
-import threading
-import uuid
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
-from enum import Enum, auto
-from concurrent.futures import ThreadPoolExecutor, Future, as_completed
-import math
 import statistics
+import threading
+import time
+import uuid
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 
 class TaskState(Enum):
@@ -503,7 +502,7 @@ class SpeculativeExecutor:
         task = self.tracker.register_task(task_id, data, priority)
 
         # Submit to worker pool
-        future = self._worker_pool.submit(self._execute_task, task)
+        self._worker_pool.submit(self._execute_task, task)
 
         return task_id
 

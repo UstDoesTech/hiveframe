@@ -6,12 +6,12 @@ Profile performance of colony operations.
 Tracks timing, resource usage, and bottlenecks.
 """
 
-import time
-import threading
 import statistics
+import threading
+import time
 from collections import defaultdict
-from typing import Dict, List
 from contextlib import contextmanager
+from typing import Dict, List
 
 
 class PerformanceProfiler:

@@ -23,14 +23,14 @@ Usage:
     # python -m hiveframe.dashboard --port 8080
 """
 
-from .server import Dashboard, DashboardConfig
 from .api import DashboardAPI
 from .components import (
     ColonyMetricsPanel,
-    WorkerStatusPanel,
     DanceFloorPanel,
     QueryHistoryPanel,
+    WorkerStatusPanel,
 )
+from .server import Dashboard, DashboardConfig
 
 __all__ = [
     "Dashboard",

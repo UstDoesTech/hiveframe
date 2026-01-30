@@ -13,14 +13,11 @@ Key Features:
 - Parallel batch processing
 """
 
-import time
-import threading
-import math
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from enum import Enum, auto
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 
 class VectorType(Enum):

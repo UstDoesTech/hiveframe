@@ -12,66 +12,65 @@ Combines basic streaming and enhanced production-grade features:
 """
 
 # Basic streaming components
+# Aggregators
+from .aggregators import (
+    avg_aggregator,
+    collect_aggregator,
+    count_aggregator,
+    max_aggregator,
+    min_aggregator,
+    sum_aggregator,
+)
 from .core import (
-    StreamRecord,
-    StreamPartitioner,
-    StreamBuffer,
-    StreamBee,
-    HiveStream,
     AsyncHiveStream,
-)
-
-# Windowing
-from .windows import (
-    WindowType,
-    Window,
-    WindowedValue,
-    WindowAssigner,
-    TumblingWindowAssigner,
-    SlidingWindowAssigner,
-    SessionWindowAssigner,
-    tumbling_window,
-    sliding_window,
-    session_window,
-)
-
-# Watermarks
-from .watermarks import (
-    Watermark,
-    WatermarkGenerator,
-    BoundedOutOfOrdernessWatermarkGenerator,
-    PunctuatedWatermarkGenerator,
-    bounded_watermark,
-)
-
-# State management
-from .state import (
-    Checkpoint,
-    StateBackend,
-    InMemoryStateBackend,
+    HiveStream,
+    StreamBee,
+    StreamBuffer,
+    StreamPartitioner,
+    StreamRecord,
 )
 
 # Delivery guarantees
 from .delivery import (
     DeliveryGuarantee,
-    ProcessingContext,
     IdempotencyStore,
+    ProcessingContext,
 )
 
 # Enhanced processor
 from .processor import (
-    WindowAggregation,
     EnhancedStreamProcessor,
+    WindowAggregation,
 )
 
-# Aggregators
-from .aggregators import (
-    count_aggregator,
-    sum_aggregator,
-    avg_aggregator,
-    max_aggregator,
-    min_aggregator,
-    collect_aggregator,
+# State management
+from .state import (
+    Checkpoint,
+    InMemoryStateBackend,
+    StateBackend,
+)
+
+# Watermarks
+from .watermarks import (
+    BoundedOutOfOrdernessWatermarkGenerator,
+    PunctuatedWatermarkGenerator,
+    Watermark,
+    WatermarkGenerator,
+    bounded_watermark,
+)
+
+# Windowing
+from .windows import (
+    SessionWindowAssigner,
+    SlidingWindowAssigner,
+    TumblingWindowAssigner,
+    Window,
+    WindowAssigner,
+    WindowedValue,
+    WindowType,
+    session_window,
+    sliding_window,
+    tumbling_window,
 )
 
 __all__ = [

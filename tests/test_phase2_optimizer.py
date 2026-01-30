@@ -6,34 +6,32 @@ Tests cover:
 - Adaptive Query Execution (AQE)
 """
 
-import pytest
 import time
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+import pytest
 
 from hiveframe.optimizer import (
-    # Vectorized Execution
-    VectorBatch,
-    VectorType,
-    VectorizedPipeline,
-    VectorizedFilter,
-    VectorizedProject,
-    VectorizedAggregate,
-    VectorizedJoin,
-    VectorizedSort,
-    VectorizedLimit,
-    ParallelVectorizedExecutor,
-    create_vectorized_filter,
-    create_vectorized_project,
-    create_vectorized_aggregate,
     # Adaptive Query Execution
     AdaptiveQueryExecutor,
     AQEContext,
-    WaggleDanceFeedback,
-    RuntimeStatistics,
     JoinStrategy,
     JoinStrategySelector,
+    ParallelVectorizedExecutor,
     PartitionCoalescer,
+    RuntimeStatistics,
     SkewHandler,
+    # Vectorized Execution
+    VectorBatch,
+    VectorizedAggregate,
+    VectorizedFilter,
+    VectorizedJoin,
+    VectorizedLimit,
+    VectorizedPipeline,
+    VectorizedProject,
+    VectorizedSort,
+    VectorType,
+    WaggleDanceFeedback,
 )
 
 
