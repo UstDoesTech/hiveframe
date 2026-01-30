@@ -58,7 +58,7 @@ How-To Guides are **problem-oriented** - they take you through the steps needed 
 |-------|-------------|--------|
 | Configure Multi-Hive Federation | Coordinate multiple clusters across datacenters | 📝 Coming Soon |
 | Use Adaptive Partitioning | Dynamic partition management based on fitness | 📝 Coming Soon |
-| Enable Speculative Execution | Scout bees for stragggler mitigation | 📝 Coming Soon |
+| Enable Speculative Execution | Scout bees for straggler mitigation | 📝 Coming Soon |
 | Work with HoneyStore | Native columnar format optimized for swarms | 📝 Coming Soon |
 | Use Caching Swarm | Pheromone-based intelligent caching | 📝 Coming Soon |
 | Enable Vectorized Execution | SIMD-accelerated numerical processing | 📝 Coming Soon |
