@@ -15,9 +15,8 @@ import os
 
 from .api import DashboardAPI
 
-
 # HTML template for the dashboard
-DASHBOARD_HTML = '''<!DOCTYPE html>
+DASHBOARD_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -540,7 +539,7 @@ Example: SELECT * FROM users WHERE age > 21"></textarea>
         setInterval(updateQueries, 10000);
     </script>
 </body>
-</html>'''
+</html>"""
 
 
 @dataclass
@@ -550,6 +549,7 @@ class DashboardConfig:
     -----------------------
     Configuration options for the Colony Dashboard.
     """
+
     host: str = "0.0.0.0"
     port: int = 8080
     debug: bool = False
@@ -560,135 +560,135 @@ class DashboardConfig:
 
 class DashboardRequestHandler(BaseHTTPRequestHandler):
     """HTTP request handler for the dashboard."""
-    
+
     # Reference to API (set by server)
     api: Optional[DashboardAPI] = None
     config: Optional[DashboardConfig] = None
-    
+
     def log_message(self, format, *args):
         """Suppress default logging."""
         if self.config and self.config.debug:
             BaseHTTPRequestHandler.log_message(self, format, *args)
-            
+
     def send_cors_headers(self):
         """Send CORS headers."""
         if self.config and self.config.enable_cors:
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-            self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-            
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
     def do_OPTIONS(self):
         """Handle OPTIONS requests."""
         self.send_response(200)
         self.send_cors_headers()
         self.end_headers()
-        
+
     def do_GET(self):
         """Handle GET requests."""
         parsed = urlparse(self.path)
         path = parsed.path
-        
+
         # Serve dashboard HTML
-        if path == '/' or path == '/dashboard':
+        if path == "/" or path == "/dashboard":
             self.send_response(200)
-            self.send_header('Content-Type', 'text/html')
+            self.send_header("Content-Type", "text/html")
             self.send_cors_headers()
             self.end_headers()
             self.wfile.write(DASHBOARD_HTML.encode())
             return
-            
+
         # API endpoints
-        if path.startswith('/api/'):
+        if path.startswith("/api/"):
             self.handle_api_get(path[5:])
             return
-            
+
         # 404
-        self.send_error(404, 'Not Found')
-        
+        self.send_error(404, "Not Found")
+
     def do_POST(self):
         """Handle POST requests."""
         parsed = urlparse(self.path)
         path = parsed.path
-        
-        if path.startswith('/api/'):
+
+        if path.startswith("/api/"):
             self.handle_api_post(path[5:])
             return
-            
-        self.send_error(404, 'Not Found')
-        
+
+        self.send_error(404, "Not Found")
+
     def handle_api_get(self, endpoint: str):
         """Handle API GET requests."""
         if not self.api:
-            self.send_error(500, 'API not initialized')
+            self.send_error(500, "API not initialized")
             return
-            
+
         response = None
-        
-        if endpoint == 'metrics':
+
+        if endpoint == "metrics":
             response = self.api.get_metrics()
-        elif endpoint == 'workers':
+        elif endpoint == "workers":
             response = self.api.get_workers()
-        elif endpoint.startswith('workers/'):
+        elif endpoint.startswith("workers/"):
             worker_id = endpoint[8:]
             response = self.api.get_worker(worker_id)
-        elif endpoint == 'dances':
+        elif endpoint == "dances":
             response = self.api.get_dances()
-        elif endpoint == 'queries':
+        elif endpoint == "queries":
             response = self.api.get_queries()
-        elif endpoint.startswith('queries/'):
+        elif endpoint.startswith("queries/"):
             query_id = endpoint[8:]
             response = self.api.get_query(query_id)
-        elif endpoint == 'health':
+        elif endpoint == "health":
             response = self.api.get_health()
-        elif endpoint == 'tables':
+        elif endpoint == "tables":
             response = self.api.get_tables()
-        elif endpoint.startswith('tables/'):
+        elif endpoint.startswith("tables/"):
             table_name = endpoint[7:]
             response = self.api.get_table_schema(table_name)
         else:
-            self.send_error(404, 'Endpoint not found')
+            self.send_error(404, "Endpoint not found")
             return
-            
+
         self.send_json_response(response)
-        
+
     def handle_api_post(self, endpoint: str):
         """Handle API POST requests."""
         if not self.api:
-            self.send_error(500, 'API not initialized')
+            self.send_error(500, "API not initialized")
             return
-            
+
         # Read request body
-        content_length = int(self.headers.get('Content-Length', 0))
+        content_length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(content_length).decode()
-        
+
         try:
             data = json.loads(body) if body else {}
         except json.JSONDecodeError:
-            self.send_error(400, 'Invalid JSON')
+            self.send_error(400, "Invalid JSON")
             return
-            
+
         response = None
-        
-        if endpoint == 'queries':
-            sql = data.get('sql', '')
+
+        if endpoint == "queries":
+            sql = data.get("sql", "")
             response = self.api.execute_query(sql)
-        elif endpoint == 'queries/explain':
-            sql = data.get('sql', '')
+        elif endpoint == "queries/explain":
+            sql = data.get("sql", "")
             response = self.api.explain_query(sql)
-        elif endpoint == 'config':
+        elif endpoint == "config":
             response = self.api.update_config(data)
-        elif endpoint == 'metrics':
+        elif endpoint == "metrics":
             response = self.api.update_metrics(data)
         else:
-            self.send_error(404, 'Endpoint not found')
+            self.send_error(404, "Endpoint not found")
             return
-            
+
         self.send_json_response(response)
-        
+
     def send_json_response(self, response):
         """Send JSON API response."""
         self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
+        self.send_header("Content-Type", "application/json")
         self.send_cors_headers()
         self.end_headers()
         self.wfile.write(response.to_json().encode())
@@ -698,31 +698,29 @@ class Dashboard:
     """
     Colony Dashboard
     ----------------
-    
+
     Web dashboard for monitoring HiveFrame clusters.
-    
+
     Usage:
         from hiveframe.dashboard import Dashboard
-        
+
         # Create dashboard
         dashboard = Dashboard(port=8080)
-        
+
         # Connect to HiveFrame
         dashboard.connect_hive(hive)
         dashboard.connect_sql(sql_context)
-        
+
         # Start server
         dashboard.start()
-        
+
         # Access at http://localhost:8080
     """
-    
-    def __init__(self, 
-                 config: Optional[DashboardConfig] = None,
-                 port: int = 8080):
+
+    def __init__(self, config: Optional[DashboardConfig] = None, port: int = 8080):
         """
         Initialize dashboard.
-        
+
         Args:
             config: Dashboard configuration
             port: Server port (if config not provided)
@@ -732,35 +730,32 @@ class Dashboard:
         self._server: Optional[HTTPServer] = None
         self._thread: Optional[threading.Thread] = None
         self._running = False
-        
+
     def connect_hive(self, hive) -> None:
         """Connect to HiveFrame instance."""
         self.api.hive = hive
-        
+
     def connect_sql(self, sql_context) -> None:
         """Connect to SwarmQL context."""
         self.api.sql_context = sql_context
-        
+
     def start(self, blocking: bool = True) -> None:
         """
         Start the dashboard server.
-        
+
         Args:
             blocking: If True, blocks until server stops
         """
         # Set up handler
         DashboardRequestHandler.api = self.api
         DashboardRequestHandler.config = self.config
-        
-        self._server = HTTPServer(
-            (self.config.host, self.config.port),
-            DashboardRequestHandler
-        )
-        
+
+        self._server = HTTPServer((self.config.host, self.config.port), DashboardRequestHandler)
+
         self._running = True
-        
+
         print(f"🐝 Colony Dashboard running at http://{self.config.host}:{self.config.port}")
-        
+
         if blocking:
             try:
                 self._server.serve_forever()
@@ -770,7 +765,7 @@ class Dashboard:
             self._thread = threading.Thread(target=self._server.serve_forever)
             self._thread.daemon = True
             self._thread.start()
-            
+
     def stop(self) -> None:
         """Stop the dashboard server."""
         self._running = False
@@ -778,7 +773,7 @@ class Dashboard:
             self._server.shutdown()
             self._server = None
         print("Dashboard stopped")
-        
+
     @property
     def is_running(self) -> bool:
         """Check if dashboard is running."""
@@ -789,23 +784,19 @@ class Dashboard:
 def main():
     """Run dashboard from command line."""
     import argparse
-    
-    parser = argparse.ArgumentParser(description='HiveFrame Colony Dashboard')
-    parser.add_argument('--host', default='0.0.0.0', help='Host to bind to')
-    parser.add_argument('--port', type=int, default=8080, help='Port to listen on')
-    parser.add_argument('--debug', action='store_true', help='Enable debug mode')
-    
+
+    parser = argparse.ArgumentParser(description="HiveFrame Colony Dashboard")
+    parser.add_argument("--host", default="0.0.0.0", help="Host to bind to")
+    parser.add_argument("--port", type=int, default=8080, help="Port to listen on")
+    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+
     args = parser.parse_args()
-    
-    config = DashboardConfig(
-        host=args.host,
-        port=args.port,
-        debug=args.debug
-    )
-    
+
+    config = DashboardConfig(host=args.host, port=args.port, debug=args.debug)
+
     dashboard = Dashboard(config)
     dashboard.start()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -25,15 +25,18 @@ from ..aggregations import (
 class AggFunc:
     """
     Aggregation function wrapper for DataFrame operations.
-    
+
     Bridges the Column-based DataFrame API with the unified Aggregator framework.
     """
-    def __init__(self, name: str, column: Column, aggregator: Aggregator, is_count_all: bool = False):
+
+    def __init__(
+        self, name: str, column: Column, aggregator: Aggregator, is_count_all: bool = False
+    ):
         self.name = name
         self.column = column
         self._aggregator = aggregator
         self._is_count_all = is_count_all
-        
+
     def apply(self, rows: List[Dict]) -> Any:
         """Apply aggregation to rows, extracting column values."""
         if self._is_count_all:
@@ -42,7 +45,7 @@ class AggFunc:
         values = [self.column.eval(row) for row in rows]
         # Filter None values and delegate to aggregator
         return self._aggregator.aggregate(values)
-    
+
     def alias(self, name: str) -> "AggFunc":
         """Return a new AggFunc with an aliased name."""
         return AggFunc(name, self.column, self._aggregator, self._is_count_all)

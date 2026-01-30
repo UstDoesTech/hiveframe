@@ -33,9 +33,9 @@ from ..aggregations import (
     get_aggregator_registry,
 )
 
-
 # Legacy function signatures for backward compatibility
 # These match the original streaming API (acc, value) -> acc
+
 
 def count_aggregator(acc: int, value: Any) -> int:
     """Count aggregator (legacy streaming API)."""

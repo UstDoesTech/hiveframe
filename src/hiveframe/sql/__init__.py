@@ -16,7 +16,7 @@ Usage:
 
     ctx = SwarmQLContext()
     ctx.register_table("users", df)
-    
+
     result = ctx.sql("SELECT name, age FROM users WHERE age > 21")
     result.show()
 """
@@ -38,24 +38,24 @@ from .types import (
 
 __all__ = [
     # Context
-    'SwarmQLContext',
-    'SQLCatalog',
+    "SwarmQLContext",
+    "SQLCatalog",
     # Parser
-    'SQLParser',
-    'SQLStatement',
-    'SQLTokenizer',
+    "SQLParser",
+    "SQLStatement",
+    "SQLTokenizer",
     # Executor
-    'SQLExecutor',
-    'QueryPlan',
-    'PlanNode',
+    "SQLExecutor",
+    "QueryPlan",
+    "PlanNode",
     # Types
-    'SQLType',
-    'IntegerType',
-    'FloatType',
-    'StringType',
-    'BooleanType',
-    'DateType',
-    'TimestampType',
-    'ArrayType',
-    'MapType',
+    "SQLType",
+    "IntegerType",
+    "FloatType",
+    "StringType",
+    "BooleanType",
+    "DateType",
+    "TimestampType",
+    "ArrayType",
+    "MapType",
 ]
