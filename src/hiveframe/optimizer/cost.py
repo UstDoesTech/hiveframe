@@ -245,17 +245,17 @@ class SwarmCostModel(CostModel):
 
         if join_type == "hash":
             # Hash join: build + probe
-            cpu_cost = left_rows + right_rows * 2  # Build hash + probe
+            cpu_cost = float(left_rows + right_rows * 2)  # Build hash + probe
             memory_cost = left_rows * 100  # Hash table
         elif join_type == "sort_merge":
             # Sort-merge: sort both sides + merge
-            cpu_cost = left_rows * math.log2(max(left_rows, 1)) + right_rows * math.log2(
+            cpu_cost = float(left_rows * math.log2(max(left_rows, 1)) + right_rows * math.log2(
                 max(right_rows, 1)
-            )
+            ))
             memory_cost = (left_rows + right_rows) * 100
         else:
             # Nested loop (worst case)
-            cpu_cost = left_rows * right_rows
+            cpu_cost = float(left_rows * right_rows)
             memory_cost = 0
 
         # Estimate output size (assume 1:1 match ratio)

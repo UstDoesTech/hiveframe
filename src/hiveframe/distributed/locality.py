@@ -447,7 +447,7 @@ class CrossDatacenterManager:
                     )
 
         # Sort by priority
-        suggestions.sort(key=lambda s: -float(s.get("priority", 0)))
+        suggestions.sort(key=lambda s: -float(s.get("priority", 0)))  # type: ignore[arg-type]
 
         return suggestions
 

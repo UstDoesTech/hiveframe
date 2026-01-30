@@ -28,11 +28,11 @@ class Checkpoint:
         checkpoint_id: Any,
         timestamp: float,
         watermark: float = 0.0,
-        offsets: Dict[int, int] = None,
-        window_state: Dict[str, Any] = None,
-        metadata: Dict[str, Any] = None,
+        offsets: Optional[Dict[int, int]] = None,
+        window_state: Optional[Dict[str, Any]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         *,
-        state: Dict[str, Any] = None,  # Alias for window_state (backward compat)
+        state: Optional[Dict[str, Any]] = None,  # Alias for window_state (backward compat)
     ):
         self.checkpoint_id = checkpoint_id
         self.timestamp = timestamp

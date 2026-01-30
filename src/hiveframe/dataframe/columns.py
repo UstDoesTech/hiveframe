@@ -41,10 +41,10 @@ class Column:
 
     def eval(self, row: Dict) -> Any:
         """Evaluate column expression against a row."""
-        return self._expr(row)
+        return self._expr(row)  # type: ignore[misc]
 
     # Comparison operators
-    def __eq__(self, other) -> Column:
+    def __eq__(self, other) -> Column:  # type: ignore[override]
         if isinstance(other, Column):
             return Column(
                 name=f"({self.name} == {other.name})",
@@ -57,7 +57,7 @@ class Column:
             _expr=lambda row: self.eval(row) == other,
         )
 
-    def __ne__(self, other) -> Column:
+    def __ne__(self, other) -> Column:  # type: ignore[override]
         if isinstance(other, Column):
             return Column(
                 name=f"({self.name} != {other.name})",

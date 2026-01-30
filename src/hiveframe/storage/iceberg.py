@@ -583,6 +583,7 @@ class IcebergTable:
             # Reload from disk
             table = IcebergTable.load(self.location)
             self._metadata = table._metadata
+        assert self._metadata is not None
         return self._metadata
 
     @property
