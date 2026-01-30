@@ -275,9 +275,7 @@ class MessageQueueSource(DataSource[Message]):
             got_messages = False
 
             for partition in self.partitions:
-                messages = self.topic.consume(
-                    self.consumer_group, partition, max_messages=100
-                )
+                messages = self.topic.consume(self.consumer_group, partition, max_messages=100)
 
                 for msg in messages:
                     self._records_read += 1

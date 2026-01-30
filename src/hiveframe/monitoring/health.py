@@ -136,7 +136,6 @@ class ColonyHealthMonitor:
         workers: List[WorkerHealthSnapshot] = []
         alerts = []
 
-
         # Collect worker stats (simulated - in real implementation
         # this would query actual worker state)
         temperature = self.colony.get_colony_temperature()

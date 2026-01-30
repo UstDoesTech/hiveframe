@@ -249,9 +249,10 @@ class SwarmCostModel(CostModel):
             memory_cost = left_rows * 100  # Hash table
         elif join_type == "sort_merge":
             # Sort-merge: sort both sides + merge
-            cpu_cost = float(left_rows * math.log2(max(left_rows, 1)) + right_rows * math.log2(
-                max(right_rows, 1)
-            ))
+            cpu_cost = float(
+                left_rows * math.log2(max(left_rows, 1))
+                + right_rows * math.log2(max(right_rows, 1))
+            )
             memory_cost = (left_rows + right_rows) * 100
         else:
             # Nested loop (worst case)

@@ -7,7 +7,6 @@ Tests cover:
 - Plan optimization
 """
 
-
 import pytest
 
 from hiveframe.optimizer import (
