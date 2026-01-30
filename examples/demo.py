@@ -772,6 +772,19 @@ def main():
     print("  ✓ Self-healing through abandonment mechanism")
     print("  ✓ Adaptive backpressure via pheromone signals")
     print("  ✓ Emergent load balancing without central scheduler")
+    
+    print("\n" + "-" * 60)
+    print("Want to explore Phase 2 features?")
+    print("-" * 60)
+    print("\nRun these demos to see advanced swarm intelligence:")
+    print("  • python examples/demo_phase2_federation.py")
+    print("      Multi-hive coordination across datacenters")
+    print("  • python examples/demo_phase2_adaptive.py")
+    print("      Dynamic partitioning and speculative execution")
+    print("  • python examples/demo_phase2_storage.py")
+    print("      HoneyStore and intelligent caching")
+    print("  • python examples/swarmql_2_demo.py")
+    print("      Advanced SQL with bee-inspired extensions")
 
 
 if __name__ == "__main__":
