@@ -984,13 +984,10 @@ python examples/demo_storage.py
 # SwarmQL 2.0 features (CTEs, subqueries, window functions)
 python examples/swarmql_2_demo.py
 
-# Phase 2 demos - coming soon:
-# python examples/demo_federation.py        # Multi-hive federation
-# python examples/demo_adaptive.py          # Adaptive partitioning & speculative execution
-# python examples/demo_vectorized.py        # Vectorized execution
-# python examples/demo_aqe.py               # Adaptive query execution
-# python examples/demo_honeystore.py        # HoneyStore native format
-# python examples/demo_caching.py           # Caching swarm
+# Phase 2 demos - swarm intelligence features:
+python examples/demo_phase2_federation.py   # Multi-hive federation
+python examples/demo_phase2_adaptive.py     # Adaptive partitioning & speculative execution
+python examples/demo_phase2_storage.py      # HoneyStore & caching swarm
 ```
 
 **demo.py** runs five demonstrations:
@@ -1025,6 +1022,28 @@ python examples/swarmql_2_demo.py
 5. **String Functions** - UPPER, LOWER, CONCAT, SUBSTRING
 6. **Date Functions** - CURRENT_DATE, DATE_ADD, EXTRACT
 7. **Bee-inspired Extensions** - WAGGLE JOIN demonstrations
+
+**demo_phase2_federation.py** demonstrates multi-hive coordination:
+1. **Federation Setup** - Registering multiple hives
+2. **Locality-Aware Scheduling** - Data-local task placement
+3. **Federated Execution** - Distributed query processing
+4. **Health Monitoring** - Cross-hive health tracking
+5. **Automatic Failover** - Handling hive failures
+
+**demo_phase2_adaptive.py** demonstrates intelligent partitioning:
+1. **Adaptive Partitioning** - Fitness-based partition sizing
+2. **Partition Splitting** - Handling data skew
+3. **Partition Merging** - Reducing overhead
+4. **Speculative Execution** - Scout bee straggler mitigation
+5. **Real-world Scenarios** - E-commerce analytics example
+
+**demo_phase2_storage.py** demonstrates storage innovations:
+1. **HoneyStore Basics** - Native columnar format
+2. **Adaptive Compression** - Intelligent codec selection
+3. **Query Pushdown** - Predicate and projection optimization
+4. **Pheromone Caching** - Trail-based cache management
+5. **Cache Eviction** - Fitness-based eviction policy
+6. **Intelligent Prefetching** - Scout bee data prediction
 
 ## Contributing
 
