@@ -281,6 +281,75 @@ from .dashboard import (
     DashboardAPI,
 )
 
+# Phase 2: Distributed Execution Engine
+from .distributed import (
+    # Federation
+    HiveFederation,
+    FederatedHive,
+    FederationCoordinator,
+    HiveRegistry,
+    FederationProtocol,
+    HiveHealth,
+    # Adaptive Partitioning
+    AdaptivePartitioner,
+    PartitionStrategy,
+    PartitionState,
+    FitnessPartitioner,
+    PartitionSplitter,
+    PartitionMerger,
+    # Speculative Execution
+    SpeculativeExecutor,
+    ScoutTaskRunner,
+    TaskTracker,
+    SlowTaskDetector,
+    SpeculativeConfig,
+    # Locality
+    LocalityAwareScheduler,
+    DataLocality,
+    LocalityLevel,
+    LocalityHint,
+    CrossDatacenterManager,
+)
+
+# Phase 2: Advanced Query Engine (Vectorized + AQE)
+from .optimizer import (
+    # Vectorized Execution
+    VectorBatch,
+    VectorType,
+    VectorizedPipeline,
+    VectorizedFilter,
+    VectorizedProject,
+    VectorizedAggregate,
+    VectorizedJoin,
+    ParallelVectorizedExecutor,
+    # Adaptive Query Execution
+    AdaptiveQueryExecutor,
+    AQEContext,
+    WaggleDanceFeedback,
+    RuntimeStatistics,
+    JoinStrategy,
+)
+
+# Phase 2: Storage Layer (HoneyStore, Iceberg, Caching)
+from .storage import (
+    # HoneyStore
+    HoneyStoreWriter,
+    HoneyStoreReader,
+    HoneyStoreMetadata,
+    write_honeystore,
+    read_honeystore,
+    # Iceberg
+    IcebergTable,
+    IcebergSchema,
+    IcebergField,
+    read_iceberg,
+    write_iceberg,
+    # Caching Swarm
+    CachingSwarm,
+    PheromoneCache,
+    SwarmPrefetcher,
+)
+
 __all__ = [
     # Utilities (new)
     'ThreadSafeMixin',
@@ -475,4 +544,58 @@ __all__ = [
     'Dashboard',
     'DashboardConfig',
     'DashboardAPI',
+    # Phase 2: Distributed Execution Engine
+    'HiveFederation',
+    'FederatedHive',
+    'FederationCoordinator',
+    'HiveRegistry',
+    'FederationProtocol',
+    'HiveHealth',
+    'AdaptivePartitioner',
+    'PartitionStrategy',
+    'PartitionState',
+    'FitnessPartitioner',
+    'PartitionSplitter',
+    'PartitionMerger',
+    'SpeculativeExecutor',
+    'ScoutTaskRunner',
+    'TaskTracker',
+    'SlowTaskDetector',
+    'SpeculativeConfig',
+    'LocalityAwareScheduler',
+    'DataLocality',
+    'LocalityLevel',
+    'LocalityHint',
+    'CrossDatacenterManager',
+    # Phase 2: Vectorized Execution
+    'VectorBatch',
+    'VectorType',
+    'VectorizedPipeline',
+    'VectorizedFilter',
+    'VectorizedProject',
+    'VectorizedAggregate',
+    'VectorizedJoin',
+    'ParallelVectorizedExecutor',
+    # Phase 2: Adaptive Query Execution
+    'AdaptiveQueryExecutor',
+    'AQEContext',
+    'WaggleDanceFeedback',
+    'RuntimeStatistics',
+    'JoinStrategy',
+    # Phase 2: HoneyStore
+    'HoneyStoreWriter',
+    'HoneyStoreReader',
+    'HoneyStoreMetadata',
+    'write_honeystore',
+    'read_honeystore',
+    # Phase 2: Iceberg
+    'IcebergTable',
+    'IcebergSchema',
+    'IcebergField',
+    'read_iceberg',
+    'write_iceberg',
+    # Phase 2: Caching Swarm
+    'CachingSwarm',
+    'PheromoneCache',
+    'SwarmPrefetcher',
 ]

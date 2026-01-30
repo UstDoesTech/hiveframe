@@ -5,11 +5,16 @@ HiveFrame Query Optimizer
 A bee-inspired query optimizer that uses swarm intelligence
 principles to optimize query execution plans.
 
-Key Features:
+Key Features (Phase 1):
 - Rule-based optimization (predicate pushdown, projection pruning)
 - Cost-based optimization using fitness functions
 - Adaptive optimization based on runtime feedback
 - Waggle dance protocol for plan quality signaling
+
+Phase 2 Additions:
+- Vectorized Execution: SIMD-accelerated processing for numerical workloads
+- Adaptive Query Execution: Real-time plan modification based on runtime stats
+- Enhanced Cost-Based Optimizer: Fitness functions with swarm intelligence
 
 This is HiveFrame's equivalent to Apache Spark's Catalyst optimizer,
 but uses bio-inspired algorithms instead of traditional approaches.
@@ -36,6 +41,38 @@ from .planner import (
     PlanCandidate,
 )
 
+# Phase 2: Vectorized Execution
+from .vectorized import (
+    VectorBatch,
+    VectorType,
+    VectorizedOp,
+    VectorizedFilter,
+    VectorizedProject,
+    VectorizedAggregate,
+    VectorizedJoin,
+    VectorizedSort,
+    VectorizedLimit,
+    VectorizedPipeline,
+    ParallelVectorizedExecutor,
+    create_vectorized_filter,
+    create_vectorized_project,
+    create_vectorized_aggregate,
+)
+
+# Phase 2: Adaptive Query Execution
+from .aqe import (
+    AdaptiveQueryExecutor,
+    AQEContext,
+    WaggleDanceFeedback,
+    RuntimeStatistics,
+    AdaptationTrigger,
+    AdaptationRule,
+    JoinStrategy,
+    JoinStrategySelector,
+    PartitionCoalescer,
+    SkewHandler,
+)
+
 __all__ = [
     # Rules
     'OptimizationRule',
@@ -54,4 +91,30 @@ __all__ = [
     'QueryOptimizer',
     'OptimizedPlan',
     'PlanCandidate',
+    # Phase 2: Vectorized Execution
+    'VectorBatch',
+    'VectorType',
+    'VectorizedOp',
+    'VectorizedFilter',
+    'VectorizedProject',
+    'VectorizedAggregate',
+    'VectorizedJoin',
+    'VectorizedSort',
+    'VectorizedLimit',
+    'VectorizedPipeline',
+    'ParallelVectorizedExecutor',
+    'create_vectorized_filter',
+    'create_vectorized_project',
+    'create_vectorized_aggregate',
+    # Phase 2: Adaptive Query Execution
+    'AdaptiveQueryExecutor',
+    'AQEContext',
+    'WaggleDanceFeedback',
+    'RuntimeStatistics',
+    'AdaptationTrigger',
+    'AdaptationRule',
+    'JoinStrategy',
+    'JoinStrategySelector',
+    'PartitionCoalescer',
+    'SkewHandler',
 ]

@@ -46,6 +46,7 @@ Spark Model:                    HiveFrame Model:
 
 ## Key Features
 
+### Phase 1 (Complete)
 | Feature | Description |
 |---------|-------------|
 | **SwarmQL** | Full SQL engine with table registration and query optimization |
@@ -57,6 +58,18 @@ Spark Model:                    HiveFrame Model:
 | **Resilience Patterns** | Circuit breakers, retry policies, bulkheads, and timeouts |
 | **Advanced Streaming** | Windowing, watermarks, and exactly-once delivery guarantees |
 | **Dead Letter Queue** | Failed record management with full error context |
+
+### Phase 2 (In Progress)
+| Feature | Description |
+|---------|-------------|
+| **Multi-Hive Federation** | Connect multiple clusters that coordinate like allied bee colonies |
+| **Adaptive Partitioning** | Dynamic partition splitting/merging based on swarm fitness |
+| **Speculative Execution** | Scout bees proactively retry slow tasks |
+| **Vectorized Execution** | SIMD-accelerated processing for numerical workloads |
+| **Adaptive Query Execution** | Real-time plan modification based on waggle dance feedback |
+| **HoneyStore** | Native columnar format optimized for swarm access patterns |
+| **Iceberg Support** | Open table format compatibility |
+| **Caching Swarm** | Distributed intelligent caching with pheromone trails |
 
 ## Installation
 
