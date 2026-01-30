@@ -8,7 +8,7 @@ Converts SQL strings into structured AST representations.
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 
 class TokenType(Enum):
@@ -56,6 +56,26 @@ class TokenType(Enum):
     CAST = auto()
     TRUE = auto()
     FALSE = auto()
+    WITH = auto()
+    OVER = auto()
+    PARTITION = auto()
+    WINDOW = auto()
+    ROWS = auto()
+    RANGE = auto()
+    UNBOUNDED = auto()
+    PRECEDING = auto()
+    FOLLOWING = auto()
+    CURRENT = auto()
+    ROW = auto()
+    EXISTS = auto()
+    
+    # Bee-inspired keywords
+    WAGGLE = auto()
+    SWARM = auto()
+    PHEROMONE = auto()
+    SCOUT = auto()
+    CACHE = auto()
+    HINT = auto()
 
     # Identifiers and literals
     IDENTIFIER = auto()
@@ -146,6 +166,24 @@ class SQLTokenizer:
         "CAST": TokenType.CAST,
         "TRUE": TokenType.TRUE,
         "FALSE": TokenType.FALSE,
+        "WITH": TokenType.WITH,
+        "OVER": TokenType.OVER,
+        "PARTITION": TokenType.PARTITION,
+        "WINDOW": TokenType.WINDOW,
+        "ROWS": TokenType.ROWS,
+        "RANGE": TokenType.RANGE,
+        "UNBOUNDED": TokenType.UNBOUNDED,
+        "PRECEDING": TokenType.PRECEDING,
+        "FOLLOWING": TokenType.FOLLOWING,
+        "CURRENT": TokenType.CURRENT,
+        "ROW": TokenType.ROW,
+        "EXISTS": TokenType.EXISTS,
+        "WAGGLE": TokenType.WAGGLE,
+        "SWARM": TokenType.SWARM,
+        "PHEROMONE": TokenType.PHEROMONE,
+        "SCOUT": TokenType.SCOUT,
+        "CACHE": TokenType.CACHE,
+        "HINT": TokenType.HINT,
     }
 
     def __init__(self, sql: str):
@@ -406,6 +444,7 @@ class InExpr(Expression):
     expr: Expression
     values: List[Expression]
     negated: bool = False
+    subquery: Optional["SQLStatement"] = None
 
 
 @dataclass
@@ -418,11 +457,78 @@ class CaseExpr(Expression):
 
 
 @dataclass
+class SubqueryExpr(Expression):
+    """Subquery expression."""
+
+    query: "SQLStatement"
+    is_scalar: bool = False
+
+
+@dataclass
+class ExistsExpr(Expression):
+    """EXISTS expression."""
+
+    subquery: "SQLStatement"
+    negated: bool = False
+
+
+@dataclass
+class WindowSpec(ASTNode):
+    """Window specification for window functions."""
+
+    partition_by: List[Expression] = field(default_factory=list)
+    order_by: List["OrderByItem"] = field(default_factory=list)
+    frame_type: Optional[str] = None  # ROWS or RANGE
+    frame_start: Optional[str] = None
+    frame_end: Optional[str] = None
+
+
+@dataclass
+class WindowFunction(Expression):
+    """Window function expression."""
+
+    function: FunctionCall
+    window_spec: WindowSpec
+
+
+@dataclass
+class CommonTableExpression(ASTNode):
+    """CTE (WITH clause) definition."""
+
+    name: str
+    columns: List[str] = field(default_factory=list)
+    query: "SQLStatement" = None  # type: ignore
+
+
+@dataclass
+class SetOperation(ASTNode):
+    """Set operation (UNION, INTERSECT, EXCEPT)."""
+
+    type: str  # UNION, INTERSECT, EXCEPT
+    left: "SQLStatement"
+    right: "SQLStatement"
+    all: bool = False
+
+
+@dataclass
+class QueryHints(ASTNode):
+    """Bee-inspired query hints."""
+
+    waggle_join: bool = False
+    swarm_partition: bool = False
+    pheromone_cache: bool = False
+    scout_hint: bool = False
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
 class TableRef(ASTNode):
     """Table reference."""
 
     name: str
     alias: Optional[str] = None
+    is_subquery: bool = False
+    subquery: Optional["SQLStatement"] = None
 
 
 @dataclass
@@ -456,6 +562,9 @@ class SQLStatement(ASTNode):
     limit: Optional[int] = None
     offset: Optional[int] = None
     distinct: bool = False
+    ctes: List[CommonTableExpression] = field(default_factory=list)
+    set_operation: Optional[SetOperation] = None
+    hints: QueryHints = field(default_factory=QueryHints)
 
 
 class SQLParser:
@@ -471,7 +580,20 @@ class SQLParser:
 
     def parse(self) -> SQLStatement:
         """Parse tokens into SQL statement."""
-        return self._parse_select()
+        # Parse CTEs (WITH clause)
+        ctes = []
+        if self._match(TokenType.WITH):
+            ctes = self._parse_ctes()
+
+        # Parse main SELECT statement
+        stmt = self._parse_select()
+        stmt.ctes = ctes
+
+        # Parse set operations (UNION, INTERSECT, EXCEPT)
+        if self._match(TokenType.UNION, TokenType.INTERSECT, TokenType.EXCEPT):
+            stmt = self._parse_set_operation(stmt)
+
+        return stmt
 
     def _current(self) -> Token:
         """Get current token."""
@@ -509,6 +631,9 @@ class SQLParser:
         """Parse SELECT statement."""
         self._expect(TokenType.SELECT)
 
+        # Parse query hints (bee-inspired extensions)
+        hints = self._parse_hints()
+
         # Check for DISTINCT
         distinct = False
         if self._match(TokenType.DISTINCT):
@@ -525,7 +650,7 @@ class SQLParser:
             self._advance()
             from_table = self._parse_table_ref()
 
-            # Parse JOINs
+            # Parse JOINs (including WAGGLE JOIN)
             while self._match(
                 TokenType.JOIN,
                 TokenType.INNER,
@@ -533,6 +658,7 @@ class SQLParser:
                 TokenType.RIGHT,
                 TokenType.FULL,
                 TokenType.CROSS,
+                TokenType.WAGGLE,
             ):
                 joins.append(self._parse_join())
 
@@ -585,6 +711,7 @@ class SQLParser:
             limit=limit,
             offset=offset,
             distinct=distinct,
+            hints=hints,
         )
 
     def _parse_select_columns(self) -> List[SelectColumn]:
@@ -620,7 +747,22 @@ class SQLParser:
         return SelectColumn(expr, alias)
 
     def _parse_table_ref(self) -> TableRef:
-        """Parse table reference."""
+        """Parse table reference (table name or subquery)."""
+        # Check for subquery in FROM
+        if self._match(TokenType.LPAREN):
+            self._advance()
+            subquery = self._parse_select()
+            self._expect(TokenType.RPAREN)
+            
+            alias = None
+            if self._match(TokenType.AS):
+                self._advance()
+                alias = self._expect(TokenType.IDENTIFIER).value
+            elif self._match(TokenType.IDENTIFIER):
+                alias = self._advance().value
+            
+            return TableRef("", alias, is_subquery=True, subquery=subquery)
+        
         name = self._expect(TokenType.IDENTIFIER).value
 
         alias = None
@@ -636,7 +778,11 @@ class SQLParser:
         """Parse JOIN clause."""
         join_type = "INNER"
 
-        if self._match(TokenType.LEFT):
+        # Check for bee-inspired WAGGLE JOIN
+        if self._match(TokenType.WAGGLE):
+            self._advance()
+            join_type = "WAGGLE"
+        elif self._match(TokenType.LEFT):
             self._advance()
             join_type = "LEFT"
             if self._match(TokenType.OUTER):
@@ -730,7 +876,23 @@ class SQLParser:
         """Parse NOT expression."""
         if self._match(TokenType.NOT):
             self._advance()
+            # Check for NOT EXISTS
+            if self._match(TokenType.EXISTS):
+                self._advance()
+                self._expect(TokenType.LPAREN)
+                subquery = self._parse_select()
+                self._expect(TokenType.RPAREN)
+                return ExistsExpr(subquery, negated=True)
             return UnaryOp("NOT", self._parse_not_expr())
+        
+        # Handle EXISTS
+        if self._match(TokenType.EXISTS):
+            self._advance()
+            self._expect(TokenType.LPAREN)
+            subquery = self._parse_select()
+            self._expect(TokenType.RPAREN)
+            return ExistsExpr(subquery, negated=False)
+        
         return self._parse_comparison()
 
     def _parse_comparison(self) -> Expression:
@@ -755,13 +917,20 @@ class SQLParser:
             high = self._parse_additive()
             return BetweenExpr(left, low, high)
 
-        # Handle IN
+        # Handle IN (list or subquery)
         if self._match(TokenType.IN):
             self._advance()
             self._expect(TokenType.LPAREN)
-            values = self._parse_expression_list()
-            self._expect(TokenType.RPAREN)
-            return InExpr(left, values)
+            
+            # Check if it's a subquery
+            if self._match(TokenType.SELECT):
+                subquery = self._parse_select()
+                self._expect(TokenType.RPAREN)
+                return InExpr(left, [], negated=False, subquery=subquery)  # type: ignore
+            else:
+                values = self._parse_expression_list()
+                self._expect(TokenType.RPAREN)
+                return InExpr(left, values)
 
         # Handle LIKE
         if self._match(TokenType.LIKE):
@@ -853,9 +1022,14 @@ class SQLParser:
         if self._match(TokenType.CASE):
             return self._parse_case()
 
-        # Parenthesized expression
+        # Parenthesized expression or subquery
         if self._match(TokenType.LPAREN):
             self._advance()
+            # Check if it's a subquery
+            if self._match(TokenType.SELECT):
+                subquery = self._parse_select()
+                self._expect(TokenType.RPAREN)
+                return SubqueryExpr(subquery, is_scalar=True)
             expr = self._parse_expression()
             self._expect(TokenType.RPAREN)
             return expr
@@ -885,7 +1059,7 @@ class SQLParser:
             f"Unexpected token {token.type.name} at line {token.line}, column {token.column}"
         )
 
-    def _parse_function_call(self, name: str) -> FunctionCall:
+    def _parse_function_call(self, name: str) -> Expression:
         """Parse function call."""
         self._expect(TokenType.LPAREN)
 
@@ -902,7 +1076,15 @@ class SQLParser:
 
         self._expect(TokenType.RPAREN)
 
-        return FunctionCall(name.upper(), args, distinct)
+        func_call = FunctionCall(name.upper(), args, distinct)
+
+        # Check for OVER clause (window function)
+        if self._match(TokenType.OVER):
+            self._advance()
+            window_spec = self._parse_window_spec()
+            return WindowFunction(func_call, window_spec)
+
+        return func_call
 
     def _parse_case(self) -> CaseExpr:
         """Parse CASE expression."""
@@ -929,3 +1111,151 @@ class SQLParser:
         self._expect(TokenType.END)
 
         return CaseExpr(operand, when_clauses, else_clause)
+
+    def _parse_ctes(self) -> List[CommonTableExpression]:
+        """Parse WITH clause (CTEs)."""
+        self._advance()  # Consume WITH
+        ctes = []
+
+        while True:
+            name = self._expect(TokenType.IDENTIFIER).value
+            
+            # Optional column list
+            columns = []
+            if self._match(TokenType.LPAREN):
+                self._advance()
+                columns.append(self._expect(TokenType.IDENTIFIER).value)
+                while self._match(TokenType.COMMA):
+                    self._advance()
+                    columns.append(self._expect(TokenType.IDENTIFIER).value)
+                self._expect(TokenType.RPAREN)
+            
+            self._expect(TokenType.AS)
+            self._expect(TokenType.LPAREN)
+            query = self._parse_select()
+            self._expect(TokenType.RPAREN)
+            
+            ctes.append(CommonTableExpression(name, columns, query))
+            
+            if not self._match(TokenType.COMMA):
+                break
+            self._advance()
+
+        return ctes
+
+    def _parse_set_operation(self, left: SQLStatement) -> SQLStatement:
+        """Parse set operations (UNION, INTERSECT, EXCEPT)."""
+        op_type = self._current().type
+        self._advance()
+
+        # Check for ALL
+        all_flag = False
+        if self._match(TokenType.ALL):
+            self._advance()
+            all_flag = True
+
+        right = self._parse_select()
+
+        op_names = {
+            TokenType.UNION: "UNION",
+            TokenType.INTERSECT: "INTERSECT",
+            TokenType.EXCEPT: "EXCEPT",
+        }
+
+        set_op = SetOperation(op_names[op_type], left, right, all_flag)
+        
+        # Create a wrapper statement with the set operation
+        result = SQLStatement(select_columns=[])
+        result.set_operation = set_op
+        
+        return result
+
+    def _parse_hints(self) -> QueryHints:
+        """Parse bee-inspired query hints."""
+        hints = QueryHints()
+        
+        # Look for hint comments
+        # Format: /*+ HINT_NAME */
+        # For now, check for specific keywords in the query
+        # This is simplified; full implementation would parse comments
+        
+        return hints
+
+    def _parse_window_spec(self) -> WindowSpec:
+        """
+        Parse window specification for window functions.
+        
+        Supports:
+        - PARTITION BY columns
+        - ORDER BY columns 
+        - ROWS/RANGE frame specification
+        """
+        self._expect(TokenType.LPAREN)
+        
+        partition_by = []
+        order_by = []
+        frame_type = None
+        frame_start = None
+        frame_end = None
+        
+        # PARTITION BY clause
+        if self._match(TokenType.PARTITION):
+            self._advance()
+            self._expect(TokenType.BY)
+            partition_by = self._parse_expression_list()
+        
+        # ORDER BY clause
+        if self._match(TokenType.ORDER):
+            self._advance()
+            self._expect(TokenType.BY)
+            order_by = self._parse_order_by_items()
+        
+        # Frame specification (ROWS or RANGE)
+        if self._match(TokenType.ROWS, TokenType.RANGE):
+            frame_type = "ROWS" if self._current().type == TokenType.ROWS else "RANGE"
+            self._advance()
+            
+            # Frame start
+            if self._match(TokenType.UNBOUNDED):
+                self._advance()
+                self._expect(TokenType.PRECEDING)
+                frame_start = "UNBOUNDED PRECEDING"
+            elif self._match(TokenType.CURRENT):
+                self._advance()
+                self._expect(TokenType.ROW)
+                frame_start = "CURRENT ROW"
+            elif self._match(TokenType.NUMBER):
+                num = self._advance().value
+                if self._match(TokenType.PRECEDING):
+                    self._advance()
+                    frame_start = f"{num} PRECEDING"
+                elif self._match(TokenType.FOLLOWING):
+                    self._advance()
+                    frame_start = f"{num} FOLLOWING"
+            
+            # Check for BETWEEN (frame start AND frame end)
+            if self._match(TokenType.BETWEEN):
+                self._advance()
+                # Parse frame start (already done above)
+                self._expect(TokenType.AND)
+                # Parse frame end
+                if self._match(TokenType.UNBOUNDED):
+                    self._advance()
+                    self._expect(TokenType.FOLLOWING)
+                    frame_end = "UNBOUNDED FOLLOWING"
+                elif self._match(TokenType.CURRENT):
+                    self._advance()
+                    self._expect(TokenType.ROW)
+                    frame_end = "CURRENT ROW"
+                elif self._match(TokenType.NUMBER):
+                    num = self._advance().value
+                    if self._match(TokenType.PRECEDING):
+                        self._advance()
+                        frame_end = f"{num} PRECEDING"
+                    elif self._match(TokenType.FOLLOWING):
+                        self._advance()
+                        frame_end = f"{num} FOLLOWING"
+        
+        self._expect(TokenType.RPAREN)
+        
+        return WindowSpec(partition_by, order_by, frame_type, frame_start, frame_end)
