@@ -59,7 +59,7 @@ Spark Model:                    HiveFrame Model:
 | **Advanced Streaming** | Windowing, watermarks, and exactly-once delivery guarantees |
 | **Dead Letter Queue** | Failed record management with full error context |
 
-### Phase 2 (In Progress)
+### Phase 2 (Complete) ✅
 | Feature | Description |
 |---------|-------------|
 | **Multi-Hive Federation** | Connect multiple clusters that coordinate like allied bee colonies |
@@ -306,6 +306,214 @@ dashboard.start()
 #   - Worker distribution visualization
 #   - Task queue monitoring
 #   - Pheromone trail activity
+```
+
+## Phase 2: Swarm Intelligence Features
+
+### Multi-Hive Federation
+
+```python
+from hiveframe.distributed import HiveFederation, FederatedHive, HiveRegistry
+
+# Create a federation of multiple hives
+federation = HiveFederation(name="global-analytics")
+
+# Register hives in different data centers
+hive_east = FederatedHive(name="east-dc", endpoint="east.example.com:9000", workers=20)
+hive_west = FederatedHive(name="west-dc", endpoint="west.example.com:9000", workers=15)
+
+federation.register_hive(hive_east)
+federation.register_hive(hive_west)
+
+# Distribute work across federated hives
+result = federation.execute_distributed(
+    data=large_dataset,
+    fn=process_function,
+    locality_hints={"region": "east"}  # Prefer east datacenter
+)
+```
+
+### Adaptive Partitioning
+
+```python
+from hiveframe.distributed import AdaptivePartitioner, PartitionStrategy
+
+# Create adaptive partitioner
+partitioner = AdaptivePartitioner(
+    strategy=PartitionStrategy.FITNESS_BASED,
+    min_partition_size=100_000,
+    max_partition_size=10_000_000
+)
+
+# Partitioner automatically splits/merges based on:
+# - Processing time fitness
+# - Data distribution patterns
+# - Worker load balancing
+df = HiveDataFrame.from_csv('large_file.csv')
+partitioned_df = partitioner.partition(df)
+
+# Partitions adapt during processing based on swarm feedback
+result = partitioned_df.groupBy('category').agg(sum_agg(col('amount')))
+```
+
+### Speculative Execution
+
+```python
+from hiveframe.distributed import SpeculativeExecutor, SpeculativeConfig
+
+# Configure speculative execution
+config = SpeculativeConfig(
+    enabled=True,
+    slow_task_threshold=1.5,  # 1.5x median time
+    speculation_fraction=0.1   # Speculate on slowest 10%
+)
+
+executor = SpeculativeExecutor(config=config, num_scouts=4)
+
+# Scout bees automatically detect and retry slow tasks
+result = executor.execute(
+    data=data,
+    fn=expensive_computation,
+    timeout=300
+)
+
+# Metrics show speculative task improvements
+print(executor.get_metrics())
+# {'tasks_total': 1000, 'tasks_speculated': 42, 'time_saved_seconds': 127}
+```
+
+### Vectorized Execution
+
+```python
+from hiveframe.optimizer import VectorizedPipeline, VectorBatch
+
+# Create vectorized pipeline
+pipeline = VectorizedPipeline()
+
+# SIMD-accelerated operations on numeric data
+df = HiveDataFrame.from_csv('numerical_data.csv')
+
+# Vectorized filter, project, and aggregate
+result = (df
+    .filter(col('value') > 100)         # Vectorized comparison
+    .select(col('value') * 2.5)         # Vectorized arithmetic
+    .agg(sum_agg(col('value')))         # Vectorized aggregation
+)
+
+# 5-10x speedup on numerical workloads
+```
+
+### Adaptive Query Execution (AQE)
+
+```python
+from hiveframe.optimizer import AdaptiveQueryExecutor, AQEContext
+
+# Enable adaptive query execution
+ctx = SwarmQLContext(aqe_enabled=True)
+
+# Query plans adapt during execution based on runtime statistics
+result = ctx.sql("""
+    SELECT customer_id, SUM(amount) as total
+    FROM orders
+    JOIN customers ON orders.customer_id = customers.id
+    WHERE status = 'completed'
+    GROUP BY customer_id
+""")
+
+# AQE automatically:
+# - Switches join strategies based on actual data sizes
+# - Adjusts partition counts dynamically
+# - Reoptimizes based on waggle dance feedback
+# - Handles data skew automatically
+```
+
+### HoneyStore (Native Columnar Format)
+
+```python
+from hiveframe.storage import write_honeystore, read_honeystore, HoneyStoreWriter
+
+# Write data in HoneyStore format
+df = HiveDataFrame.from_csv('sales.csv')
+write_honeystore(df, 'sales.honey', compression='adaptive')
+
+# HoneyStore features:
+# - Columnar layout optimized for swarm access
+# - Adaptive compression based on data patterns
+# - Honeycomb blocks for balanced parallel I/O
+# - Nectar encoding for efficient null handling
+
+# Read with column pruning and predicate pushdown
+df = read_honeystore(
+    'sales.honey',
+    columns=['customer_id', 'amount'],
+    filters={'region': 'West'}
+)
+
+# Native integration with swarm optimizer
+result = df.groupBy('customer_id').agg(sum_agg(col('amount')))
+```
+
+### Iceberg Support
+
+```python
+from hiveframe.storage import IcebergTable, read_iceberg, write_iceberg
+
+# Create Iceberg table
+table = IcebergTable('warehouse/sales_iceberg')
+
+# Write with schema evolution
+df = HiveDataFrame.from_csv('sales.csv')
+write_iceberg(df, table, mode='append')
+
+# Time travel
+df_yesterday = read_iceberg(table, snapshot_id=12345)
+df_last_week = read_iceberg(table, timestamp='2024-01-15T00:00:00Z')
+
+# Schema evolution
+new_df = df.withColumn('new_field', col('amount') * 1.1)
+write_iceberg(new_df, table, mode='append')  # Schema automatically evolves
+
+# Hidden partitioning (Iceberg handles partitioning transparently)
+partitioned_df = read_iceberg(
+    table,
+    filters={'date': '2024-01-20', 'region': 'East'}
+)
+```
+
+### Caching Swarm
+
+```python
+from hiveframe.storage import CachingSwarm, PheromoneCache
+
+# Initialize caching swarm with pheromone-based eviction
+cache = CachingSwarm(
+    max_size_gb=10.0,
+    eviction_policy='pheromone',  # Swarm intelligence-based
+    l1_size_mb=512,
+    l2_size_gb=2.0,
+    l3_distributed=True
+)
+
+# Cache frequently accessed data
+df = HiveDataFrame.from_csv('large_dataset.csv')
+cache.put('dataset_1', df)
+
+# Pheromone trails track access patterns
+# - Frequently accessed data gets stronger pheromone
+# - Pheromones decay over time
+# - Eviction prioritizes weak pheromone trails
+
+# Automatic prefetching by scout bees
+result = cache.get('dataset_1')  # Fast cache hit
+related = cache.get('dataset_2')  # Prefetched by swarm intelligence
+
+# Distributed cache coordination across cluster
+cache.enable_distributed_coordination()
+
+# Cache metrics
+stats = cache.get_stats()
+print(f"Hit rate: {stats['hit_rate']:.2%}")
+print(f"Avg pheromone: {stats['avg_pheromone']:.2f}")
 ```
 
 ## Architecture
@@ -766,12 +974,29 @@ python examples/demo.py
 
 # Progressive challenge demo - production scenarios
 python examples/demo_progressive.py
+
+# SQL queries (SwarmQL 1.0)
+python examples/demo_sql.py
+
+# Storage features (Parquet & Delta Lake)
+python examples/demo_storage.py
+
+# SwarmQL 2.0 features (CTEs, subqueries, window functions)
+python examples/swarmql_2_demo.py
+
+# Phase 2 demos - coming soon:
+# python examples/demo_federation.py        # Multi-hive federation
+# python examples/demo_adaptive.py          # Adaptive partitioning & speculative execution
+# python examples/demo_vectorized.py        # Vectorized execution
+# python examples/demo_aqe.py               # Adaptive query execution
+# python examples/demo_honeystore.py        # HoneyStore native format
+# python examples/demo_caching.py           # Caching swarm
 ```
 
 **demo.py** runs five demonstrations:
 1. **Core API** - RDD-style map/filter/reduce
 2. **DataFrame API** - Spark-like queries
-3. **Streaming** - Real-time processing
+3. **Streaming** - Real-time processing with windowing
 4. **Benchmarks** - Performance comparison
 5. **Colony Behavior** - Visualization of bee dynamics
 
@@ -780,6 +1005,26 @@ python examples/demo_progressive.py
 2. **Resilience Patterns** - Circuit breakers, retries, bulkheads
 3. **Monitoring Integration** - Metrics, tracing, health checks
 4. **Scale Testing** - Concurrent load and backpressure
+
+**demo_sql.py** demonstrates SwarmQL 1.0:
+1. **Table Registration** - Catalog management
+2. **SELECT Queries** - Basic queries with WHERE, GROUP BY
+3. **Aggregations** - COUNT, SUM, AVG, MIN, MAX
+4. **Joins** - INNER, LEFT, RIGHT joins
+
+**demo_storage.py** demonstrates storage layer:
+1. **Parquet** - Read/write operations with compression
+2. **Delta Lake** - ACID transactions and time travel
+3. **Schema Evolution** - Handling schema changes
+
+**swarmql_2_demo.py** demonstrates SwarmQL 2.0:
+1. **CTEs** - Common Table Expressions (WITH clause)
+2. **Set Operations** - UNION, INTERSECT, EXCEPT
+3. **Subqueries** - IN, EXISTS, scalar subqueries
+4. **Window Functions** - ROW_NUMBER, RANK, LAG, LEAD
+5. **String Functions** - UPPER, LOWER, CONCAT, SUBSTRING
+6. **Date Functions** - CURRENT_DATE, DATE_ADD, EXTRACT
+7. **Bee-inspired Extensions** - WAGGLE JOIN demonstrations
 
 ## Contributing
 
