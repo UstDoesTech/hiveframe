@@ -145,7 +145,7 @@ class DanceFloor:
             selected = []
             for _ in range(min(n, len(all_dances))):
                 r = random.uniform(0, total)
-                cumsum = 0
+                cumsum: float = 0
                 for dance, weight in zip(all_dances, weights):
                     cumsum += weight
                     if cumsum >= r:
@@ -306,7 +306,7 @@ class Bee:
                 self.current_source = random.choice(sources)
             else:
                 r = random.uniform(0, total)
-                cumsum = 0
+                cumsum: float = 0
                 for source, weight in zip(sources, weights):
                     cumsum += weight
                     if cumsum >= r:
@@ -468,6 +468,8 @@ class HiveFrame:
         n_onlookers = int(self.num_workers * self.onlooker_ratio)
         n_scouts = self.num_workers - n_employed - n_onlookers
 
+        assert self.colony is not None
+
         for i in range(n_employed):
             bees.append(
                 Bee(
@@ -540,7 +542,7 @@ class HiveFrame:
 
         # Run foraging cycles
         cycles = 0
-        processed_partitions = set()
+        processed_partitions: set = set()
 
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
             while cycles < self.max_cycles:
@@ -585,7 +587,7 @@ class HiveFrame:
         """
         results = self.process(data, fn)
         # Preserve order
-        return [results.get(f"partition_{i}") for i in range(len(data))]
+        return [results.get(f"partition_{i}") for i in range(len(data))]  # type: ignore
 
     def filter(self, data: List[T], predicate: Callable[[T], bool]) -> List[T]:
         """
@@ -615,12 +617,10 @@ class HiveFrame:
             for i in range(0, len(current) - 1, 2):
                 pairs.append((current[i], current[i + 1]))
             if len(current) % 2 == 1:
-                pairs.append((current[-1], None))
+                pairs.append((current[-1], current[-1]))  # Pair with itself
 
             def reduce_pair(pair):
                 a, b = pair
-                if b is None:
-                    return a
                 return fn(a, b)
 
             results = self.process(pairs, reduce_pair)

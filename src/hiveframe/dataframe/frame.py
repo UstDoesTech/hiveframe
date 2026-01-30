@@ -48,13 +48,14 @@ class HiveDataFrame:
         cls, path: str, header: bool = True, hive: Optional[HiveFrame] = None
     ) -> "HiveDataFrame":
         """Load DataFrame from CSV file."""
+        data: List[Dict[str, Any]]
         with open(path, "r") as f:
             if header:
-                reader = csv.DictReader(f)
-                data = list(reader)
+                csv_reader = csv.DictReader(f)
+                data = list(csv_reader)  # type: ignore
             else:
-                reader = csv.reader(f)
-                rows = list(reader)
+                csv_reader2 = csv.reader(f)
+                rows = list(csv_reader2)
                 data = [{f"col_{i}": val for i, val in enumerate(row)} for row in rows]
         return cls(data, hive)
 
@@ -130,7 +131,7 @@ class HiveDataFrame:
         """Filter rows by condition."""
 
         def filter_fn(row: Dict) -> bool:
-            return condition.eval(row)
+            return bool(condition.eval(row))
 
         new_data = self._hive.filter(self._data, filter_fn)
         return HiveDataFrame(new_data, self._hive)
@@ -377,7 +378,7 @@ class HiveDataFrame:
         result = []
 
         for stat in stats:
-            row = {"summary": stat}
+            row: Dict[str, Any] = {"summary": stat}
             for col in numeric_cols:
                 values = [r.get(col) for r in self._data if r.get(col) is not None]
                 if not values:
@@ -385,15 +386,15 @@ class HiveDataFrame:
                 elif stat == "count":
                     row[col] = len(values)
                 elif stat == "mean":
-                    row[col] = sum(values) / len(values)
+                    row[col] = sum(values) / len(values)  # type: ignore
                 elif stat == "std":
-                    mean = sum(values) / len(values)
-                    variance = sum((x - mean) ** 2 for x in values) / len(values)
+                    mean = sum(values) / len(values)  # type: ignore
+                    variance = sum((x - mean) ** 2 for x in values) / len(values)  # type: ignore
                     row[col] = variance**0.5
                 elif stat == "min":
-                    row[col] = min(values)
+                    row[col] = min(values)  # type: ignore
                 elif stat == "max":
-                    row[col] = max(values)
+                    row[col] = max(values)  # type: ignore
             result.append(row)
 
         return HiveDataFrame(result, self._hive)

@@ -333,7 +333,7 @@ def run_schema_drift_scenario(
         {"id": "int", "amount": "float", "new_field": "string"},  # Renamed field
     ]
 
-    observed_schemas = []
+    observed_schemas: List[set] = []
     drift_events = []
     valid_records = 0
     invalid_records = 0
@@ -349,7 +349,7 @@ def run_schema_drift_scenario(
         # Generate records according to current schema
         records = []
         for i in range(records_per_batch):
-            record = {"id": batch_idx * records_per_batch + i}
+            record: Dict[str, Any] = {"id": batch_idx * records_per_batch + i}
 
             if "value" in current_schema:
                 if current_schema["value"] == "float":
@@ -442,7 +442,7 @@ def run_null_handling_scenario(num_records: int = 1000) -> DataQualityResult:
     # Generate records with various null patterns
     records = []
     for i in range(num_records):
-        record = {"id": i}
+        record: Dict[str, Any] = {"id": i}
 
         r = random.random()
 
@@ -518,25 +518,25 @@ def run_null_handling_scenario(num_records: int = 1000) -> DataQualityResult:
             # Explicit None
             if value is None:
                 issues["explicit_null"] += 1
-                corrections.append(f"{field}: null -> default")
+                corrections.append(f"{field_name}: null -> default")
                 continue
 
             # Empty string
             if value == "":
                 issues["empty_string"] += 1
-                corrections.append(f"{field}: empty -> default")
+                corrections.append(f"{field_name}: empty -> default")
                 continue
 
             # "null" string
             if isinstance(value, str) and value.lower() == "null":
                 issues["null_string"] += 1
-                corrections.append(f'{field}: "null" -> null')
+                corrections.append(f'{field_name}: "null" -> null')
                 continue
 
             # Special floats
             if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
                 issues["special_float"] += 1
-                corrections.append(f"{field}: special float -> default")
+                corrections.append(f"{field_name}: special float -> default")
                 continue
 
         if valid:
@@ -616,38 +616,40 @@ def run_unicode_encoding_scenario(num_records: int = 500) -> DataQualityResult:
 
     for record in records:
         corrections = []
-        text = record.get("text", "")
+        text_val = record.get("text", "")
+        if not isinstance(text_val, str):
+            text_val = str(text_val)
 
         # Check for various unicode issues
-        if "\x00" in text:
+        if "\x00" in text_val:
             issues["control_chars"] += 1
-            text = text.replace("\x00", "")
+            text_val = text_val.replace("\x00", "")
             corrections.append("removed null bytes")
 
-        if "\u202e" in text or "\u202d" in text:
+        if "\u202e" in text_val or "\u202d" in text_val:
             issues["rtl_override"] += 1
             corrections.append("found RTL override")
 
-        if text.startswith("\ufeff"):
+        if text_val.startswith("\ufeff"):
             issues["bom"] += 1
-            text = text.lstrip("\ufeff")
+            text_val = text_val.lstrip("\ufeff")
             corrections.append("stripped BOM")
 
-        if "\u200b" in text or "\u200c" in text or "\u200d" in text:
+        if "\u200b" in text_val or "\u200c" in text_val or "\u200d" in text_val:
             issues["zero_width"] += 1
             corrections.append("contains zero-width chars")
 
         # Check for combining characters
         import unicodedata
 
-        for char in text:
+        for char in text_val:
             if unicodedata.category(char).startswith("M"):
                 issues["combining"] += 1
                 break
 
         # Check for mixed scripts
         scripts = set()
-        for char in text:
+        for char in text_val:
             try:
                 name = unicodedata.name(char, "")
                 if "CJK" in name:
@@ -738,34 +740,37 @@ def run_extreme_values_scenario(num_records: int = 500) -> DataQualityResult:
 
     for record in records:
         corrections = []
-        value = record.get("value")
+        value_obj = record.get("value")
+        if not isinstance(value_obj, (int, float)):
+            value_obj = 0.0
+        numeric_value: float = float(value_obj)
 
-        if isinstance(value, float):
-            if math.isinf(value):
+        if isinstance(numeric_value, float):
+            if math.isinf(numeric_value):
                 issues["infinity"] += 1
                 corrections.append("infinite value")
 
-            if math.isnan(value):
+            if math.isnan(numeric_value):
                 issues["nan"] += 1
                 corrections.append("NaN value")
 
             # Check for negative zero
-            if value == 0 and math.copysign(1, value) < 0:
+            if numeric_value == 0 and math.copysign(1, numeric_value) < 0:
                 issues["negative_zero"] += 1
                 corrections.append("negative zero")
 
             # Check for precision issues
-            if value != 0 and abs(value) < 1e-15:
+            if numeric_value != 0 and abs(numeric_value) < 1e-15:
                 issues["underflow"] += 1
                 corrections.append("near underflow")
 
-        if isinstance(value, (int, float)):
+        if isinstance(numeric_value, (int, float)):
             # Check for potential overflow in common representations
-            if abs(value) > 2**53:
+            if abs(numeric_value) > 2**53:
                 issues["precision_loss"] += 1
                 corrections.append("precision loss likely")
 
-            if abs(value) > 2**63:
+            if abs(numeric_value) > 2**63:
                 issues["overflow"] += 1
                 corrections.append("int64 overflow")
 

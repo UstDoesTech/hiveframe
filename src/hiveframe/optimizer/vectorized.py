@@ -55,13 +55,13 @@ class VectorBatch:
             return cls(num_rows=0)
 
         # Collect column names
-        col_names = set()
+        col_names: set = set()
         for row in rows:
             col_names.update(row.keys())
 
         # Build columnar arrays
-        columns = {name: [] for name in col_names}
-        null_masks = {name: [] for name in col_names}
+        columns: Dict[str, List[Any]] = {name: [] for name in col_names}
+        null_masks: Dict[str, List[bool]] = {name: [] for name in col_names}
 
         for row in rows:
             for name in col_names:
@@ -187,21 +187,21 @@ class VectorizedFilter(VectorizedOp):
         """Compare single value."""
         try:
             if self.operator == "=":
-                return val == self.value
+                return bool(val == self.value)
             elif self.operator == "!=":
-                return val != self.value
+                return bool(val != self.value)
             elif self.operator == ">":
-                return val > self.value
+                return bool(val > self.value)
             elif self.operator == ">=":
-                return val >= self.value
+                return bool(val >= self.value)
             elif self.operator == "<":
-                return val < self.value
+                return bool(val < self.value)
             elif self.operator == "<=":
-                return val <= self.value
+                return bool(val <= self.value)
             elif self.operator == "LIKE":
                 return self._like_match(str(val), str(self.value))
             elif self.operator == "IN":
-                return val in self.value
+                return bool(val in self.value)
             else:
                 return False
         except (TypeError, ValueError):
@@ -518,7 +518,7 @@ class ParallelVectorizedExecutor:
             batches.append(VectorBatch.from_rows(batch_data))
 
         # Process batches in parallel
-        results = []
+        results: List[Dict[str, Any]] = []
 
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
             futures = {
@@ -526,7 +526,7 @@ class ParallelVectorizedExecutor:
             }
 
             # Collect results in order
-            result_batches = [None] * len(batches)
+            result_batches: List[Optional[VectorBatch]] = [None] * len(batches)
             for future in as_completed(futures):
                 idx = futures[future]
                 result_batches[idx] = future.result()

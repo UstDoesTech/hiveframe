@@ -188,7 +188,7 @@ class SQLExecutor:
             )
             nodes = [limit_node]
 
-        return QueryPlan(root=nodes[0] if nodes else None, tables=tables)
+        return QueryPlan(root=nodes[0] if nodes else PlanNode(type=PlanNodeType.SCAN), tables=tables)
 
     def _execute_plan(self, plan: QueryPlan, stmt: SQLStatement) -> HiveDataFrame:
         """Execute the query plan."""
@@ -385,7 +385,7 @@ class SQLExecutor:
             }
 
             if expr.op in ops:
-                return ops[expr.op](left, right)
+                return ops[expr.op](left, right)  # type: ignore
             raise ValueError(f"Unsupported operator: {expr.op}")
 
         if isinstance(expr, UnaryOp):
@@ -394,7 +394,7 @@ class SQLExecutor:
             if expr.op == "NOT":
                 return ~operand
             if expr.op == "-":
-                return -operand
+                return operand * lit(-1)  # type: ignore
             if expr.op == "IS NULL":
                 return operand.isNull()
             if expr.op == "IS NOT NULL":
@@ -411,7 +411,11 @@ class SQLExecutor:
             col_expr = self._expr_to_column(expr.expr)
             # For IN, we need to evaluate against constant list
             values = [self._eval_constant_expr(v) for v in expr.values]
-            return col_expr.isin(values)
+            # Use a custom function since Column doesn't have isin
+            def check_in(row: Dict) -> bool:
+                val = col_expr.eval(row)
+                return val in values
+            return Column("in_check", eval_fn=check_in)  # type: ignore
 
         if isinstance(expr, CaseExpr):
             # CASE expressions need special handling
@@ -426,32 +430,57 @@ class SQLExecutor:
         # String functions
         if name == "UPPER":
             arg = self._expr_to_column(func.args[0])
-            return arg.upper()
+            # Use a custom function since Column doesn't have upper
+            def upper_fn(row: Dict) -> Any:
+                val = arg.eval(row)
+                return str(val).upper() if val is not None else None
+            return Column("upper", eval_fn=upper_fn)  # type: ignore
         if name == "LOWER":
             arg = self._expr_to_column(func.args[0])
-            return arg.lower()
+            def lower_fn(row: Dict) -> Any:
+                val = arg.eval(row)
+                return str(val).lower() if val is not None else None
+            return Column("lower", eval_fn=lower_fn)  # type: ignore
         if name == "LENGTH":
             arg = self._expr_to_column(func.args[0])
-            return arg.length()
+            def length_fn(row: Dict) -> Any:
+                val = arg.eval(row)
+                return len(str(val)) if val is not None else None
+            return Column("length", eval_fn=length_fn)  # type: ignore
         if name == "CONCAT":
-            result = self._expr_to_column(func.args[0])
-            for arg in func.args[1:]:
-                result = result.concat(self._expr_to_column(arg))
-            return result
+            args = [self._expr_to_column(a) for a in func.args]
+            def concat_fn(row: Dict) -> Any:
+                parts = [str(arg.eval(row)) if arg.eval(row) is not None else "" for arg in args]
+                return "".join(parts)
+            return Column("concat", eval_fn=concat_fn)  # type: ignore
         if name == "SUBSTRING" or name == "SUBSTR":
             s = self._expr_to_column(func.args[0])
             start = self._eval_constant_expr(func.args[1])
             length = self._eval_constant_expr(func.args[2]) if len(func.args) > 2 else None
-            return s.substring(start, length)
+            def substr_fn(row: Dict) -> Any:
+                val = s.eval(row)
+                if val is None:
+                    return None
+                str_val = str(val)
+                if length is not None:
+                    return str_val[start:start+length]
+                return str_val[start:]
+            return Column("substring", eval_fn=substr_fn)  # type: ignore
 
         # Math functions
         if name == "ABS":
             arg = self._expr_to_column(func.args[0])
-            return arg.abs()
+            def abs_fn(row: Dict) -> Any:
+                val = arg.eval(row)
+                return abs(val) if val is not None else None
+            return Column("abs", eval_fn=abs_fn)  # type: ignore
         if name == "ROUND":
             arg = self._expr_to_column(func.args[0])
             decimals = self._eval_constant_expr(func.args[1]) if len(func.args) > 1 else 0
-            return arg.round(decimals)
+            def round_fn(row: Dict) -> Any:
+                val = arg.eval(row)
+                return round(val, decimals) if val is not None else None
+            return Column("round", eval_fn=round_fn)  # type: ignore
 
         # Date functions
         if name == "NOW" or name == "CURRENT_TIMESTAMP":
@@ -495,7 +524,7 @@ class SQLExecutor:
                 return self._eval_expr_on_row(case.else_clause, row)
             return None
 
-        return Column("case", eval_fn=eval_case)
+        return Column("case", eval_fn=eval_case)  # type: ignore
 
     def _coalesce_column(self, args: List[Expression]) -> Column:
         """Create COALESCE column."""
@@ -507,7 +536,7 @@ class SQLExecutor:
                     return val
             return None
 
-        return Column("coalesce", eval_fn=eval_coalesce)
+        return Column("coalesce", eval_fn=eval_coalesce)  # type: ignore
 
     def _eval_expr_on_row(self, expr: Expression, row: Dict) -> Any:
         """Evaluate expression on a row."""
@@ -592,7 +621,7 @@ class SQLExecutor:
 
     def _extract_aggregates(self, stmt: SQLStatement) -> List[Tuple[str, Expression]]:
         """Extract aggregate functions from statement."""
-        aggs = []
+        aggs: List[Tuple[str, Expression]] = []
         for sc in stmt.select_columns:
             if isinstance(sc.expression, FunctionCall):
                 if sc.expression.name.upper() in self.AGGREGATE_FUNCTIONS:
