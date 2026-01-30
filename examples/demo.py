@@ -27,6 +27,19 @@ from hiveframe import (
     create_hive, BeeRole
 )
 
+# SQL support
+from hiveframe.sql import SwarmQLContext
+
+# Storage support  
+from hiveframe.storage import read_parquet, write_parquet, DeltaTable
+
+# Advanced streaming
+from hiveframe.streaming import (
+    sliding_window, session_window, tumbling_window,
+    bounded_watermark, DeliveryGuarantee, EnhancedStreamProcessor,
+    StreamRecord
+)
+
 
 def generate_sample_data(n: int = 10000) -> List[Dict[str, Any]]:
     """Generate sample transaction data."""
@@ -473,6 +486,218 @@ def demo_colony_behavior():
 
 
 # =============================================================================
+# DEMO 6: SwarmQL - SQL Engine
+# =============================================================================
+
+def demo_sql_engine():
+    """Demonstrate the SwarmQL SQL engine."""
+    print_header("DEMO 6: SwarmQL - SQL Engine")
+    
+    # Create SQL context
+    ctx = SwarmQLContext(num_workers=4)
+    print("Created SwarmQLContext with 4 workers")
+    
+    # Generate sample data
+    print("\nRegistering tables...")
+    
+    users = [
+        {'user_id': 1, 'name': 'Alice', 'city': 'New York', 'age': 28},
+        {'user_id': 2, 'name': 'Bob', 'city': 'San Francisco', 'age': 35},
+        {'user_id': 3, 'name': 'Carol', 'city': 'New York', 'age': 42},
+        {'user_id': 4, 'name': 'David', 'city': 'Chicago', 'age': 29},
+        {'user_id': 5, 'name': 'Eve', 'city': 'San Francisco', 'age': 31},
+    ]
+    
+    orders = [
+        {'order_id': 101, 'user_id': 1, 'amount': 250.00, 'status': 'completed'},
+        {'order_id': 102, 'user_id': 2, 'amount': 150.00, 'status': 'pending'},
+        {'order_id': 103, 'user_id': 1, 'amount': 75.50, 'status': 'completed'},
+        {'order_id': 104, 'user_id': 3, 'amount': 320.00, 'status': 'completed'},
+        {'order_id': 105, 'user_id': 2, 'amount': 89.99, 'status': 'cancelled'},
+        {'order_id': 106, 'user_id': 4, 'amount': 199.00, 'status': 'completed'},
+        {'order_id': 107, 'user_id': 5, 'amount': 450.00, 'status': 'pending'},
+    ]
+    
+    ctx.register_table("users", HiveDataFrame(users))
+    ctx.register_table("orders", HiveDataFrame(orders))
+    
+    print(f"Available tables: {ctx.tables()}")
+    
+    print_subheader("Simple SELECT")
+    result = ctx.sql("SELECT name, city FROM users WHERE age > 30")
+    result.show()
+    
+    print_subheader("Aggregation Query")
+    result = ctx.sql("""
+        SELECT city, COUNT(*) as user_count, AVG(age) as avg_age 
+        FROM users 
+        GROUP BY city
+    """)
+    result.show()
+    
+    print_subheader("Query Explanation")
+    plan = ctx.explain("SELECT * FROM orders WHERE amount > 100")
+    print(plan)
+    
+    print_subheader("Catalog Management")
+    print(f"Tables in catalog: {ctx.tables()}")
+    ctx.drop_table("orders")
+    print(f"After dropping 'orders': {ctx.tables()}")
+    
+
+# =============================================================================
+# DEMO 7: DataFrame Joins and Advanced Operations
+# =============================================================================
+
+def demo_advanced_dataframe():
+    """Demonstrate advanced DataFrame operations."""
+    print_header("DEMO 7: Advanced DataFrame Operations")
+    
+    # Create sample data
+    employees = HiveDataFrame([
+        {'emp_id': 1, 'name': 'Alice', 'dept_id': 10, 'salary': 95000},
+        {'emp_id': 2, 'name': 'Bob', 'dept_id': 20, 'salary': 87000},
+        {'emp_id': 3, 'name': 'Carol', 'dept_id': 10, 'salary': 78000},
+        {'emp_id': 4, 'name': 'David', 'dept_id': 30, 'salary': 92000},
+        {'emp_id': 5, 'name': 'Eve', 'dept_id': 20, 'salary': 88000},
+    ])
+    
+    departments = HiveDataFrame([
+        {'dept_id': 10, 'dept_name': 'Engineering', 'location': 'NYC'},
+        {'dept_id': 20, 'dept_name': 'Marketing', 'location': 'LA'},
+        {'dept_id': 30, 'dept_name': 'Sales', 'location': 'Chicago'},
+        {'dept_id': 40, 'dept_name': 'HR', 'location': 'NYC'},  # No employees
+    ])
+    
+    print_subheader("Inner Join")
+    print("Query: Employees with their department info")
+    
+    start = time.time()
+    joined = employees.join(departments, on='dept_id', how='inner')
+    elapsed = time.time() - start
+    
+    joined.select('name', 'salary', 'dept_name', 'location').show()
+    print(f"Time: {elapsed:.4f}s")
+    
+    print_subheader("Left Join")
+    print("Query: All departments with employee counts")
+    
+    dept_employees = departments.join(employees, on='dept_id', how='left')
+    dept_employees.show()
+    
+    print_subheader("Union Operations")
+    
+    team_a = HiveDataFrame([
+        {'id': 1, 'name': 'Alice', 'score': 95},
+        {'id': 2, 'name': 'Bob', 'score': 87},
+    ])
+    
+    team_b = HiveDataFrame([
+        {'id': 3, 'name': 'Carol', 'score': 92},
+        {'id': 4, 'name': 'David', 'score': 88},
+    ])
+    
+    combined = team_a.union(team_b)
+    print("Combined teams:")
+    combined.show()
+    
+    print_subheader("Distinct & Deduplication")
+    
+    with_dupes = HiveDataFrame([
+        {'category': 'A', 'value': 1},
+        {'category': 'B', 'value': 2},
+        {'category': 'A', 'value': 1},  # Duplicate
+        {'category': 'C', 'value': 3},
+        {'category': 'B', 'value': 2},  # Duplicate
+    ])
+    
+    print(f"Before distinct: {with_dupes.count()} rows")
+    deduped = with_dupes.distinct()
+    print(f"After distinct: {deduped.count()} rows")
+    deduped.show()
+    
+    print_subheader("Statistical Summary")
+    print("describe() on employee salaries:")
+    employees.select('salary').describe().show()
+
+
+# =============================================================================
+# DEMO 8: Advanced Streaming with Windows
+# =============================================================================
+
+def demo_advanced_streaming():
+    """Demonstrate advanced streaming features."""
+    print_header("DEMO 8: Advanced Streaming Features")
+    
+    print_subheader("Window Types Comparison")
+    
+    print("1. TUMBLING WINDOW (5-second fixed intervals)")
+    print("   └── Events: |--window1--|--window2--|--window3--|")
+    print("   └── Non-overlapping, fixed-size batches")
+    
+    print("\n2. SLIDING WINDOW (10s window, 2s slide)")
+    print("   └── Events: |---window1---|")
+    print("              |---window2---|")
+    print("                |---window3---|")
+    print("   └── Overlapping, smooth updates")
+    
+    print("\n3. SESSION WINDOW (5s gap timeout)")
+    print("   └── Events: |--session1--|  gap  |--session2--|")
+    print("   └── Activity-based, variable length")
+    
+    print_subheader("Tumbling Window Processing")
+    
+    processor = EnhancedStreamProcessor(
+        num_workers=4,
+        window_assigner=tumbling_window(2.0),  # 2-second windows
+        watermark_generator=bounded_watermark(0.5),
+        delivery_guarantee=DeliveryGuarantee.AT_LEAST_ONCE
+    )
+    
+    # Simulate sensor data stream
+    import random
+    
+    print("Simulating sensor data stream...")
+    base_time = time.time()
+    
+    for i in range(50):
+        record = StreamRecord(
+            key=f"sensor_{i % 3}",
+            value={'temperature': 20 + random.random() * 10, 'reading': i},
+            timestamp=base_time + (i * 0.1)  # 100ms apart
+        )
+        processor.process_record(record, aggregator=lambda acc, v: acc + 1, initial_value=0)
+    
+    metrics = processor.get_metrics()
+    print(f"\nStream Metrics:")
+    print(f"  Records processed: {metrics['records_processed']}")
+    print(f"  Late records: {metrics['late_records']}")
+    print(f"  Active windows: {metrics['active_windows']}")
+    print(f"  Delivery guarantee: {processor.delivery_guarantee.name}")
+    
+    print_subheader("Sliding Window Demo")
+    
+    sliding_processor = EnhancedStreamProcessor(
+        num_workers=4,
+        window_assigner=sliding_window(4.0, 1.0),  # 4-second window, 1-second slide
+        delivery_guarantee=DeliveryGuarantee.EXACTLY_ONCE
+    )
+    
+    for i in range(30):
+        record = StreamRecord(
+            key=f"metric_{i % 2}",
+            value=random.random() * 100,
+            timestamp=time.time()
+        )
+        sliding_processor.process_record(record, aggregator=lambda acc, v: acc + v, initial_value=0.0)
+        time.sleep(0.05)
+    
+    sliding_metrics = sliding_processor.get_metrics()
+    print(f"Sliding window processed: {sliding_metrics['records_processed']} records")
+    print(f"Exactly-once guarantee active: {sliding_processor.delivery_guarantee == DeliveryGuarantee.EXACTLY_ONCE}")
+
+
+# =============================================================================
 # MAIN
 # =============================================================================
 
@@ -494,6 +719,9 @@ def main():
         ("Streaming", demo_streaming),
         ("Benchmarks", benchmark_comparison),
         ("Colony Behavior", demo_colony_behavior),
+        ("SwarmQL", demo_sql_engine),
+        ("Advanced DataFrame", demo_advanced_dataframe),
+        ("Advanced Streaming", demo_advanced_streaming),
     ]
     
     for name, demo_fn in demos:

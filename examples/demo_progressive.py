@@ -49,12 +49,15 @@ from hiveframe.monitoring import (
     get_logger, get_registry, get_profiler,
     ColonyHealthMonitor, Logger, LogLevel
 )
-from hiveframe.streaming_enhanced import (
-    EnhancedStreamProcessor, tumbling_window, 
-    bounded_watermark, DeliveryGuarantee,
-    count_aggregator, sum_aggregator
+from hiveframe.streaming import (
+    StreamRecord,
+    EnhancedStreamProcessor, 
+    tumbling_window, 
+    bounded_watermark, 
+    DeliveryGuarantee,
+    count_aggregator, 
+    sum_aggregator
 )
-from hiveframe.streaming import StreamRecord
 
 
 # Configure logging
