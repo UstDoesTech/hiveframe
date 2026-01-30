@@ -199,7 +199,8 @@ def demo_aggregations():
     # Multiple aggregations with aliases
     print_subheader("4. Multiple Aggregations with Aliases")
     print(
-        "Query: SELECT category, COUNT(*) as order_count, SUM(amount) as total, AVG(amount) as average FROM orders GROUP BY category\n"
+        "Query: SELECT category, COUNT(*) as order_count, SUM(amount) as total, "
+        "AVG(amount) as average FROM orders GROUP BY category\n"
     )
 
     result = ctx.sql("""
@@ -212,7 +213,8 @@ def demo_aggregations():
     # Filtered aggregation
     print_subheader("5. Filtered Aggregation")
     print(
-        "Query: SELECT category, COUNT(*) as high_value_orders FROM orders WHERE amount > 200 GROUP BY category\n"
+        "Query: SELECT category, COUNT(*) as high_value_orders "
+        "FROM orders WHERE amount > 200 GROUP BY category\n"
     )
 
     result = ctx.sql("""

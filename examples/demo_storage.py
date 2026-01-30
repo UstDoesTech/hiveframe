@@ -451,10 +451,12 @@ def demo_performance():
             print("  Format      | Write (ms) | Read (ms) | Size (KB)")
             print("  ------------|------------|-----------|----------")
             print(
-                f"  Parquet     | {parquet_write*1000:>10.2f} | {parquet_read*1000:>9.2f} | {parquet_size:>8.2f}"
+                f"  Parquet     | {parquet_write*1000:>10.2f} | "
+                f"{parquet_read*1000:>9.2f} | {parquet_size:>8.2f}"
             )
             print(
-                f"  Delta Lake  | {delta_write*1000:>10.2f} | {delta_read*1000:>9.2f} | {delta_size:>8.2f}"
+                f"  Delta Lake  | {delta_write*1000:>10.2f} | "
+                f"{delta_read*1000:>9.2f} | {delta_size:>8.2f}"
             )
 
     finally:

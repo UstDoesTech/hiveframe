@@ -89,7 +89,7 @@ class CircuitBreaker:
         for listener in self._listeners:
             try:
                 listener(old_state, new_state)
-            except:
+            except Exception:
                 pass
 
     def add_state_listener(self, listener: Callable[[CircuitState, CircuitState], None]) -> None:

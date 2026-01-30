@@ -151,8 +151,6 @@ from .dlq import (
 from .exceptions import (
     CircuitOpenError,
     ConfigurationError,
-    DeadLetterQueue,
-    DeadLetterRecord,
     DependencyError,
     HiveFrameError,
     NetworkError,

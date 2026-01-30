@@ -395,13 +395,16 @@ def benchmark_comparison():
     print_header("Benchmark Summary")
 
     print(
-        f"{'Size':>10} | {'Operation':>10} | {'Traditional':>12} | {'HiveFrame':>12} | {'Speedup':>8}"
+        f"{'Size':>10} | {'Operation':>10} | {'Traditional':>12} | "
+        f"{'HiveFrame':>12} | {'Speedup':>8}"
     )
     print("-" * 60)
 
     for r in results_table:
         print(
-            f"{r['size']:>10,} | {r['operation']:>10} | {r['traditional']:>12.4f}s | {r['hiveframe']:>12.4f}s | {r['speedup']:>7.2f}x"
+            f"{r['size']:>10,} | {r['operation']:>10} | "
+            f"{r['traditional']:>12.4f}s | {r['hiveframe']:>12.4f}s | "
+            f"{r['speedup']:>7.2f}x"
         )
 
     print("\nNote: HiveFrame's advantage increases with:")
@@ -715,7 +718,8 @@ def demo_advanced_streaming():
     sliding_metrics = sliding_processor.get_metrics()
     print(f"Sliding window processed: {sliding_metrics['records_processed']} records")
     print(
-        f"Exactly-once guarantee active: {sliding_processor.delivery_guarantee == DeliveryGuarantee.EXACTLY_ONCE}"
+        f"Exactly-once guarantee active: "
+        f"{sliding_processor.delivery_guarantee == DeliveryGuarantee.EXACTLY_ONCE}"
     )
 
 

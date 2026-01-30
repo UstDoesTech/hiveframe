@@ -669,11 +669,11 @@ class TestDeadLetterQueue:
         # Add different error types
         types = [ValidationError, ParseError, ValidationError, SchemaError]
 
-        for i, ErrorClass in enumerate(types):
-            if ErrorClass == ValidationError:
-                error = ErrorClass(f"Error {i}", field="test")
+        for i, error_class in enumerate(types):
+            if error_class == ValidationError:
+                error = error_class(f"Error {i}", field="test")
             else:
-                error = ErrorClass(f"Error {i}")
+                error = error_class(f"Error {i}")
 
             record = DeadLetterRecord(
                 original_data={"id": i},

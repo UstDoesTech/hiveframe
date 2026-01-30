@@ -112,7 +112,7 @@ class BufferedHandler(LogHandler):
             logs = list(self._buffer)
 
         if level:
-            logs = [l for l in logs if l.level.value >= level.value]
+            logs = [log for log in logs if log.level.value >= level.value]
 
         return logs[-limit:]
 

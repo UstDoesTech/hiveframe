@@ -72,10 +72,10 @@ class TestColumnOperations:
 
     def test_lit_creation(self):
         """Test creating literal column."""
-        l = lit(42)
+        literal_col = lit(42)
 
         # Literal should evaluate to the constant value
-        result = l.eval({})
+        result = literal_col.eval({})
         assert result == 42
 
     def test_column_comparison_eq(self):

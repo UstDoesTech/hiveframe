@@ -39,7 +39,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+                sans-serif;
             background: var(--bg-color);
             color: var(--text);
             min-height: 100vh;
@@ -446,12 +447,16 @@ Example: SELECT * FROM users WHERE age > 21"></textarea>
                 const list = document.getElementById('query-list');
                 list.innerHTML = result.data.queries.map(q => `
                     <div class="worker-item">
-                        <span class="worker-role ${q.status === 'COMPLETED' ? 'role-onlooker' :
-                                                    q.status === 'FAILED' ? 'role-scout' : 'role-employed'}">
+                        <span class="worker-role ${
+                            q.status === 'COMPLETED' ? 'role-onlooker' :
+                            q.status === 'FAILED' ? 'role-scout' : 'role-employed'
+                        }">
                             ${q.status}
                         </span>
                         <span class="worker-id">${q.sql}</span>
-                        ${q.duration ? `<span class="worker-status">${q.duration.toFixed(2)}s</span>` : ''}
+                        ${q.duration ?
+                            `<span class="worker-status">${q.duration.toFixed(2)}s</span>` : ''
+                        }
                     </div>
                 `).join('');
             }
@@ -513,7 +518,8 @@ Example: SELECT * FROM users WHERE age > 21"></textarea>
 
             if (result.success) {
                 resultsDiv.innerHTML = `<pre style="margin-top: 1rem; background: rgba(0,0,0,0.2);
-                    padding: 1rem; border-radius: 8px; overflow-x: auto;">${result.data.plan}</pre>`;
+                    padding: 1rem; border-radius: 8px; overflow-x: auto;">
+                    ${result.data.plan}</pre>`;
             } else {
                 resultsDiv.innerHTML = `<p style="color: var(--secondary); margin-top: 1rem;">
                     Error: ${result.error}</p>`;
