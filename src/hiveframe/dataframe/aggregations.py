@@ -28,16 +28,24 @@ class AggFunc:
     
     Bridges the Column-based DataFrame API with the unified Aggregator framework.
     """
-    def __init__(self, name: str, column: Column, aggregator: Aggregator):
+    def __init__(self, name: str, column: Column, aggregator: Aggregator, is_count_all: bool = False):
         self.name = name
         self.column = column
         self._aggregator = aggregator
+        self._is_count_all = is_count_all
         
     def apply(self, rows: List[Dict]) -> Any:
         """Apply aggregation to rows, extracting column values."""
+        if self._is_count_all:
+            # For COUNT(*), just count rows - don't extract column values
+            return len(rows)
         values = [self.column.eval(row) for row in rows]
         # Filter None values and delegate to aggregator
         return self._aggregator.aggregate(values)
+    
+    def alias(self, name: str) -> "AggFunc":
+        """Return a new AggFunc with an aliased name."""
+        return AggFunc(name, self.column, self._aggregator, self._is_count_all)
 
 
 def sum_agg(column: Column) -> AggFunc:
@@ -57,8 +65,8 @@ def count(column: Column) -> AggFunc:
 
 def count_all() -> AggFunc:
     """Count all rows."""
-    # For count_all, we don't filter nulls - create a simple counter
-    return AggFunc("count(*)", Column("*"), CountAggregator())
+    # For count_all, we count rows directly, not column values
+    return AggFunc("count(*)", Column("*"), CountAggregator(), is_count_all=True)
 
 
 def min_agg(column: Column) -> AggFunc:

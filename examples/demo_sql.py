@@ -161,38 +161,60 @@ def demo_aggregations():
     
     print(f"Registered 'users' ({len(users)} rows) and 'orders' ({len(orders)} rows)")
     
-    # COUNT aggregation using DataFrame API via SQL context
-    print_subheader("1. Aggregation via DataFrame")
-    print("Using DataFrame groupBy after SQL-style filtering")
+    # COUNT with alias
+    print_subheader("1. COUNT with Alias")
+    print("Query: SELECT city, COUNT(*) as user_count FROM users GROUP BY city\n")
     
-    # Use DataFrame API for aggregations (more reliable)
-    df = ctx.table("users")
-    result = df.groupBy("city").agg(count(col("user_id")))
+    result = ctx.sql("""
+        SELECT city, COUNT(*) as user_count 
+        FROM users 
+        GROUP BY city
+    """)
     result.show()
     
-    # Simple filter + count
-    print_subheader("2. Filtered Counts")
-    print("Query: Filter high-value orders, then count by category")
+    # SUM aggregation with alias
+    print_subheader("2. SUM with Alias")
+    print("Query: SELECT category, SUM(amount) as total_revenue FROM orders GROUP BY category\n")
     
-    orders_df = ctx.table("orders")
-    high_value = orders_df.filter(col("amount") > 100)
-    result = high_value.groupBy("category").agg(count(col("order_id")))
+    result = ctx.sql("""
+        SELECT category, SUM(amount) as total_revenue 
+        FROM orders 
+        GROUP BY category
+    """)
     result.show()
     
-    # Multiple aggregations on orders
-    print_subheader("3. Multiple Aggregations")
-    print("Statistics by category using DataFrame API")
+    # AVG aggregation with alias
+    print_subheader("3. AVG with Alias")
+    print("Query: SELECT status, AVG(amount) as avg_order_value FROM orders GROUP BY status\n")
     
-    result = orders_df.groupBy("category").agg(
-        count(col("order_id")),
-        avg(col("amount"))
-    )
+    result = ctx.sql("""
+        SELECT status, AVG(amount) as avg_order_value 
+        FROM orders 
+        GROUP BY status
+    """)
     result.show()
     
-    print_subheader("4. Status Distribution")
-    print("Order counts by status")
+    # Multiple aggregations with aliases
+    print_subheader("4. Multiple Aggregations with Aliases")
+    print("Query: SELECT category, COUNT(*) as order_count, SUM(amount) as total, AVG(amount) as average FROM orders GROUP BY category\n")
     
-    result = orders_df.groupBy("status").agg(count(col("order_id")))
+    result = ctx.sql("""
+        SELECT category, COUNT(*) as order_count, SUM(amount) as total, AVG(amount) as average 
+        FROM orders 
+        GROUP BY category
+    """)
+    result.show()
+    
+    # Filtered aggregation
+    print_subheader("5. Filtered Aggregation")
+    print("Query: SELECT category, COUNT(*) as high_value_orders FROM orders WHERE amount > 200 GROUP BY category\n")
+    
+    result = ctx.sql("""
+        SELECT category, COUNT(*) as high_value_orders 
+        FROM orders 
+        WHERE amount > 200 
+        GROUP BY category
+    """)
     result.show()
 
 
