@@ -133,7 +133,7 @@ class ColonyHealthMonitor:
     def _collect_health(self) -> ColonyHealthReport:
         """Collect current health metrics."""
         now = time.time()
-        workers = []
+        workers: List[WorkerHealthSnapshot] = []
         alerts = []
 
 
@@ -192,7 +192,7 @@ class ColonyHealthMonitor:
         """Get latest health report."""
         with self._lock:
             if self._history:
-                return self._history[-1]
+                return self._history[-1]  # type: ignore[no-any-return, return-value]
         return self._collect_health()
 
     def get_health_history(self, limit: int = 20) -> List[ColonyHealthReport]:

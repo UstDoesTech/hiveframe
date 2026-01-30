@@ -81,7 +81,7 @@ class FileWatcher:
         """Get next file event."""
         try:
             event = self._events.get(timeout=timeout)
-            return event  # type: ignore[return-value]
+            return event  # type: ignore[no-any-return, return-value]
         except Empty:
             return None
 

@@ -169,7 +169,7 @@ class StreamBuffer:
             if self.buffer:
                 record = self.buffer.popleft()
                 self._not_full.notify()
-                return record  # type: ignore[return-value]
+                return record  # type: ignore[no-any-return, return-value]
             return None
 
     def get_batch(self, max_batch: int = 100, timeout: float = 0.1) -> List[StreamRecord]:
@@ -421,7 +421,7 @@ class HiveStream:
         """Get a processed result."""
         try:
             result = self.results.get(timeout=timeout)
-            return result  # type: ignore[return-value]
+            return result  # type: ignore[no-any-return, return-value]
         except Empty:
             return None
 
