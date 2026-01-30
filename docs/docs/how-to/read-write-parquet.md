@@ -303,4 +303,4 @@ for chunk in hf.read.parquet_batches("large_file.parquet", batch_size=10000):
 
 - [Use Delta Lake](./use-delta-lake) - ACID transactions on Parquet
 - [Reference: Storage](/docs/reference/storage) - Complete API reference
-- [Explanation: Storage Layer](/docs/explanation/architecture-overview#storage) - How storage works
+- [Explanation: Storage Layer](/docs/explanation/architecture-overview#storage-layer) - How storage works
