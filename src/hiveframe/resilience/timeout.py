@@ -51,7 +51,8 @@ class TimeoutWrapper:
         if exception[0]:
             raise exception[0]
 
-        return result[0]
+        # Type checker: result[0] could be None if the function returns None
+        return result[0]  # type: ignore[return-value]
 
 
 def with_timeout(timeout: float, operation_name: str = "operation"):

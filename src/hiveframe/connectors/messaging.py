@@ -9,7 +9,7 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from queue import Empty, Queue
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any, Dict, Generator, List, Optional, Union
 
 from ..exceptions import ConfigurationError
 from .sinks import DataSink
@@ -39,7 +39,7 @@ class FileWatcher:
 
     def __init__(
         self,
-        directory: str | Path,
+        directory: Union[str, Path],
         pattern: str = "*",
         poll_interval: float = 1.0,
         process_existing: bool = True,
@@ -80,7 +80,8 @@ class FileWatcher:
     def get_event(self, timeout: float = 1.0) -> Optional[FileEvent]:
         """Get next file event."""
         try:
-            return self._events.get(timeout=timeout)
+            event = self._events.get(timeout=timeout)
+            return event  # type: ignore[return-value]
         except Empty:
             return None
 
@@ -275,7 +276,7 @@ class MessageQueueSource(DataSource[Message]):
 
             for partition in self.partitions:
                 messages = self.topic.consume(
-                    self.consumer_group, partition, max_messages=100, timeout=self.poll_timeout
+                    self.consumer_group, partition, max_messages=100
                 )
 
                 for msg in messages:

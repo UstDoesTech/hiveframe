@@ -194,7 +194,7 @@ class QueryOptimizer:
                     r = random.uniform(0, total_fitness)
                     cumsum = 0
                     for i, candidate in enumerate(candidates):
-                        cumsum += candidate.fitness
+                        cumsum = cumsum + candidate.fitness
                         if cumsum >= r:
                             # Generate neighbor
                             neighbor = self._generate_neighbor(candidate.plan, stats)

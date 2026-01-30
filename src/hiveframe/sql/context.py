@@ -69,7 +69,7 @@ class SwarmQLContext:
             if data.endswith(".json"):
                 df = HiveDataFrame.from_json(data, self._hive)
             elif data.endswith(".csv"):
-                df = HiveDataFrame.from_csv(data, self._hive)
+                df = HiveDataFrame.from_csv(data, header=True, hive=self._hive)
             else:
                 raise ValueError(f"Unsupported file format: {data}")
         else:

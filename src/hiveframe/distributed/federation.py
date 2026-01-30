@@ -307,9 +307,9 @@ class FederationCoordinator:
             return random.choice(available)
 
         r = random.uniform(0, total)
-        cumsum = 0
+        cumsum = 0.0
         for hive, fitness in fitness_scores:
-            cumsum += fitness
+            cumsum = cumsum + fitness
             if cumsum >= r:
                 return hive
 
