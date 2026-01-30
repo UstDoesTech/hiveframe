@@ -19,15 +19,22 @@ from dataclasses import dataclass, field
 
 from ..core import HiveFrame, ColonyState, BeeRole
 from ..exceptions import (
-    HiveFrameError, TransientError, ValidationError, 
-    ProcessingError, DeadLetterQueue, DeadLetterRecord
+    HiveFrameError,
+    TransientError,
+    ValidationError,
+    ProcessingError,
+    DeadLetterQueue,
+    DeadLetterRecord,
 )
 from ..resilience import (
-    RetryPolicy, CircuitBreaker, CircuitBreakerConfig,
-    BackoffStrategy, with_retry, ResilientExecutor
+    RetryPolicy,
+    CircuitBreaker,
+    CircuitBreakerConfig,
+    BackoffStrategy,
+    with_retry,
+    ResilientExecutor,
 )
 from ..monitoring import get_logger, get_registry, get_profiler
-
 
 logger = get_logger("challenge.errors")
 metrics = get_registry()
@@ -37,10 +44,11 @@ profiler = get_profiler()
 @dataclass
 class ErrorScenarioConfig:
     """Configuration for error injection scenarios."""
-    transient_error_rate: float = 0.1      # 10% transient errors
-    permanent_error_rate: float = 0.02     # 2% permanent errors
-    cascade_probability: float = 0.05      # 5% chance of cascade
-    poison_pill_rate: float = 0.01         # 1% poison pills
+
+    transient_error_rate: float = 0.1  # 10% transient errors
+    permanent_error_rate: float = 0.02  # 2% permanent errors
+    cascade_probability: float = 0.05  # 5% chance of cascade
+    poison_pill_rate: float = 0.01  # 1% poison pills
     max_retries: int = 3
     timeout_seconds: float = 5.0
 
@@ -48,6 +56,7 @@ class ErrorScenarioConfig:
 @dataclass
 class ScenarioResult:
     """Results from a challenge scenario."""
+
     scenario_name: str
     total_records: int
     successful: int
@@ -60,7 +69,7 @@ class ScenarioResult:
     throughput: float
     error_rate: float
     recovery_rate: float  # Transient errors that recovered
-    
+
     def summary(self) -> str:
         return f"""
 === {self.scenario_name} ===
@@ -81,117 +90,115 @@ Recovery Rate:     {100*self.recovery_rate:.1f}%
 class ErrorInjector:
     """
     Injects various types of errors into processing.
-    
+
     Simulates real-world failure modes:
     - Network timeouts (transient)
     - Data corruption (permanent)
     - Downstream service failures (cascading)
     - Resource exhaustion (transient)
     """
-    
+
     def __init__(self, config: ErrorScenarioConfig):
         self.config = config
-        self._error_counts = {'transient': 0, 'permanent': 0, 'cascade': 0}
+        self._error_counts = {"transient": 0, "permanent": 0, "cascade": 0}
         self._lock = threading.Lock()
-        
+
     def maybe_inject_error(self, record_id: str) -> None:
         """Potentially inject an error based on configuration."""
         r = random.random()
-        
+
         # Check for poison pill (specific bad records)
         if self.config.poison_pill_rate > 0:
             if hash(record_id) % 100 < self.config.poison_pill_rate * 100:
                 with self._lock:
-                    self._error_counts['permanent'] += 1
+                    self._error_counts["permanent"] += 1
                 raise ValidationError(
                     f"Poison pill detected: {record_id}",
                     field="record_id",
                     expected="valid",
-                    actual="poison"
+                    actual="poison",
                 )
-                
+
         # Check for transient error
         if r < self.config.transient_error_rate:
             with self._lock:
-                self._error_counts['transient'] += 1
+                self._error_counts["transient"] += 1
             raise TransientError(
                 f"Simulated transient error for {record_id}",
                 retry_after=0.1,
-                max_retries=self.config.max_retries
+                max_retries=self.config.max_retries,
             )
-            
+
         # Check for permanent error
         elif r < self.config.transient_error_rate + self.config.permanent_error_rate:
             with self._lock:
-                self._error_counts['permanent'] += 1
+                self._error_counts["permanent"] += 1
             raise ValidationError(
                 f"Simulated permanent error for {record_id}",
                 field="data",
                 expected="valid",
-                actual="corrupted"
+                actual="corrupted",
             )
-            
+
         # Check for cascade
-        elif r < (self.config.transient_error_rate + 
-                  self.config.permanent_error_rate + 
-                  self.config.cascade_probability):
+        elif r < (
+            self.config.transient_error_rate
+            + self.config.permanent_error_rate
+            + self.config.cascade_probability
+        ):
             with self._lock:
-                self._error_counts['cascade'] += 1
+                self._error_counts["cascade"] += 1
             raise ProcessingError(
-                f"Simulated cascade failure for {record_id}",
-                partition_id=record_id
+                f"Simulated cascade failure for {record_id}", partition_id=record_id
             )
-            
+
     def get_stats(self) -> Dict[str, int]:
         with self._lock:
             return dict(self._error_counts)
 
 
 def run_transient_recovery_scenario(
-    num_records: int = 1000,
-    error_rate: float = 0.2,
-    max_retries: int = 3
+    num_records: int = 1000, error_rate: float = 0.2, max_retries: int = 3
 ) -> ScenarioResult:
     """
     Scenario 1: Transient Error Recovery
-    
+
     Tests the system's ability to recover from temporary failures
     using retry logic with exponential backoff.
-    
+
     Expected behavior:
     - Most transient errors should recover within max_retries
     - Throughput should degrade gracefully under errors
     - No data loss for recoverable errors
     """
-    logger.info("Starting transient recovery scenario", 
-                num_records=num_records, error_rate=error_rate)
-    
+    logger.info(
+        "Starting transient recovery scenario", num_records=num_records, error_rate=error_rate
+    )
+
     config = ErrorScenarioConfig(
-        transient_error_rate=error_rate,
-        permanent_error_rate=0,
-        max_retries=max_retries
+        transient_error_rate=error_rate, permanent_error_rate=0, max_retries=max_retries
     )
     injector = ErrorInjector(config)
-    
+
     retry_policy = RetryPolicy(
         max_retries=max_retries,
         base_delay=0.01,
         max_delay=0.5,
-        strategy=BackoffStrategy.EXPONENTIAL
+        strategy=BackoffStrategy.EXPONENTIAL,
     )
-    
+
     successful = 0
     failed = 0
     retries_used = 0
-    records = [{'id': f'rec_{i}', 'value': i} for i in range(num_records)]
-    
+    records = [{"id": f"rec_{i}", "value": i} for i in range(num_records)]
+
     start_time = time.time()
-    
+
     @with_retry(retry_policy)
     def process_with_retry(record: Dict) -> Dict:
-        injector.maybe_inject_error(record['id'])
-        return {'id': record['id'], 'result': record['value'] * 2}
-    
+        injector.maybe_inject_error(record["id"])
+        return {"id": record["id"], "result": record["value"] * 2}
+
     for record in records:
         try:
             with profiler.profile("transient_recovery_process"):
@@ -199,68 +206,66 @@ def run_transient_recovery_scenario(
             successful += 1
         except HiveFrameError as e:
             failed += 1
-            logger.debug("Record failed after retries", record_id=record['id'])
-            
+            logger.debug("Record failed after retries", record_id=record["id"])
+
     elapsed = time.time() - start_time
     stats = injector.get_stats()
-    
+
     # Recovery rate = (transient errors - permanent failures) / transient errors
-    transient_recovered = stats['transient'] - failed
-    recovery_rate = transient_recovered / max(1, stats['transient'])
-    
+    transient_recovered = stats["transient"] - failed
+    recovery_rate = transient_recovered / max(1, stats["transient"])
+
     return ScenarioResult(
         scenario_name="Transient Error Recovery",
         total_records=num_records,
         successful=successful,
         failed_transient=failed,
         failed_permanent=0,
-        retries_used=stats['transient'],  # Each transient error triggers retry
+        retries_used=stats["transient"],  # Each transient error triggers retry
         dead_letter_count=0,
         circuit_trips=0,
         elapsed_seconds=elapsed,
         throughput=num_records / elapsed,
         error_rate=failed / num_records,
-        recovery_rate=recovery_rate
+        recovery_rate=recovery_rate,
     )
 
 
 def run_dead_letter_scenario(
-    num_records: int = 1000,
-    permanent_error_rate: float = 0.05
+    num_records: int = 1000, permanent_error_rate: float = 0.05
 ) -> ScenarioResult:
     """
     Scenario 2: Dead Letter Queue Handling
-    
+
     Tests the system's ability to route permanently failed
     records to a dead letter queue for later inspection.
-    
+
     Expected behavior:
     - Permanent failures should be captured in DLQ
     - Processing should continue for other records
     - DLQ should contain full error context
     """
-    logger.info("Starting dead letter scenario",
-                num_records=num_records, error_rate=permanent_error_rate)
-    
+    logger.info(
+        "Starting dead letter scenario", num_records=num_records, error_rate=permanent_error_rate
+    )
+
     config = ErrorScenarioConfig(
-        transient_error_rate=0,
-        permanent_error_rate=permanent_error_rate,
-        poison_pill_rate=0.01
+        transient_error_rate=0, permanent_error_rate=permanent_error_rate, poison_pill_rate=0.01
     )
     injector = ErrorInjector(config)
     dlq = DeadLetterQueue(max_size=1000)
-    
+
     successful = 0
     failed = 0
-    records = [{'id': f'rec_{i}', 'value': i} for i in range(num_records)]
-    
+    records = [{"id": f"rec_{i}", "value": i} for i in range(num_records)]
+
     start_time = time.time()
-    
+
     for record in records:
         try:
             with profiler.profile("dlq_process"):
-                injector.maybe_inject_error(record['id'])
-                result = {'id': record['id'], 'result': record['value'] * 2}
+                injector.maybe_inject_error(record["id"])
+                result = {"id": record["id"], "result": record["value"] * 2}
             successful += 1
         except HiveFrameError as e:
             failed += 1
@@ -268,20 +273,22 @@ def run_dead_letter_scenario(
             dlq_record = DeadLetterRecord(
                 original_data=record,
                 error=e,
-                partition_id=record['id'],
+                partition_id=record["id"],
                 worker_id="test_worker",
                 attempt_count=1,
-                first_failure=time.time()
+                first_failure=time.time(),
             )
             dlq.push(dlq_record)
-            
+
     elapsed = time.time() - start_time
     dlq_stats = dlq.get_stats()
-    
-    logger.info("Dead letter queue stats",
-                size=dlq_stats['size'],
-                error_distribution=dlq_stats['error_distribution'])
-    
+
+    logger.info(
+        "Dead letter queue stats",
+        size=dlq_stats["size"],
+        error_distribution=dlq_stats["error_distribution"],
+    )
+
     return ScenarioResult(
         scenario_name="Dead Letter Queue Handling",
         total_records=num_records,
@@ -289,72 +296,73 @@ def run_dead_letter_scenario(
         failed_transient=0,
         failed_permanent=failed,
         retries_used=0,
-        dead_letter_count=dlq_stats['size'],
+        dead_letter_count=dlq_stats["size"],
         circuit_trips=0,
         elapsed_seconds=elapsed,
         throughput=num_records / elapsed,
         error_rate=failed / num_records,
-        recovery_rate=0  # No recovery expected for permanent errors
+        recovery_rate=0,  # No recovery expected for permanent errors
     )
 
 
 def run_circuit_breaker_scenario(
-    num_records: int = 1000,
-    failure_burst_size: int = 20,
-    failure_threshold: int = 5
+    num_records: int = 1000, failure_burst_size: int = 20, failure_threshold: int = 5
 ) -> ScenarioResult:
     """
     Scenario 3: Circuit Breaker Activation
-    
+
     Tests the circuit breaker pattern under sustained failures.
-    
+
     Expected behavior:
     - Circuit should open after failure_threshold failures
     - Requests should be rejected while circuit is open
     - Circuit should half-open after timeout and test recovery
     """
-    logger.info("Starting circuit breaker scenario",
-                num_records=num_records, failure_threshold=failure_threshold)
-    
+    logger.info(
+        "Starting circuit breaker scenario",
+        num_records=num_records,
+        failure_threshold=failure_threshold,
+    )
+
     circuit = CircuitBreaker(
         "test_service",
         CircuitBreakerConfig(
             failure_threshold=failure_threshold,
             success_threshold=2,
-            timeout=1.0  # Short timeout for testing
-        )
+            timeout=1.0,  # Short timeout for testing
+        ),
     )
-    
+
     # Track circuit state changes
     circuit_trips = [0]
-    
+
     def on_state_change(old_state, new_state):
-        if new_state.name == 'OPEN':
+        if new_state.name == "OPEN":
             circuit_trips[0] += 1
             logger.warning("Circuit opened!", old_state=old_state.name)
-            
+
     circuit.add_state_listener(on_state_change)
-    
+
     successful = 0
     failed_by_error = 0
     failed_by_circuit = 0
-    
+
     # Create records with burst of failures in the middle
     records = []
     failure_start = num_records // 3
     failure_end = failure_start + failure_burst_size
-    
+
     for i in range(num_records):
         should_fail = failure_start <= i < failure_end
-        records.append({'id': f'rec_{i}', 'value': i, 'should_fail': should_fail})
-    
+        records.append({"id": f"rec_{i}", "value": i, "should_fail": should_fail})
+
     start_time = time.time()
-    
+
     def risky_operation(record: Dict) -> Dict:
-        if record['should_fail']:
+        if record["should_fail"]:
             raise TransientError(f"Service unavailable for {record['id']}")
-        return {'id': record['id'], 'result': record['value'] * 2}
-    
+        return {"id": record["id"], "result": record["value"] * 2}
+
     for record in records:
         try:
             with profiler.profile("circuit_breaker_process"):
@@ -367,16 +375,14 @@ def run_circuit_breaker_scenario(
                 failed_by_circuit += 1
             else:
                 failed_by_error += 1
-                
+
         # Small delay to allow circuit state transitions
         time.sleep(0.001)
-        
+
     elapsed = time.time() - start_time
-    
-    logger.info("Circuit breaker stats",
-                trips=circuit_trips[0],
-                final_state=circuit.state.name)
-    
+
+    logger.info("Circuit breaker stats", trips=circuit_trips[0], final_state=circuit.state.name)
+
     return ScenarioResult(
         scenario_name="Circuit Breaker Activation",
         total_records=num_records,
@@ -389,116 +395,113 @@ def run_circuit_breaker_scenario(
         elapsed_seconds=elapsed,
         throughput=num_records / elapsed,
         error_rate=(failed_by_error + failed_by_circuit) / num_records,
-        recovery_rate=successful / max(1, num_records - failure_burst_size)
+        recovery_rate=successful / max(1, num_records - failure_burst_size),
     )
 
 
-def run_mixed_error_scenario(
-    num_records: int = 1000
-) -> ScenarioResult:
+def run_mixed_error_scenario(num_records: int = 1000) -> ScenarioResult:
     """
     Scenario 4: Mixed Error Rates
-    
+
     Tests the system under realistic mixed error conditions.
-    
+
     Expected behavior:
     - System should handle multiple error types simultaneously
     - Quality metrics should degrade proportionally
     - Recovery mechanisms should work together
     """
     logger.info("Starting mixed error scenario", num_records=num_records)
-    
+
     config = ErrorScenarioConfig(
         transient_error_rate=0.15,
         permanent_error_rate=0.03,
         cascade_probability=0.02,
         poison_pill_rate=0.005,
-        max_retries=3
+        max_retries=3,
     )
     injector = ErrorInjector(config)
     dlq = DeadLetterQueue(max_size=500)
-    
+
     retry_policy = RetryPolicy(
-        max_retries=config.max_retries,
-        base_delay=0.01,
-        strategy=BackoffStrategy.EXPONENTIAL
+        max_retries=config.max_retries, base_delay=0.01, strategy=BackoffStrategy.EXPONENTIAL
     )
-    
+
     circuit = CircuitBreaker(
-        "mixed_service",
-        CircuitBreakerConfig(failure_threshold=10, timeout=0.5)
+        "mixed_service", CircuitBreakerConfig(failure_threshold=10, timeout=0.5)
     )
-    
+
     successful = 0
     failed_transient = 0
     failed_permanent = 0
     retries_used = 0
     circuit_trips = [0]
-    
+
     def on_trip(old, new):
-        if new.name == 'OPEN':
+        if new.name == "OPEN":
             circuit_trips[0] += 1
-            
+
     circuit.add_state_listener(on_trip)
-    
-    records = [{'id': f'rec_{i}', 'value': i} for i in range(num_records)]
+
+    records = [{"id": f"rec_{i}", "value": i} for i in range(num_records)]
     start_time = time.time()
-    
+
     for record in records:
         attempts = 0
         success = False
         last_error = None
-        
+
         while attempts < config.max_retries and not success:
             attempts += 1
             try:
                 # Check circuit
                 if not circuit.allow_request():
                     raise ProcessingError("Circuit open")
-                    
+
                 # Try processing
                 with profiler.profile("mixed_error_process"):
-                    injector.maybe_inject_error(record['id'])
-                    result = {'id': record['id'], 'result': record['value'] * 2}
-                    
+                    injector.maybe_inject_error(record["id"])
+                    result = {"id": record["id"], "result": record["value"] * 2}
+
                 circuit.record_success()
                 success = True
                 successful += 1
-                
+
             except TransientError as e:
                 last_error = e
                 retries_used += 1
                 circuit.record_failure()
                 time.sleep(retry_policy.calculate_delay(attempts))
-                
+
             except (ValidationError, ProcessingError) as e:
                 last_error = e
                 circuit.record_failure()
                 break  # No retry for permanent errors
-                
+
         if not success:
             if isinstance(last_error, TransientError):
                 failed_transient += 1
             else:
                 failed_permanent += 1
-                
+
             # Add to DLQ
             if last_error:
-                dlq.push(DeadLetterRecord(
-                    original_data=record,
-                    error=last_error,
-                    partition_id=record['id'],
-                    worker_id="test_worker",
-                    attempt_count=attempts,
-                    first_failure=time.time()
-                ))
-                
+                dlq.push(
+                    DeadLetterRecord(
+                        original_data=record,
+                        error=last_error,
+                        partition_id=record["id"],
+                        worker_id="test_worker",
+                        attempt_count=attempts,
+                        first_failure=time.time(),
+                    )
+                )
+
     elapsed = time.time() - start_time
     stats = injector.get_stats()
-    
-    transient_recovered = stats['transient'] - failed_transient
-    recovery_rate = transient_recovered / max(1, stats['transient'])
-    
+
+    transient_recovered = stats["transient"] - failed_transient
+    recovery_rate = transient_recovered / max(1, stats["transient"])
+
     return ScenarioResult(
         scenario_name="Mixed Error Conditions",
         total_records=num_records,
@@ -506,86 +509,83 @@ def run_mixed_error_scenario(
         failed_transient=failed_transient,
         failed_permanent=failed_permanent,
         retries_used=retries_used,
-        dead_letter_count=dlq.get_stats()['size'],
+        dead_letter_count=dlq.get_stats()["size"],
         circuit_trips=circuit_trips[0],
         elapsed_seconds=elapsed,
         throughput=num_records / elapsed,
         error_rate=(failed_transient + failed_permanent) / num_records,
-        recovery_rate=recovery_rate
+        recovery_rate=recovery_rate,
     )
 
 
-def run_poison_pill_scenario(
-    num_records: int = 1000,
-    poison_rate: float = 0.02
-) -> ScenarioResult:
+def run_poison_pill_scenario(num_records: int = 1000, poison_rate: float = 0.02) -> ScenarioResult:
     """
     Scenario 5: Poison Pill Detection
-    
+
     Tests the system's ability to detect and isolate bad records
     that consistently cause failures.
-    
+
     Expected behavior:
     - Poison pills should be quickly identified
     - Processing should continue for good records
     - Poison pills should be routed to DLQ with clear labeling
     """
-    logger.info("Starting poison pill scenario",
-                num_records=num_records, poison_rate=poison_rate)
-    
+    logger.info("Starting poison pill scenario", num_records=num_records, poison_rate=poison_rate)
+
     # Create records with some poison pills
     records = []
     poison_ids = set()
-    
+
     for i in range(num_records):
-        record = {'id': f'rec_{i}', 'value': i}
+        record = {"id": f"rec_{i}", "value": i}
         # Deterministically mark some as poison
-        if hash(f'rec_{i}') % 100 < poison_rate * 100:
-            record['poison'] = True
-            poison_ids.add(f'rec_{i}')
+        if hash(f"rec_{i}") % 100 < poison_rate * 100:
+            record["poison"] = True
+            poison_ids.add(f"rec_{i}")
         records.append(record)
-        
+
     dlq = DeadLetterQueue(max_size=500)
     successful = 0
     poisoned = 0
-    
+
     start_time = time.time()
-    
+
     for record in records:
         try:
             with profiler.profile("poison_pill_process"):
-                if record.get('poison'):
+                if record.get("poison"):
                     raise ValidationError(
-                        f"Poison pill: {record['id']}",
-                        field="poison",
-                        expected=False,
-                        actual=True
+                        f"Poison pill: {record['id']}", field="poison", expected=False, actual=True
                     )
-                result = {'id': record['id'], 'result': record['value'] * 2}
+                result = {"id": record["id"], "result": record["value"] * 2}
             successful += 1
-            
+
         except ValidationError as e:
             poisoned += 1
-            dlq.push(DeadLetterRecord(
-                original_data=record,
-                error=e,
-                partition_id=record['id'],
-                worker_id="test_worker",
-                attempt_count=1,
-                first_failure=time.time(),
-                metadata={'poison_pill': True}
-            ))
-            
+            dlq.push(
+                DeadLetterRecord(
+                    original_data=record,
+                    error=e,
+                    partition_id=record["id"],
+                    worker_id="test_worker",
+                    attempt_count=1,
+                    first_failure=time.time(),
+                    metadata={"poison_pill": True},
+                )
+            )
+
     elapsed = time.time() - start_time
-    
+
     # Verify all poison pills were caught
     dlq_records = dlq.peek(n=poisoned)
-    caught_poisons = sum(1 for r in dlq_records if r.metadata.get('poison_pill'))
-    
-    logger.info("Poison pill detection complete",
-                expected_poisons=len(poison_ids),
-                caught_poisons=caught_poisons)
-    
+    caught_poisons = sum(1 for r in dlq_records if r.metadata.get("poison_pill"))
+
+    logger.info(
+        "Poison pill detection complete",
+        expected_poisons=len(poison_ids),
+        caught_poisons=caught_poisons,
+    )
+
     return ScenarioResult(
         scenario_name="Poison Pill Detection",
         total_records=num_records,
@@ -598,18 +598,18 @@ def run_poison_pill_scenario(
         elapsed_seconds=elapsed,
         throughput=num_records / elapsed,
         error_rate=poisoned / num_records,
-        recovery_rate=0  # Poison pills can't recover
+        recovery_rate=0,  # Poison pills can't recover
     )
 
 
 def run_all_error_scenarios() -> List[ScenarioResult]:
     """Run all error handling scenarios and return results."""
     results = []
-    
+
     print("\n" + "=" * 60)
     print("HiveFrame Error Handling Challenge Suite")
     print("=" * 60)
-    
+
     scenarios = [
         ("Transient Recovery", lambda: run_transient_recovery_scenario(1000, 0.2)),
         ("Dead Letter Queue", lambda: run_dead_letter_scenario(1000, 0.05)),
@@ -617,7 +617,7 @@ def run_all_error_scenarios() -> List[ScenarioResult]:
         ("Mixed Errors", lambda: run_mixed_error_scenario(1000)),
         ("Poison Pills", lambda: run_poison_pill_scenario(1000, 0.02)),
     ]
-    
+
     for name, scenario_fn in scenarios:
         print(f"\nRunning: {name}...")
         try:
@@ -626,20 +626,22 @@ def run_all_error_scenarios() -> List[ScenarioResult]:
             print(result.summary())
         except Exception as e:
             print(f"  ERROR: {e}")
-            
+
     # Summary
     print("\n" + "=" * 60)
     print("SUMMARY")
     print("=" * 60)
-    
+
     total_records = sum(r.total_records for r in results)
     total_success = sum(r.successful for r in results)
     avg_recovery = sum(r.recovery_rate for r in results) / len(results) if results else 0
-    
+
     print(f"Total Records Processed: {total_records}")
-    print(f"Total Successful:        {total_success} ({100*total_success/max(1,total_records):.1f}%)")
+    print(
+        f"Total Successful:        {total_success} ({100*total_success/max(1,total_records):.1f}%)"
+    )
     print(f"Average Recovery Rate:   {100*avg_recovery:.1f}%")
-    
+
     return results
 
 

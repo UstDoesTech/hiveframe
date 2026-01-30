@@ -14,34 +14,36 @@ import traceback
 
 class ErrorSeverity(Enum):
     """Severity levels for error categorization."""
-    DEBUG = auto()      # Informational, no action needed
-    WARNING = auto()    # Recoverable, may indicate issues
-    ERROR = auto()      # Requires attention, retryable
-    CRITICAL = auto()   # System-level failure, may not be retryable
-    FATAL = auto()      # Unrecoverable, requires shutdown
+
+    DEBUG = auto()  # Informational, no action needed
+    WARNING = auto()  # Recoverable, may indicate issues
+    ERROR = auto()  # Requires attention, retryable
+    CRITICAL = auto()  # System-level failure, may not be retryable
+    FATAL = auto()  # Unrecoverable, requires shutdown
 
 
 class ErrorCategory(Enum):
     """Categories for error routing and handling."""
-    TRANSIENT = auto()       # Temporary failures (network, timeout)
-    DATA_QUALITY = auto()    # Malformed or invalid data
-    RESOURCE = auto()        # Resource exhaustion (memory, connections)
-    CONFIGURATION = auto()   # Invalid configuration
-    DEPENDENCY = auto()      # External dependency failures
-    INTERNAL = auto()        # Internal logic errors
+
+    TRANSIENT = auto()  # Temporary failures (network, timeout)
+    DATA_QUALITY = auto()  # Malformed or invalid data
+    RESOURCE = auto()  # Resource exhaustion (memory, connections)
+    CONFIGURATION = auto()  # Invalid configuration
+    DEPENDENCY = auto()  # External dependency failures
+    INTERNAL = auto()  # Internal logic errors
 
 
 class HiveFrameError(Exception):
     """
     Base exception for all HiveFrame errors.
-    
+
     Provides structured error information for:
     - Retry decision logic
     - Dead letter queue routing
     - Monitoring and alerting
     - Root cause analysis
     """
-    
+
     def __init__(
         self,
         message: str,
@@ -49,7 +51,7 @@ class HiveFrameError(Exception):
         category: ErrorCategory = ErrorCategory.INTERNAL,
         retryable: bool = False,
         details: Optional[Dict[str, Any]] = None,
-        cause: Optional[Exception] = None
+        cause: Optional[Exception] = None,
     ):
         super().__init__(message)
         self.message = message
@@ -60,19 +62,19 @@ class HiveFrameError(Exception):
         self.cause = cause
         self.timestamp = time.time()
         self.traceback_str = traceback.format_exc()
-        
+
     def to_dict(self) -> Dict[str, Any]:
         """Serialize error for logging/storage."""
         return {
-            'error_type': self.__class__.__name__,
-            'message': self.message,
-            'severity': self.severity.name,
-            'category': self.category.name,
-            'retryable': self.retryable,
-            'details': self.details,
-            'timestamp': self.timestamp,
-            'cause': str(self.cause) if self.cause else None,
-            'traceback': self.traceback_str
+            "error_type": self.__class__.__name__,
+            "message": self.message,
+            "severity": self.severity.name,
+            "category": self.category.name,
+            "retryable": self.retryable,
+            "details": self.details,
+            "timestamp": self.timestamp,
+            "cause": str(self.cause) if self.cause else None,
+            "traceback": self.traceback_str,
         }
 
 
@@ -80,366 +82,288 @@ class HiveFrameError(Exception):
 # Transient Errors (Retryable)
 # ============================================================================
 
+
 class TransientError(HiveFrameError):
     """Base class for temporary, retryable failures."""
-    
-    def __init__(
-        self,
-        message: str,
-        retry_after: float = 1.0,
-        max_retries: int = 3,
-        **kwargs
-    ):
-        super().__init__(
-            message,
-            category=ErrorCategory.TRANSIENT,
-            retryable=True,
-            **kwargs
-        )
+
+    def __init__(self, message: str, retry_after: float = 1.0, max_retries: int = 3, **kwargs):
+        super().__init__(message, category=ErrorCategory.TRANSIENT, retryable=True, **kwargs)
         self.retry_after = retry_after
         self.max_retries = max_retries
 
 
 class NetworkError(TransientError):
     """Network-related transient failures."""
-    
+
     def __init__(self, message: str, endpoint: str = "", **kwargs):
         super().__init__(message, **kwargs)
-        self.details['endpoint'] = endpoint
+        self.details["endpoint"] = endpoint
 
 
 class TimeoutError(TransientError):
     """Operation exceeded time limit."""
-    
-    def __init__(
-        self,
-        message: str,
-        timeout_seconds: float = 0,
-        operation: str = "",
-        **kwargs
-    ):
+
+    def __init__(self, message: str, timeout_seconds: float = 0, operation: str = "", **kwargs):
         super().__init__(message, retry_after=timeout_seconds * 0.5, **kwargs)
-        self.details['timeout_seconds'] = timeout_seconds
-        self.details['operation'] = operation
+        self.details["timeout_seconds"] = timeout_seconds
+        self.details["operation"] = operation
 
 
 class RateLimitError(TransientError):
     """Rate limit exceeded from external service."""
-    
-    def __init__(
-        self,
-        message: str,
-        retry_after: float = 60.0,
-        limit_type: str = "",
-        **kwargs
-    ):
+
+    def __init__(self, message: str, retry_after: float = 60.0, limit_type: str = "", **kwargs):
         super().__init__(message, retry_after=retry_after, **kwargs)
-        self.details['limit_type'] = limit_type
+        self.details["limit_type"] = limit_type
 
 
 class ConnectionError(TransientError):
     """Connection establishment or maintenance failure."""
-    
+
     def __init__(self, message: str, host: str = "", port: int = 0, **kwargs):
         super().__init__(message, **kwargs)
-        self.details['host'] = host
-        self.details['port'] = port
+        self.details["host"] = host
+        self.details["port"] = port
 
 
 # ============================================================================
 # Data Quality Errors (May or may not be retryable)
 # ============================================================================
 
+
 class DataError(HiveFrameError):
     """Base class for data-related errors."""
-    
+
     def __init__(self, message: str, **kwargs):
-        super().__init__(
-            message,
-            category=ErrorCategory.DATA_QUALITY,
-            **kwargs
-        )
+        super().__init__(message, category=ErrorCategory.DATA_QUALITY, **kwargs)
 
 
 class ValidationError(DataError):
     """Data failed validation rules."""
-    
+
     def __init__(
-        self,
-        message: str,
-        field: str = "",
-        expected: Any = None,
-        actual: Any = None,
-        **kwargs
+        self, message: str, field: str = "", expected: Any = None, actual: Any = None, **kwargs
     ):
         super().__init__(message, retryable=False, **kwargs)
-        self.details['field'] = field
-        self.details['expected'] = str(expected)
-        self.details['actual'] = str(actual)
+        self.details["field"] = field
+        self.details["expected"] = str(expected)
+        self.details["actual"] = str(actual)
 
 
 class SchemaError(DataError):
     """Schema mismatch or violation."""
-    
+
     def __init__(
         self,
         message: str,
         expected_schema: Optional[Dict] = None,
         actual_schema: Optional[Dict] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(message, retryable=False, **kwargs)
-        self.details['expected_schema'] = expected_schema
-        self.details['actual_schema'] = actual_schema
+        self.details["expected_schema"] = expected_schema
+        self.details["actual_schema"] = actual_schema
 
 
 class ParseError(DataError):
     """Failed to parse input data."""
-    
+
     def __init__(
-        self,
-        message: str,
-        raw_data: str = "",
-        position: int = -1,
-        format_type: str = "",
-        **kwargs
+        self, message: str, raw_data: str = "", position: int = -1, format_type: str = "", **kwargs
     ):
         super().__init__(message, retryable=False, **kwargs)
-        self.details['raw_data_preview'] = raw_data[:200] if raw_data else ""
-        self.details['position'] = position
-        self.details['format_type'] = format_type
+        self.details["raw_data_preview"] = raw_data[:200] if raw_data else ""
+        self.details["position"] = position
+        self.details["format_type"] = format_type
 
 
 class EncodingError(DataError):
     """Character encoding/decoding failure."""
-    
+
     def __init__(
         self,
         message: str,
         expected_encoding: str = "utf-8",
         detected_encoding: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(message, retryable=False, **kwargs)
-        self.details['expected_encoding'] = expected_encoding
-        self.details['detected_encoding'] = detected_encoding
+        self.details["expected_encoding"] = expected_encoding
+        self.details["detected_encoding"] = detected_encoding
 
 
 class NullValueError(DataError):
     """Unexpected null/None value encountered."""
-    
+
     def __init__(self, message: str, field: str = "", **kwargs):
         super().__init__(message, retryable=False, **kwargs)
-        self.details['field'] = field
+        self.details["field"] = field
 
 
 # ============================================================================
 # Resource Errors
 # ============================================================================
 
+
 class ResourceError(HiveFrameError):
     """Base class for resource-related errors."""
-    
+
     def __init__(self, message: str, **kwargs):
         super().__init__(
-            message,
-            category=ErrorCategory.RESOURCE,
-            severity=ErrorSeverity.CRITICAL,
-            **kwargs
+            message, category=ErrorCategory.RESOURCE, severity=ErrorSeverity.CRITICAL, **kwargs
         )
 
 
 class MemoryError(ResourceError):
     """Memory exhaustion or allocation failure."""
-    
-    def __init__(
-        self,
-        message: str,
-        required_bytes: int = 0,
-        available_bytes: int = 0,
-        **kwargs
-    ):
+
+    def __init__(self, message: str, required_bytes: int = 0, available_bytes: int = 0, **kwargs):
         super().__init__(message, retryable=True, **kwargs)
-        self.details['required_bytes'] = required_bytes
-        self.details['available_bytes'] = available_bytes
+        self.details["required_bytes"] = required_bytes
+        self.details["available_bytes"] = available_bytes
 
 
 class DiskSpaceError(ResourceError):
     """Disk space exhaustion."""
-    
-    def __init__(
-        self,
-        message: str,
-        path: str = "",
-        required_bytes: int = 0,
-        **kwargs
-    ):
+
+    def __init__(self, message: str, path: str = "", required_bytes: int = 0, **kwargs):
         super().__init__(message, retryable=True, **kwargs)
-        self.details['path'] = path
-        self.details['required_bytes'] = required_bytes
+        self.details["path"] = path
+        self.details["required_bytes"] = required_bytes
 
 
 class ConnectionPoolExhausted(ResourceError):
     """No available connections in pool."""
-    
+
     def __init__(self, message: str, pool_size: int = 0, **kwargs):
         super().__init__(message, retryable=True, **kwargs)
-        self.details['pool_size'] = pool_size
+        self.details["pool_size"] = pool_size
 
 
 class WorkerExhausted(ResourceError):
     """All workers are busy or unavailable."""
-    
-    def __init__(
-        self,
-        message: str,
-        active_workers: int = 0,
-        total_workers: int = 0,
-        **kwargs
-    ):
+
+    def __init__(self, message: str, active_workers: int = 0, total_workers: int = 0, **kwargs):
         super().__init__(message, retryable=True, **kwargs)
-        self.details['active_workers'] = active_workers
-        self.details['total_workers'] = total_workers
+        self.details["active_workers"] = active_workers
+        self.details["total_workers"] = total_workers
 
 
 # ============================================================================
 # Configuration Errors
 # ============================================================================
 
+
 class ConfigurationError(HiveFrameError):
     """Base class for configuration errors."""
-    
+
     def __init__(self, message: str, **kwargs):
         super().__init__(
             message,
             category=ErrorCategory.CONFIGURATION,
             severity=ErrorSeverity.FATAL,
             retryable=False,
-            **kwargs
+            **kwargs,
         )
 
 
 class InvalidParameterError(ConfigurationError):
     """Invalid parameter value."""
-    
+
     def __init__(
         self,
         message: str,
         parameter: str = "",
         value: Any = None,
         allowed_values: Optional[List] = None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(message, **kwargs)
-        self.details['parameter'] = parameter
-        self.details['value'] = str(value)
-        self.details['allowed_values'] = allowed_values
+        self.details["parameter"] = parameter
+        self.details["value"] = str(value)
+        self.details["allowed_values"] = allowed_values
 
 
 class MissingConfigError(ConfigurationError):
     """Required configuration is missing."""
-    
-    def __init__(
-        self,
-        message: str,
-        config_key: str = "",
-        **kwargs
-    ):
+
+    def __init__(self, message: str, config_key: str = "", **kwargs):
         super().__init__(message, **kwargs)
-        self.details['config_key'] = config_key
+        self.details["config_key"] = config_key
 
 
 # ============================================================================
 # Dependency Errors
 # ============================================================================
 
+
 class DependencyError(HiveFrameError):
     """Base class for external dependency errors."""
-    
+
     def __init__(self, message: str, **kwargs):
-        super().__init__(
-            message,
-            category=ErrorCategory.DEPENDENCY,
-            **kwargs
-        )
+        super().__init__(message, category=ErrorCategory.DEPENDENCY, **kwargs)
 
 
 class ServiceUnavailable(DependencyError):
     """External service is unavailable."""
-    
-    def __init__(
-        self,
-        message: str,
-        service_name: str = "",
-        endpoint: str = "",
-        **kwargs
-    ):
+
+    def __init__(self, message: str, service_name: str = "", endpoint: str = "", **kwargs):
         super().__init__(message, retryable=True, **kwargs)
-        self.details['service_name'] = service_name
-        self.details['endpoint'] = endpoint
+        self.details["service_name"] = service_name
+        self.details["endpoint"] = endpoint
 
 
 class CircuitOpenError(DependencyError):
     """Circuit breaker is open due to repeated failures."""
-    
-    def __init__(
-        self,
-        message: str,
-        service_name: str = "",
-        reset_time: float = 0,
-        **kwargs
-    ):
+
+    def __init__(self, message: str, service_name: str = "", reset_time: float = 0, **kwargs):
         super().__init__(message, retryable=True, **kwargs)
-        self.details['service_name'] = service_name
-        self.details['reset_time'] = reset_time
+        self.details["service_name"] = service_name
+        self.details["reset_time"] = reset_time
 
 
 class UpstreamError(DependencyError):
     """Error propagated from upstream system."""
-    
+
     def __init__(
-        self,
-        message: str,
-        upstream_error_code: str = "",
-        upstream_service: str = "",
-        **kwargs
+        self, message: str, upstream_error_code: str = "", upstream_service: str = "", **kwargs
     ):
         super().__init__(message, **kwargs)
-        self.details['upstream_error_code'] = upstream_error_code
-        self.details['upstream_service'] = upstream_service
+        self.details["upstream_error_code"] = upstream_error_code
+        self.details["upstream_service"] = upstream_service
 
 
 # ============================================================================
 # Processing Errors
 # ============================================================================
 
+
 class ProcessingError(HiveFrameError):
     """Error during data processing."""
-    
+
     def __init__(
-        self,
-        message: str,
-        partition_id: str = "",
-        record_key: Optional[str] = None,
-        **kwargs
+        self, message: str, partition_id: str = "", record_key: Optional[str] = None, **kwargs
     ):
         super().__init__(message, **kwargs)
-        self.details['partition_id'] = partition_id
-        self.details['record_key'] = record_key
+        self.details["partition_id"] = partition_id
+        self.details["record_key"] = record_key
 
 
 class TransformError(ProcessingError):
     """Error in transformation function."""
+
     pass
 
 
 class AggregationError(ProcessingError):
     """Error during aggregation operation."""
+
     pass
 
 
 class JoinError(ProcessingError):
     """Error during join operation."""
+
     pass
 
 
@@ -454,44 +378,44 @@ from .dlq import DeadLetterQueue, DeadLetterRecord
 
 __all__ = [
     # Error severity and categories
-    'ErrorSeverity',
-    'ErrorCategory',
+    "ErrorSeverity",
+    "ErrorCategory",
     # Base exception
-    'HiveFrameError',
+    "HiveFrameError",
     # Transient errors
-    'TransientError',
-    'NetworkError',
-    'TimeoutError',
-    'RateLimitError',
-    'ConnectionError',
+    "TransientError",
+    "NetworkError",
+    "TimeoutError",
+    "RateLimitError",
+    "ConnectionError",
     # Data quality errors
-    'DataError',
-    'ValidationError',
-    'SchemaError',
-    'ParseError',
-    'EncodingError',
-    'NullValueError',
+    "DataError",
+    "ValidationError",
+    "SchemaError",
+    "ParseError",
+    "EncodingError",
+    "NullValueError",
     # Resource errors
-    'ResourceError',
-    'MemoryError',
-    'DiskSpaceError',
-    'ConnectionPoolExhausted',
-    'WorkerExhausted',
+    "ResourceError",
+    "MemoryError",
+    "DiskSpaceError",
+    "ConnectionPoolExhausted",
+    "WorkerExhausted",
     # Configuration errors
-    'ConfigurationError',
-    'InvalidParameterError',
-    'MissingConfigError',
+    "ConfigurationError",
+    "InvalidParameterError",
+    "MissingConfigError",
     # Dependency errors
-    'DependencyError',
-    'ServiceUnavailable',
-    'CircuitOpenError',
-    'UpstreamError',
+    "DependencyError",
+    "ServiceUnavailable",
+    "CircuitOpenError",
+    "UpstreamError",
     # Processing errors
-    'ProcessingError',
-    'TransformError',
-    'AggregationError',
-    'JoinError',
+    "ProcessingError",
+    "TransformError",
+    "AggregationError",
+    "JoinError",
     # DLQ (re-exported)
-    'DeadLetterQueue',
-    'DeadLetterRecord',
+    "DeadLetterQueue",
+    "DeadLetterRecord",
 ]

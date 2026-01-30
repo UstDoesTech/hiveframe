@@ -14,11 +14,11 @@ Key Features:
 
 Usage:
     from hiveframe.dashboard import Dashboard
-    
+
     # Start dashboard server
     dashboard = Dashboard(port=8080)
     dashboard.start()
-    
+
     # Or run from command line
     # python -m hiveframe.dashboard --port 8080
 """
@@ -33,11 +33,11 @@ from .components import (
 )
 
 __all__ = [
-    'Dashboard',
-    'DashboardConfig',
-    'DashboardAPI',
-    'ColonyMetricsPanel',
-    'WorkerStatusPanel',
-    'DanceFloorPanel',
-    'QueryHistoryPanel',
+    "Dashboard",
+    "DashboardConfig",
+    "DashboardAPI",
+    "ColonyMetricsPanel",
+    "WorkerStatusPanel",
+    "DanceFloorPanel",
+    "QueryHistoryPanel",
 ]

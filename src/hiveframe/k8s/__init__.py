@@ -12,7 +12,7 @@ Enables running HiveFrame clusters on Kubernetes with:
 
 Usage:
     from hiveframe.k8s import HiveCluster, HiveOperator
-    
+
     # Define a cluster
     cluster = HiveCluster(
         name="my-cluster",
@@ -20,7 +20,7 @@ Usage:
         worker_memory="4Gi",
         worker_cpu="2"
     )
-    
+
     # Deploy to Kubernetes
     operator = HiveOperator()
     operator.deploy(cluster)
@@ -46,17 +46,17 @@ from .manifests import (
 
 __all__ = [
     # Cluster
-    'HiveCluster',
-    'WorkerSpec',
-    'ResourceRequirements',
-    'ClusterStatus',
-    'ClusterPhase',
+    "HiveCluster",
+    "WorkerSpec",
+    "ResourceRequirements",
+    "ClusterStatus",
+    "ClusterPhase",
     # Operator
-    'HiveOperator',
-    'OperatorConfig',
+    "HiveOperator",
+    "OperatorConfig",
     # Manifests
-    'generate_deployment',
-    'generate_service',
-    'generate_configmap',
-    'generate_crd',
+    "generate_deployment",
+    "generate_service",
+    "generate_configmap",
+    "generate_crd",
 ]
