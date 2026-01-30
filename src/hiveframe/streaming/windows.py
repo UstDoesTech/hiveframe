@@ -15,7 +15,7 @@ import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Dict, Generic, List, TypeVar
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -88,7 +88,9 @@ class TumblingWindowAssigner(WindowAssigner):
     [00:00-00:05], [00:05-00:10], [00:10-00:15], ...
     """
 
-    def __init__(self, size_seconds: float = None, *, window_size: float = None):
+    def __init__(
+        self, size_seconds: Optional[float] = None, *, window_size: Optional[float] = None
+    ):
         # Support both parameter names - window_size is deprecated
         if window_size is not None:
             warnings.warn(
@@ -131,11 +133,11 @@ class SlidingWindowAssigner(WindowAssigner):
 
     def __init__(
         self,
-        size_seconds: float = None,
-        slide_seconds: float = None,
+        size_seconds: Optional[float] = None,
+        slide_seconds: Optional[float] = None,
         *,
-        window_size: float = None,
-        slide_interval: float = None,
+        window_size: Optional[float] = None,
+        slide_interval: Optional[float] = None,
     ):
         # Support both parameter names - window_size and slide_interval are deprecated
         if window_size is not None:
@@ -203,7 +205,7 @@ class SessionWindowAssigner(WindowAssigner):
     Particularly useful for user session analysis.
     """
 
-    def __init__(self, gap_seconds: float = None, *, gap: float = None):
+    def __init__(self, gap_seconds: Optional[float] = None, *, gap: Optional[float] = None):
         # Support both parameter names - gap is deprecated
         if gap is not None:
             warnings.warn(

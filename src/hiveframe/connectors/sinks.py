@@ -8,7 +8,7 @@ import csv
 import json
 from abc import abstractmethod
 from pathlib import Path
-from typing import Any, Dict, Generic, List, Optional, TypeVar
+from typing import Any, Dict, Generic, List, Optional, TextIO, TypeVar, Union
 
 from ..utils import ManagedResource
 
@@ -68,17 +68,17 @@ class DataSink(ManagedResource, Generic[T]):
 class JSONLSink(DataSink[Dict[str, Any]]):
     """JSON Lines output sink."""
 
-    def __init__(self, path: str | Path, encoding: str = "utf-8", append: bool = False):
+    def __init__(self, path: Union[str, Path], encoding: str = "utf-8", append: bool = False):
         super().__init__(f"jsonl:{path}")
         self.path = Path(path)
         self.encoding = encoding
         self.append = append
-        self._file = None
+        self._file: Optional[TextIO] = None
 
     def _do_open(self) -> None:
         mode = "a" if self.append else "w"
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._file = open(self.path, mode, encoding=self.encoding)
+        self._file = open(self.path, mode, encoding=self.encoding)  # type: ignore[assignment]
 
     def _do_close(self) -> None:
         if self._file:
@@ -90,6 +90,7 @@ class JSONLSink(DataSink[Dict[str, Any]]):
         if not self._is_open:
             raise RuntimeError("Sink not open")
 
+        assert self._file is not None, "File must be open"
         self._file.write(json.dumps(record) + "\n")
         self._records_written += 1
 
@@ -99,7 +100,7 @@ class CSVSink(DataSink[Dict[str, str]]):
 
     def __init__(
         self,
-        path: str | Path,
+        path: Union[str, Path],
         columns: Optional[List[str]] = None,
         delimiter: str = ",",
         write_header: bool = True,
@@ -113,14 +114,15 @@ class CSVSink(DataSink[Dict[str, str]]):
         self.write_header = write_header
         self.encoding = encoding
         self.append = append
-        self._file = None
-        self._writer = None
+        self._file: Optional[TextIO] = None
+        self._writer: Optional[Any] = None  # csv.writer type
         self._header_written = False
 
     def _do_open(self) -> None:
         mode = "a" if self.append else "w"
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._file = open(self.path, mode, encoding=self.encoding, newline="")
+        self._file = open(self.path, mode, encoding=self.encoding, newline="")  # type: ignore[assignment]
+        assert self._file is not None
         self._writer = csv.writer(self._file, delimiter=self.delimiter)
 
         # Don't write header if appending to existing file
@@ -137,6 +139,8 @@ class CSVSink(DataSink[Dict[str, str]]):
     def write(self, record: Dict[str, str]) -> None:
         if not self._is_open:
             raise RuntimeError("Sink not open")
+
+        assert self._writer is not None, "Writer must be initialized"
 
         # Infer columns from first record if not specified
         if self.columns is None:

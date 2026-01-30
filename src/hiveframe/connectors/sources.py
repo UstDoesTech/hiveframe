@@ -15,7 +15,7 @@ import urllib.request
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, Generator, Generic, List, Optional, TypeVar
+from typing import Any, Callable, Dict, Generator, Generic, List, Optional, TextIO, TypeVar, Union
 
 from ..exceptions import (
     ConfigurationError,
@@ -98,7 +98,7 @@ class CSVSource(DataSource[Dict[str, str]]):
 
     def __init__(
         self,
-        path: str | Path,
+        path: Union[str, Path],
         delimiter: str = ",",
         quotechar: str = '"',
         has_header: bool = True,
@@ -116,8 +116,8 @@ class CSVSource(DataSource[Dict[str, str]]):
         self.encoding = encoding
         self.skip_malformed = skip_malformed
         self.max_field_size = max_field_size
-        self._file = None
-        self._reader = None
+        self._file: Optional[TextIO] = None
+        self._reader: Optional[Any] = None  # csv.reader type
 
     def _do_open(self) -> None:
         if not self.path.exists():
@@ -130,6 +130,7 @@ class CSVSource(DataSource[Dict[str, str]]):
         # Read header if present
         if self.has_header and self.columns is None:
             try:
+                assert self._reader is not None
                 self.columns = next(self._reader)
             except StopIteration:
                 raise DataError("CSV file is empty")
@@ -143,6 +144,8 @@ class CSVSource(DataSource[Dict[str, str]]):
     def read(self) -> Generator[Dict[str, str], None, None]:
         if not self._is_open:
             raise RuntimeError("Source not open")
+
+        assert self._reader is not None, "Reader must be initialized"
 
         line_num = 1 if self.has_header else 0
 
@@ -179,12 +182,14 @@ class JSONLSource(DataSource[Dict[str, Any]]):
     than regular JSON arrays.
     """
 
-    def __init__(self, path: str | Path, encoding: str = "utf-8", skip_malformed: bool = True):
+    def __init__(
+        self, path: Union[str, Path], encoding: str = "utf-8", skip_malformed: bool = True
+    ):
         super().__init__(f"jsonl:{path}")
         self.path = Path(path)
         self.encoding = encoding
         self.skip_malformed = skip_malformed
-        self._file = None
+        self._file: Optional[TextIO] = None
 
     def _do_open(self) -> None:
         if not self.path.exists():
@@ -201,6 +206,9 @@ class JSONLSource(DataSource[Dict[str, Any]]):
         if not self._is_open:
             raise RuntimeError("Source not open")
 
+        assert self._file is not None, "File must be open"
+
+        line: str
         for line_num, line in enumerate(self._file, 1):
             line = line.strip()
             if not line:
@@ -231,7 +239,7 @@ class JSONSource(DataSource[Dict[str, Any]]):
     """
 
     def __init__(
-        self, path: str | Path, array_field: Optional[str] = None, encoding: str = "utf-8"
+        self, path: Union[str, Path], array_field: Optional[str] = None, encoding: str = "utf-8"
     ):
         super().__init__(f"json:{path}")
         self.path = Path(path)
@@ -340,7 +348,8 @@ class HTTPSource(DataSource[Dict[str, Any]]):
         try:
             with urllib.request.urlopen(request, timeout=self.config.timeout) as response:
                 data = response.read().decode("utf-8")
-                return json.loads(data)
+                result: Dict[str, Any] = json.loads(data)
+                return result
 
         except urllib.error.HTTPError as e:
             if e.code == 429:
@@ -362,7 +371,7 @@ class HTTPSource(DataSource[Dict[str, Any]]):
         if not self._is_open:
             raise RuntimeError("Source not open")
 
-        url = self.base_url
+        url: Optional[str] = self.base_url
         page = 0
 
         retry_policy = RetryPolicy(
@@ -494,7 +503,7 @@ class DataGenerator(DataSource[Dict[str, Any]]):
 
         for i in range(self.count):
             # Rate limiting
-            if self.rate:
+            if self.rate and self._start_time is not None:
                 expected_time = i / self.rate
                 actual_time = time.time() - self._start_time
 

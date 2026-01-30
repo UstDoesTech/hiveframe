@@ -248,10 +248,10 @@ class LocalityAwareScheduler:
             total_size = 0
 
             for data_id in data_ids:
-                locality = self._data_locations.get(data_id)
-                if locality:
-                    hints.append(locality)
-                    total_size += locality.size_bytes
+                data_locality = self._data_locations.get(data_id)
+                if data_locality:
+                    hints.append(data_locality)
+                    total_size += data_locality.size_bytes
 
             if not hints:
                 # No locality info, pick random available DC
@@ -275,21 +275,21 @@ class LocalityAwareScheduler:
                     for loc in hint.locations:
                         if loc.get("datacenter") == dc:
                             # Data is in this DC
-                            locality = LocalityLevel.DATACENTER_LOCAL
+                            loc_locality = LocalityLevel.DATACENTER_LOCAL
 
                             # Check for node locality
                             if available_nodes and dc in available_nodes:
                                 if loc.get("node") in available_nodes[dc]:
-                                    locality = LocalityLevel.NODE_LOCAL
+                                    loc_locality = LocalityLevel.NODE_LOCAL
 
-                            loc_score = self.locality_weights[locality]
+                            loc_score = self.locality_weights[loc_locality]
 
                             # Weight by data size
                             size_weight = hint.size_bytes / total_size if total_size > 0 else 1.0
                             score += loc_score * size_weight
 
-                            if locality.value < best_locality.value:
-                                best_locality = locality
+                            if loc_locality.value < best_locality.value:
+                                best_locality = loc_locality
                             break
                     else:
                         # Data not in this DC, calculate transfer cost
@@ -307,7 +307,7 @@ class LocalityAwareScheduler:
 
             # Select best datacenter
             best_dc = max(dc_scores.keys(), key=lambda d: dc_scores[d][0])
-            score, locality = dc_scores[best_dc]
+            score, locality_level = dc_scores[best_dc]
 
             # Calculate estimated transfer time for remote data
             transfer_time = 0.0
@@ -319,7 +319,7 @@ class LocalityAwareScheduler:
                     )
 
             # Update statistics
-            self._stats[f"locality_{locality.name}"] += 1
+            self._stats[f"locality_{locality_level.name}"] += 1
 
             # Select node if available
             target_node = None
@@ -343,7 +343,7 @@ class LocalityAwareScheduler:
                 task_id=task_id,
                 target_datacenter=best_dc,
                 target_node=target_node,
-                locality_level=locality,
+                locality_level=locality_level,
                 estimated_data_transfer_time=transfer_time,
                 score=score,
             )
@@ -401,7 +401,7 @@ class CrossDatacenterManager:
             patterns = {}
 
             for data_id, accesses in self._access_history.items():
-                dc_counts: Dict[str, int] = defaultdict(int)
+                dc_counts: Dict[str, float] = defaultdict(float)
 
                 # Weight recent accesses more heavily
                 current_time = time.time()
@@ -447,7 +447,7 @@ class CrossDatacenterManager:
                     )
 
         # Sort by priority
-        suggestions.sort(key=lambda s: -s["priority"])
+        suggestions.sort(key=lambda s: -float(s.get("priority", 0)))  # type: ignore[arg-type]
 
         return suggestions
 
@@ -467,6 +467,8 @@ class CrossDatacenterManager:
                 continue
 
             primary_dc = locality.locations[0].get("datacenter")
+            if primary_dc is None:
+                continue
             primary_freq = dc_frequencies.get(primary_dc, 0)
 
             # Check if another DC has dominant access

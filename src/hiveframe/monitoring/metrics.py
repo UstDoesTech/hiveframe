@@ -343,7 +343,9 @@ class MetricsRegistry:
         with self._lock:
             if full_name not in self._metrics:
                 self._metrics[full_name] = Counter(full_name, help_text)
-            return self._metrics[full_name]
+            metric = self._metrics[full_name]
+            assert isinstance(metric, Counter)
+            return metric
 
     def gauge(self, name: str, help_text: str = "") -> Gauge:
         """Get or create a gauge metric."""
@@ -351,7 +353,9 @@ class MetricsRegistry:
         with self._lock:
             if full_name not in self._metrics:
                 self._metrics[full_name] = Gauge(full_name, help_text)
-            return self._metrics[full_name]
+            metric = self._metrics[full_name]
+            assert isinstance(metric, Gauge)
+            return metric
 
     def histogram(
         self, name: str, help_text: str = "", buckets: tuple = Histogram.DEFAULT_BUCKETS
@@ -361,7 +365,9 @@ class MetricsRegistry:
         with self._lock:
             if full_name not in self._metrics:
                 self._metrics[full_name] = Histogram(full_name, help_text, buckets)
-            return self._metrics[full_name]
+            metric = self._metrics[full_name]
+            assert isinstance(metric, Histogram)
+            return metric
 
     def summary(
         self, name: str, help_text: str = "", quantiles: tuple = (0.5, 0.9, 0.95, 0.99)
@@ -371,7 +377,9 @@ class MetricsRegistry:
         with self._lock:
             if full_name not in self._metrics:
                 self._metrics[full_name] = Summary(full_name, help_text, quantiles)
-            return self._metrics[full_name]
+            metric = self._metrics[full_name]
+            assert isinstance(metric, Summary)
+            return metric
 
     def to_prometheus(self) -> str:
         """Export all metrics in Prometheus format."""

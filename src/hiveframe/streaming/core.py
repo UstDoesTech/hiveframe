@@ -99,9 +99,9 @@ class StreamPartitioner:
 
             # Roulette wheel selection
             r = random.uniform(0, total)
-            cumsum = 0
+            cumsum = 0.0
             for i, weight in enumerate(weights):
-                cumsum += weight
+                cumsum = cumsum + weight
                 if cumsum >= r:
                     return i
 
@@ -169,12 +169,12 @@ class StreamBuffer:
             if self.buffer:
                 record = self.buffer.popleft()
                 self._not_full.notify()
-                return record
+                return record  # type: ignore[no-any-return, return-value]
             return None
 
     def get_batch(self, max_batch: int = 100, timeout: float = 0.1) -> List[StreamRecord]:
         """Get a batch of records for micro-batch processing."""
-        batch = []
+        batch: List[StreamRecord] = []
         deadline = time.time() + timeout
 
         while len(batch) < max_batch and time.time() < deadline:
@@ -420,7 +420,8 @@ class HiveStream:
     def get_result(self, timeout: float = 1.0) -> Optional[Tuple[str, Any]]:
         """Get a processed result."""
         try:
-            return self.results.get(timeout=timeout)
+            result = self.results.get(timeout=timeout)
+            return result  # type: ignore[no-any-return, return-value]
         except Empty:
             return None
 

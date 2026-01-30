@@ -5,9 +5,12 @@ Kubernetes Manifests Generator
 Generates Kubernetes manifests for HiveFrame clusters.
 """
 
-from typing import Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List
 
-import yaml
+import yaml  # type: ignore[import-untyped]
+
+if TYPE_CHECKING:
+    from hiveframe.k8s.cluster import HiveCluster
 
 
 def generate_deployment(cluster: "HiveCluster") -> Dict[str, Any]:
@@ -61,7 +64,7 @@ def generate_deployment(cluster: "HiveCluster") -> Dict[str, Any]:
 
     # Add volume mounts if persistence enabled
     if cluster.persistence_enabled:
-        deployment["spec"]["template"]["spec"]["volumes"] = [
+        deployment["spec"]["template"]["spec"]["volumes"] = [  # type: ignore[index]
             {
                 "name": "data",
                 "persistentVolumeClaim": {
@@ -70,7 +73,7 @@ def generate_deployment(cluster: "HiveCluster") -> Dict[str, Any]:
             }
         ]
 
-        deployment["spec"]["template"]["spec"]["containers"][0]["volumeMounts"] = [
+        deployment["spec"]["template"]["spec"]["containers"][0]["volumeMounts"] = [  # type: ignore[index]
             {
                 "name": "data",
                 "mountPath": "/data",
@@ -78,7 +81,8 @@ def generate_deployment(cluster: "HiveCluster") -> Dict[str, Any]:
         ]
 
     # Add configmap volume
-    deployment["spec"]["template"]["spec"].setdefault("volumes", []).append(
+    volumes = deployment["spec"]["template"]["spec"].setdefault("volumes", [])  # type: ignore[index]
+    volumes.append(  # type: ignore[union-attr]
         {
             "name": "config",
             "configMap": {
@@ -87,7 +91,9 @@ def generate_deployment(cluster: "HiveCluster") -> Dict[str, Any]:
         }
     )
 
-    deployment["spec"]["template"]["spec"]["containers"][0].setdefault("volumeMounts", []).append(
+    containers = deployment["spec"]["template"]["spec"]["containers"]  # type: ignore[index]
+    volume_mounts = containers[0].setdefault("volumeMounts", [])
+    volume_mounts.append(  # type: ignore[union-attr]
         {
             "name": "config",
             "mountPath": "/etc/hiveframe",
@@ -396,7 +402,7 @@ def generate_rbac(namespace: str = "hiveframe-system") -> List[Dict[str, Any]]:
     Returns:
         List of RBAC resources
     """
-    resources = []
+    resources: List[Dict[str, Any]] = []
 
     # ServiceAccount
     resources.append(

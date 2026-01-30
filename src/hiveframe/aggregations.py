@@ -283,7 +283,7 @@ class AggregatorRegistry:
         cls = self.get(name)
         if cls is None:
             raise ValueError(f"Unknown aggregator: {name}")
-        return cls()
+        return cls()  # type: ignore[no-any-return]
 
     def list_aggregators(self) -> List[str]:
         """List all registered aggregator names."""

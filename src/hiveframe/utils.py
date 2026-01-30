@@ -103,9 +103,8 @@ class ManagedResource(ABC):
         self.open()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.close()
-        return False
 
     @property
     def is_open(self) -> bool:

@@ -51,10 +51,10 @@ class BoundedOutOfOrdernessWatermarkGenerator(WatermarkGenerator):
 
     def __init__(
         self,
-        max_out_of_orderness_seconds: float = None,
+        max_out_of_orderness_seconds: Optional[float] = None,
         emit_interval_seconds: float = 1.0,
         *,
-        max_out_of_orderness: float = None,
+        max_out_of_orderness: Optional[float] = None,
     ):
         # Support both parameter names for backward compatibility
         if max_out_of_orderness_seconds is not None:

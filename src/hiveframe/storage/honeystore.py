@@ -602,6 +602,7 @@ class HoneyStoreReader:
         """Get file metadata."""
         if self._metadata is None:
             self._read_metadata()
+        assert self._metadata is not None
         return self._metadata
 
     @property

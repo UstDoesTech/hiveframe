@@ -17,7 +17,7 @@ import statistics
 import threading
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from ..core import ColonyState, HiveFrame
 from ..monitoring import get_logger, get_profiler, get_registry
@@ -91,7 +91,7 @@ class MemoryTracker:
         self._running = False
         if self._thread:
             self._thread.join(timeout=1.0)
-        return self._peak_mb
+        return float(self._peak_mb)
 
     def _monitor(self):
         import sys
@@ -259,7 +259,7 @@ def run_partition_skew_scenario(
 
     # Track per-partition processing
     partition_counts = {i: 0 for i in range(num_partitions)}
-    partition_times = {i: [] for i in range(num_partitions)}
+    partition_times: Dict[int, List[float]] = {i: [] for i in range(num_partitions)}
     latency_tracker = LatencyTracker()
 
     def process_with_partition_tracking(item: Dict) -> Tuple[Dict, float]:
@@ -434,7 +434,9 @@ def run_sustained_load_scenario(
 
 
 def run_worker_saturation_scenario(
-    num_records: int = 5000, processing_time_ms: float = 10.0, worker_counts: List[int] = None
+    num_records: int = 5000,
+    processing_time_ms: float = 10.0,
+    worker_counts: Optional[List[int]] = None,
 ) -> List[ScaleResult]:
     """
     Scenario 4: Worker Saturation

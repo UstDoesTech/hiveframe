@@ -116,13 +116,13 @@ class WorkerSpec:
         }
 
         if self.node_selector:
-            spec["template"]["spec"]["nodeSelector"] = self.node_selector
+            spec["template"]["spec"]["nodeSelector"] = self.node_selector  # type: ignore[index]
 
         if self.tolerations:
-            spec["template"]["spec"]["tolerations"] = self.tolerations
+            spec["template"]["spec"]["tolerations"] = self.tolerations  # type: ignore[index]
 
         if self.affinity:
-            spec["template"]["spec"]["affinity"] = self.affinity
+            spec["template"]["spec"]["affinity"] = self.affinity  # type: ignore[index]
 
         return spec
 

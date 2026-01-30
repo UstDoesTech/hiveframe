@@ -425,7 +425,8 @@ class HiveOperator:
             return []
 
         data = json.loads(result.stdout)
-        return data.get("items", [])
+        items: List[Dict[str, Any]] = data.get("items", [])
+        return items
 
     def get_logs(self, name: str, namespace: str = "default", tail: int = 100) -> str:
         """
@@ -452,4 +453,5 @@ class HiveOperator:
             "--all-containers",
         )
 
-        return result.stdout if result.returncode == 0 else result.stderr
+        logs: str = result.stdout if result.returncode == 0 else result.stderr
+        return logs

@@ -502,9 +502,9 @@ class DeltaTable:
 
             # Write data file
             file_name = f"part-{uuid.uuid4()}.parquet"
-            file_path = self.path / file_name
+            file_path_obj = self.path / file_name
 
-            writer = ParquetWriter(str(file_path), options=self._options)
+            writer = ParquetWriter(str(file_path_obj), options=self._options)
             metadata = writer.write(records)
 
             # Generate stats
@@ -517,7 +517,12 @@ class DeltaTable:
         if not records:
             return {}
 
-        stats = {"numRecords": len(records), "minValues": {}, "maxValues": {}, "nullCount": {}}
+        stats: Dict[str, Any] = {
+            "numRecords": len(records),
+            "minValues": {},
+            "maxValues": {},
+            "nullCount": {},
+        }
 
         columns = records[0].keys()
         for col in columns:
@@ -528,8 +533,10 @@ class DeltaTable:
 
             if values:
                 try:
-                    stats["minValues"][col] = min(values)
-                    stats["maxValues"][col] = max(values)
+                    min_val = min(values)  # type: ignore
+                    max_val = max(values)  # type: ignore
+                    stats["minValues"][col] = min_val
+                    stats["maxValues"][col] = max_val
                 except TypeError:
                     pass  # Non-comparable types
 

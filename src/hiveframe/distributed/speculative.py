@@ -568,7 +568,7 @@ class SpeculativeExecutor:
                 if task.task_id not in self._results:
                     self._results[task.task_id] = result
 
-    def get_result(self, task_id: str, timeout: float = None) -> Optional[Any]:
+    def get_result(self, task_id: str, timeout: Optional[float] = None) -> Optional[Any]:
         """
         Get result for a specific task.
 
