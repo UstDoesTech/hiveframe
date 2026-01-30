@@ -144,7 +144,7 @@ class CSVSource(DataSource[Dict[str, str]]):
     def read(self) -> Generator[Dict[str, str], None, None]:
         if not self._is_open:
             raise RuntimeError("Source not open")
-        
+
         assert self._reader is not None, "Reader must be initialized"
 
         line_num = 1 if self.has_header else 0
@@ -182,7 +182,9 @@ class JSONLSource(DataSource[Dict[str, Any]]):
     than regular JSON arrays.
     """
 
-    def __init__(self, path: Union[str, Path], encoding: str = "utf-8", skip_malformed: bool = True):
+    def __init__(
+        self, path: Union[str, Path], encoding: str = "utf-8", skip_malformed: bool = True
+    ):
         super().__init__(f"jsonl:{path}")
         self.path = Path(path)
         self.encoding = encoding
@@ -203,7 +205,7 @@ class JSONLSource(DataSource[Dict[str, Any]]):
     def read(self) -> Generator[Dict[str, Any], None, None]:
         if not self._is_open:
             raise RuntimeError("Source not open")
-        
+
         assert self._file is not None, "File must be open"
 
         line: str

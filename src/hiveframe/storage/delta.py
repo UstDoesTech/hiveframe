@@ -517,7 +517,12 @@ class DeltaTable:
         if not records:
             return {}
 
-        stats: Dict[str, Any] = {"numRecords": len(records), "minValues": {}, "maxValues": {}, "nullCount": {}}
+        stats: Dict[str, Any] = {
+            "numRecords": len(records),
+            "minValues": {},
+            "maxValues": {},
+            "nullCount": {},
+        }
 
         columns = records[0].keys()
         for col in columns:

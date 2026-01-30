@@ -188,7 +188,9 @@ class SQLExecutor:
             )
             nodes = [limit_node]
 
-        return QueryPlan(root=nodes[0] if nodes else PlanNode(type=PlanNodeType.SCAN), tables=tables)
+        default_node = PlanNode(type=PlanNodeType.SCAN)
+        root = nodes[0] if nodes else default_node
+        return QueryPlan(root=root, tables=tables)
 
     def _execute_plan(self, plan: QueryPlan, stmt: SQLStatement) -> HiveDataFrame:
         """Execute the query plan."""

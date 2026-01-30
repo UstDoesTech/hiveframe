@@ -434,7 +434,9 @@ def run_sustained_load_scenario(
 
 
 def run_worker_saturation_scenario(
-    num_records: int = 5000, processing_time_ms: float = 10.0, worker_counts: Optional[List[int]] = None
+    num_records: int = 5000,
+    processing_time_ms: float = 10.0,
+    worker_counts: Optional[List[int]] = None,
 ) -> List[ScaleResult]:
     """
     Scenario 4: Worker Saturation

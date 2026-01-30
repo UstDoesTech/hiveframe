@@ -15,7 +15,7 @@ import random
 import threading
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 from ..exceptions import (
     DeadLetterQueue,
@@ -483,7 +483,11 @@ def run_mixed_error_scenario(num_records: int = 1000) -> ScenarioResult:
             # Add to DLQ
             if last_error:
                 # Cast to HiveFrameError for type checking
-                error_to_log = last_error if isinstance(last_error, HiveFrameError) else ProcessingError(str(last_error))
+                error_to_log = (
+                    last_error
+                    if isinstance(last_error, HiveFrameError)
+                    else ProcessingError(str(last_error))
+                )
                 dlq.push(
                     DeadLetterRecord(
                         original_data=record,

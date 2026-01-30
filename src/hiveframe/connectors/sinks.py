@@ -89,7 +89,7 @@ class JSONLSink(DataSink[Dict[str, Any]]):
     def write(self, record: Dict[str, Any]) -> None:
         if not self._is_open:
             raise RuntimeError("Sink not open")
-        
+
         assert self._file is not None, "File must be open"
         self._file.write(json.dumps(record) + "\n")
         self._records_written += 1
@@ -139,7 +139,7 @@ class CSVSink(DataSink[Dict[str, str]]):
     def write(self, record: Dict[str, str]) -> None:
         if not self._is_open:
             raise RuntimeError("Sink not open")
-        
+
         assert self._writer is not None, "Writer must be initialized"
 
         # Infer columns from first record if not specified

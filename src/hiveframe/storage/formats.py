@@ -55,11 +55,23 @@ class PartitionSpec:
             if transform == "identity":
                 part_value = str(value) if value is not None else "__null__"
             elif transform == "year":
-                part_value = str(value.year) if value is not None and hasattr(value, "year") else str(value)[:4]
+                part_value = (
+                    str(value.year)
+                    if value is not None and hasattr(value, "year")
+                    else str(value)[:4]
+                )
             elif transform == "month":
-                part_value = str(value.month) if value is not None and hasattr(value, "month") else str(value)[5:7]
+                part_value = (
+                    str(value.month)
+                    if value is not None and hasattr(value, "month")
+                    else str(value)[5:7]
+                )
             elif transform == "day":
-                part_value = str(value.day) if value is not None and hasattr(value, "day") else str(value)[8:10]
+                part_value = (
+                    str(value.day)
+                    if value is not None and hasattr(value, "day")
+                    else str(value)[8:10]
+                )
             else:
                 part_value = str(value)
 

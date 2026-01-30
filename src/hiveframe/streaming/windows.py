@@ -88,7 +88,9 @@ class TumblingWindowAssigner(WindowAssigner):
     [00:00-00:05], [00:05-00:10], [00:10-00:15], ...
     """
 
-    def __init__(self, size_seconds: Optional[float] = None, *, window_size: Optional[float] = None):
+    def __init__(
+        self, size_seconds: Optional[float] = None, *, window_size: Optional[float] = None
+    ):
         # Support both parameter names - window_size is deprecated
         if window_size is not None:
             warnings.warn(

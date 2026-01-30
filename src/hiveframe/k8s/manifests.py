@@ -91,7 +91,8 @@ def generate_deployment(cluster: "HiveCluster") -> Dict[str, Any]:
         }
     )
 
-    volume_mounts = deployment["spec"]["template"]["spec"]["containers"][0].setdefault("volumeMounts", [])  # type: ignore[index]
+    containers = deployment["spec"]["template"]["spec"]["containers"]  # type: ignore[index]
+    volume_mounts = containers[0].setdefault("volumeMounts", [])
     volume_mounts.append(  # type: ignore[union-attr]
         {
             "name": "config",
