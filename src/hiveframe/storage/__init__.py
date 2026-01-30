@@ -3,13 +3,18 @@ HiveFrame Storage
 =================
 
 Storage layer supporting various file formats including
-Parquet and Delta Lake for the HiveFrame data platform.
+Parquet, Delta Lake, HoneyStore, and Iceberg for the HiveFrame data platform.
 
-Key Features:
+Key Features (Phase 1):
 - Parquet file support (columnar storage)
 - Delta Lake format support (ACID transactions)
 - Schema evolution and type inference
 - Partition pruning for optimized reads
+
+Phase 2 Additions:
+- HoneyStore: Native columnar format optimized for swarm access
+- Apache Iceberg: Open table format compatibility
+- Caching Swarm: Distributed intelligent caching with pheromone trails
 """
 
 from .parquet import (
@@ -33,6 +38,51 @@ from .formats import (
     CompressionCodec,
 )
 
+# Phase 2: HoneyStore native columnar format
+from .honeystore import (
+    HoneyStoreWriter,
+    HoneyStoreReader,
+    HoneyStoreMetadata,
+    HoneycombBlock,
+    ColumnMetadata,
+    EncodingType,
+    NectarEncoder,
+    DictionaryEncoder,
+    RLEEncoder,
+    write_honeystore,
+    read_honeystore,
+)
+
+# Phase 2: Apache Iceberg support
+from .iceberg import (
+    IcebergTable,
+    IcebergSchema,
+    IcebergField,
+    IcebergDataType,
+    PartitionField,
+    PartitionTransform,
+    Snapshot,
+    TableMetadata,
+    ManifestFile,
+    DataFile,
+    SchemaEvolution,
+    read_iceberg,
+    write_iceberg,
+)
+
+# Phase 2: Caching Swarm
+from .cache import (
+    CachingSwarm,
+    PheromoneCache,
+    CacheEntry,
+    PheromoneTrail,
+    EvictionPolicy,
+    CacheLevel,
+    CacheStatistics,
+    SwarmPrefetcher,
+    DistributedCacheNode,
+)
+
 __all__ = [
     # Parquet
     'ParquetReader',
@@ -51,4 +101,40 @@ __all__ = [
     'StorageOptions',
     'PartitionSpec',
     'CompressionCodec',
+    # Phase 2: HoneyStore
+    'HoneyStoreWriter',
+    'HoneyStoreReader',
+    'HoneyStoreMetadata',
+    'HoneycombBlock',
+    'ColumnMetadata',
+    'EncodingType',
+    'NectarEncoder',
+    'DictionaryEncoder',
+    'RLEEncoder',
+    'write_honeystore',
+    'read_honeystore',
+    # Phase 2: Iceberg
+    'IcebergTable',
+    'IcebergSchema',
+    'IcebergField',
+    'IcebergDataType',
+    'PartitionField',
+    'PartitionTransform',
+    'Snapshot',
+    'TableMetadata',
+    'ManifestFile',
+    'DataFile',
+    'SchemaEvolution',
+    'read_iceberg',
+    'write_iceberg',
+    # Phase 2: Caching Swarm
+    'CachingSwarm',
+    'PheromoneCache',
+    'CacheEntry',
+    'PheromoneTrail',
+    'EvictionPolicy',
+    'CacheLevel',
+    'CacheStatistics',
+    'SwarmPrefetcher',
+    'DistributedCacheNode',
 ]
