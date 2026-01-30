@@ -153,6 +153,10 @@ cython_debug/
 ehthumbs.db
 Thumbs.db
 
+# Docs Specific
+docs/node_modules/
+docs/.docusaurus/
+
 # Project specific
 *.csv
 *.jsonl

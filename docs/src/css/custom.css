@@ -1,0 +1,90 @@
+:root {
+  --ifm-color-primary: #f59e0b;
+  --ifm-color-primary-dark: #d97706;
+  --ifm-color-primary-darker: #b45309;
+  --ifm-color-primary-darkest: #92400e;
+  --ifm-color-primary-light: #fbbf24;
+  --ifm-color-primary-lighter: #fcd34d;
+  --ifm-color-primary-lightest: #fde68a;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(245, 158, 11, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #fbbf24;
+  --ifm-color-primary-dark: #f59e0b;
+  --ifm-color-primary-darker: #d97706;
+  --ifm-color-primary-darkest: #b45309;
+  --ifm-color-primary-light: #fcd34d;
+  --ifm-color-primary-lighter: #fde68a;
+  --ifm-color-primary-lightest: #fef3c7;
+  --docusaurus-highlighted-code-line-bg: rgba(251, 191, 36, 0.15);
+}
+
+/* Bee-themed styling */
+.hero {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+}
+
+[data-theme='dark'] .hero {
+  background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #4b5563 100%);
+}
+
+.hero__title {
+  color: #92400e;
+}
+
+[data-theme='dark'] .hero__title {
+  color: #fbbf24;
+}
+
+.hero__subtitle {
+  color: #b45309;
+}
+
+[data-theme='dark'] .hero__subtitle {
+  color: #fcd34d;
+}
+
+/* Feature cards */
+.feature-card {
+  border: 2px solid var(--ifm-color-primary-light);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  border-color: var(--ifm-color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+/* Mermaid diagram styling */
+.mermaid {
+  background: transparent !important;
+}
+
+/* Code block enhancements */
+.prism-code {
+  border-radius: 8px;
+}
+
+/* Admonition styling */
+.admonition {
+  border-radius: 8px;
+}
+
+/* Table styling */
+table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th {
+  background-color: var(--ifm-color-primary-lightest);
+}
+
+[data-theme='dark'] th {
+  background-color: var(--ifm-color-primary-darkest);
+}
