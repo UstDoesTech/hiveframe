@@ -80,10 +80,11 @@ class TestAutoMLSwarm:
             return params["x"]
         
         automl = AutoMLSwarm(n_workers=5, space=space)
-        automl.optimize(objective, n_iterations=15, maximize=True, verbose=False)
+        n_iterations = 15
+        automl.optimize(objective, n_iterations=n_iterations, maximize=True, verbose=False)
         
         history = automl.get_history()
-        assert len(history) == 16  # Initial + 15 iterations
+        assert len(history) == n_iterations + 1  # Initial + iterations
         
         # Best score should improve or stay same
         for i in range(1, len(history)):

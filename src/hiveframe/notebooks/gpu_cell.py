@@ -142,6 +142,9 @@ class GPUCell:
         """
         Execute GPU-accelerated code.
         
+        WARNING: This is a simplified implementation for Phase 3.
+        Production use requires proper sandboxing and security measures.
+        
         Args:
             code: Code to execute
             device: Optional specific device (auto-selected if None)
@@ -169,6 +172,7 @@ class GPUCell:
             
             # For now, execute as regular Python
             # In real implementation, would set CUDA device context
+            # NOTE: exec on user code is a security risk - needs sandboxing for production
             context = {}
             exec(code, context)
             

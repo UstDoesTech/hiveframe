@@ -149,13 +149,21 @@ class NotebookKernel:
         return execution
     
     def _execute_python(self, code: str) -> CellOutput:
-        """Execute Python code."""
+        """
+        Execute Python code.
+        
+        WARNING: This is a simplified implementation for Phase 3.
+        Production use should implement proper sandboxing and security measures.
+        Consider using RestrictedPython or similar libraries for production.
+        """
         # Capture stdout
         old_stdout = sys.stdout
         sys.stdout = captured_output = StringIO()
         
         try:
             # Execute code
+            # NOTE: eval/exec on user code is a security risk
+            # This is acceptable for Phase 3 demo but needs sandboxing for production
             result = eval(code, self.context) if self._is_expression(code) else exec(code, self.context)
             
             # Get captured output
