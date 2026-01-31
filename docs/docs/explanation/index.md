@@ -35,6 +35,21 @@ Explanations are **understanding-oriented** - they clarify and illuminate a topi
 |---------|-------------|
 | [Comparison with Spark](./comparison-spark) | How HiveFrame differs from Apache Spark |
 
+### Phase 2: Advanced Swarm Intelligence (New!)
+
+| Article | Description | Status |
+|---------|-------------|--------|
+| Multi-Hive Federation | How clusters coordinate like allied bee colonies | 📝 Coming Soon |
+| Adaptive Partitioning | Dynamic partition sizing based on fitness | 📝 Coming Soon |
+| Speculative Execution | Scout bee proactive task retry | 📝 Coming Soon |
+| HoneyStore Architecture | Swarm-optimized columnar storage | 📝 Coming Soon |
+| Pheromone-Based Caching | Intelligent cache eviction using trails | 📝 Coming Soon |
+| Vectorized Execution | SIMD acceleration for swarm processing | 📝 Coming Soon |
+| Adaptive Query Execution | Runtime plan modification via waggle dance | 📝 Coming Soon |
+
+> **Note**: Phase 2 features are fully implemented! Explanation articles are being written.
+> For now, see README.md and the demo files for comprehensive examples.
+
 ## The Biomimicry Philosophy
 
 HiveFrame is built on **biomimicry** - the practice of learning from and emulating nature's solutions. Bee colonies have evolved over millions of years to solve distributed coordination problems that are remarkably similar to modern computing challenges:

@@ -52,6 +52,22 @@ How-To Guides are **problem-oriented** - they take you through the steps needed 
 | [Connect to PostgreSQL](./connect-postgres) | Database source and sink |
 | [Connect via HTTP](./connect-http) | REST API integration |
 
+### 🐝 Phase 2: Swarm Intelligence (New!)
+
+| Guide | Description | Status |
+|-------|-------------|--------|
+| Configure Multi-Hive Federation | Coordinate multiple clusters across datacenters | 📝 Coming Soon |
+| Use Adaptive Partitioning | Dynamic partition management based on fitness | 📝 Coming Soon |
+| Enable Speculative Execution | Scout bees for straggler mitigation | 📝 Coming Soon |
+| Work with HoneyStore | Native columnar format optimized for swarms | 📝 Coming Soon |
+| Use Caching Swarm | Pheromone-based intelligent caching | 📝 Coming Soon |
+| Enable Vectorized Execution | SIMD-accelerated numerical processing | 📝 Coming Soon |
+| Use Adaptive Query Execution | Real-time query plan optimization | 📝 Coming Soon |
+| Integrate Iceberg Tables | Open table format with schema evolution | 📝 Coming Soon |
+
+> **Note**: Phase 2 features are fully implemented and available! The how-to guides are being written.
+> For now, see the comprehensive examples in `examples/demo_phase2_*.py` files.
+
 ## Finding the Right Guide
 
 - **New to HiveFrame?** Start with [Tutorials](/docs/tutorials) instead

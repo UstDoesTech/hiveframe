@@ -13,6 +13,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation in `docs/` directory
 - Example scripts in `examples/` directory
 
+### Phase 2 Features (Complete)
+
+#### Distributed Execution Engine
+- Multi-hive Federation for cluster coordination
+- Cross-datacenter swarm coordination
+- Adaptive partitioning with fitness-based strategies
+- Speculative execution with scout bees
+- Locality-aware scheduling
+
+#### Advanced Query Engine
+- SwarmQL 2.0 with full ANSI SQL compliance
+- Common Table Expressions (CTEs)
+- Set operations (UNION, INTERSECT, EXCEPT)
+- Subqueries (IN, EXISTS, scalar)
+- Window functions (ROW_NUMBER, RANK, LAG, LEAD)
+- 20+ new SQL functions (string, date/time, etc.)
+- Bee-inspired extensions (WAGGLE JOIN, etc.)
+- Adaptive Query Execution (AQE)
+- Real-time plan modification based on waggle dance feedback
+- Vectorized execution for numerical workloads
+
+#### Storage Layer
+- HoneyStore native columnar format
+- Adaptive compression
+- Honeycomb block structure
+- Nectar encoding for nulls
+- Iceberg table format support
+- Schema evolution
+- Hidden partitioning
+- Caching Swarm with pheromone-based eviction
+- Intelligent prefetching by scout bees
+- Distributed cache coordination
+
+#### Documentation & Examples
+- Comprehensive Phase 2 feature documentation in README
+- Updated ROADMAP to reflect Phase 2 completion
+- New demo files:
+  - `demo_phase2_federation.py` - Multi-hive coordination
+  - `demo_phase2_adaptive.py` - Adaptive partitioning & speculative execution
+  - `demo_phase2_storage.py` - HoneyStore & caching swarm
+  - `swarmql_2_demo.py` - SwarmQL 2.0 features
+- API examples for all Phase 2 features
+
 ## [0.1.0] - 2026-01-29
 
 ### Added
