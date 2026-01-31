@@ -345,8 +345,15 @@ from .utils import (
 from .lakehouse import (
     AccessControl,
     DeltaSharing,
+    LineageNode,
     LineageTracker,
     PIIDetector,
+    PIISensitivity,
+    PermissionType,
+    Share,
+    ShareAccessLevel,
+    ShareRecipient,
+    TableMetadata,
     UnityHiveCatalog,
 )
 
@@ -355,17 +362,25 @@ from .ml import (
     AutoMLSwarm,
     DistributedTrainer,
     FeatureHive,
+    FeatureType,
+    HyperparameterSpace,
     MLflowIntegration,
     ModelServer,
+    ModelStage,
+    TaskType,
 )
 
 # Phase 3: HiveFrame Notebooks
 from .notebooks import (
+    CellStatus,
+    CellType,
     CollaborationManager,
     GPUCell,
+    KernelLanguage,
     NotebookFormat,
     NotebookKernel,
     NotebookSession,
+    OperationType,
 )
 
 __all__ = [
@@ -622,16 +637,31 @@ __all__ = [
     "LineageTracker",
     "PIIDetector",
     "DeltaSharing",
+    "PermissionType",
+    "PIISensitivity",
+    "TableMetadata",
+    "LineageNode",
+    "ShareAccessLevel",
+    "Share",
+    "ShareRecipient",
     # Phase 3: HiveMind ML
     "AutoMLSwarm",
     "FeatureHive",
     "ModelServer",
     "DistributedTrainer",
     "MLflowIntegration",
+    "HyperparameterSpace",
+    "TaskType",
+    "FeatureType",
+    "ModelStage",
     # Phase 3: HiveFrame Notebooks
     "NotebookKernel",
     "NotebookSession",
     "CollaborationManager",
     "NotebookFormat",
     "GPUCell",
+    "KernelLanguage",
+    "CellStatus",
+    "OperationType",
+    "CellType",
 ]
