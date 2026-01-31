@@ -43,7 +43,7 @@ __all__ = [
     "CellType",
 ]
 
-from .kernel import NotebookKernel, NotebookSession, KernelLanguage, CellStatus
 from .collaboration import CollaborationManager, OperationType
-from .format import NotebookFormat, CellType
+from .format import CellType, NotebookFormat
 from .gpu_cell import GPUCell
+from .kernel import CellStatus, KernelLanguage, NotebookKernel, NotebookSession

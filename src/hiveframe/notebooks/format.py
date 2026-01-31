@@ -6,10 +6,10 @@ Support for reading and writing notebook files in various formats.
 """
 
 import json
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class CellType(Enum):

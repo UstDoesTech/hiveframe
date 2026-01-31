@@ -2,18 +2,15 @@
 Tests for Phase 3 Lakehouse features (Unity Hive Catalog, Delta Sharing)
 """
 
-import pytest
-from datetime import datetime, timedelta
 
 from hiveframe.lakehouse import (
-    UnityHiveCatalog,
     AccessControl,
-    LineageTracker,
-    PIIDetector,
     DeltaSharing,
+    LineageTracker,
     PermissionType,
-    PIISensitivity,
+    PIIDetector,
     ShareAccessLevel,
+    UnityHiveCatalog,
 )
 
 

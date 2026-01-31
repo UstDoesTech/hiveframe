@@ -5,11 +5,11 @@ Collaboration Manager - Real-time Multi-user Collaboration
 Manages collaborative editing sessions with bee-inspired coordination.
 """
 
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
-import uuid
+from typing import Any, Dict, List, Optional
 
 
 class OperationType(Enum):

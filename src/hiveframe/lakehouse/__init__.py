@@ -44,18 +44,18 @@ __all__ = [
 ]
 
 from .catalog import (
-    UnityHiveCatalog,
     AccessControl,
+    LineageNode,
     LineageTracker,
-    PIIDetector,
     PermissionType,
+    PIIDetector,
     PIISensitivity,
     TableMetadata,
-    LineageNode,
+    UnityHiveCatalog,
 )
 from .delta_sharing import (
     DeltaSharing,
-    ShareAccessLevel,
     Share,
+    ShareAccessLevel,
     ShareRecipient,
 )

@@ -5,12 +5,12 @@ Notebook Kernel - Multi-language Execution Engine
 Execution engine for notebook cells with multi-language support.
 """
 
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
-import sys
 from io import StringIO
+from typing import Any, Dict, List, Optional
 
 
 class KernelLanguage(Enum):
