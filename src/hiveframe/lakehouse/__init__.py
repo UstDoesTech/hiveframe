@@ -20,10 +20,10 @@ Key Components:
 
 Example:
     from hiveframe.lakehouse import UnityHiveCatalog, AccessControl
-    
+
     catalog = UnityHiveCatalog()
     catalog.register_table("users", schema, location="/data/users")
-    
+
     acl = AccessControl(catalog)
     acl.grant("user@example.com", "users", ["SELECT", "INSERT"])
 """

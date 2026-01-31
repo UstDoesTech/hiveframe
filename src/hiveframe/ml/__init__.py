@@ -20,16 +20,16 @@ Key Components:
 
 Example:
     from hiveframe.ml import AutoMLSwarm, FeatureHive, ModelServer
-    
+
     # AutoML with bee-inspired optimization
     automl = AutoMLSwarm(n_workers=8)
     best_model = automl.fit(X_train, y_train, task='classification')
-    
+
     # Feature store
     feature_store = FeatureHive()
     feature_store.register_feature("user_activity_7d", compute_fn)
     features = feature_store.get_features(["user_activity_7d"], user_ids)
-    
+
     # Model serving
     server = ModelServer(best_model)
     predictions = server.predict(new_data)

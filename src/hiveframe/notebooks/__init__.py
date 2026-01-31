@@ -20,10 +20,10 @@ Key Components:
 
 Example:
     from hiveframe.notebooks import NotebookKernel, NotebookSession
-    
+
     kernel = NotebookKernel(language='python')
     session = NotebookSession(kernel)
-    
+
     result = session.execute_cell(\"\"\"
     from hiveframe import HiveDataFrame
     df = HiveDataFrame.from_csv('data.csv')
