@@ -37,7 +37,7 @@ Biomimicry Concepts:
 - Adaptive Allocation: Self-organizing based on local stimuli
 """
 
-__version__ = "0.2.0-dev"
+__version__ = "0.3.0-dev"
 __author__ = "HiveFrame Contributors"
 
 # Utilities (new unified module)
@@ -341,6 +341,33 @@ from .utils import (
     deprecated_param,
 )
 
+# Phase 3: Lakehouse Architecture (Unity Hive Catalog, Delta Sharing)
+from .lakehouse import (
+    AccessControl,
+    DeltaSharing,
+    LineageTracker,
+    PIIDetector,
+    UnityHiveCatalog,
+)
+
+# Phase 3: Machine Learning Platform (HiveMind ML)
+from .ml import (
+    AutoMLSwarm,
+    DistributedTrainer,
+    FeatureHive,
+    MLflowIntegration,
+    ModelServer,
+)
+
+# Phase 3: HiveFrame Notebooks
+from .notebooks import (
+    CollaborationManager,
+    GPUCell,
+    NotebookFormat,
+    NotebookKernel,
+    NotebookSession,
+)
+
 __all__ = [
     # Utilities (new)
     "ThreadSafeMixin",
@@ -589,4 +616,22 @@ __all__ = [
     "CachingSwarm",
     "PheromoneCache",
     "SwarmPrefetcher",
+    # Phase 3: Unity Hive Catalog & Lakehouse
+    "UnityHiveCatalog",
+    "AccessControl",
+    "LineageTracker",
+    "PIIDetector",
+    "DeltaSharing",
+    # Phase 3: HiveMind ML
+    "AutoMLSwarm",
+    "FeatureHive",
+    "ModelServer",
+    "DistributedTrainer",
+    "MLflowIntegration",
+    # Phase 3: HiveFrame Notebooks
+    "NotebookKernel",
+    "NotebookSession",
+    "CollaborationManager",
+    "NotebookFormat",
+    "GPUCell",
 ]
