@@ -772,7 +772,7 @@ def main():
     print("  ✓ Self-healing through abandonment mechanism")
     print("  ✓ Adaptive backpressure via pheromone signals")
     print("  ✓ Emergent load balancing without central scheduler")
-    
+
     print("\n" + "-" * 60)
     print("Want to explore Phase 2 features?")
     print("-" * 60)

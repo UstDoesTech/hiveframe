@@ -88,16 +88,32 @@ class SQLExecutor:
 
     # Supported aggregate functions
     AGGREGATE_FUNCTIONS = {"COUNT", "SUM", "AVG", "MIN", "MAX", "COLLECT_LIST", "COLLECT_SET"}
-    
+
     # Window functions
-    WINDOW_FUNCTIONS = {"ROW_NUMBER", "RANK", "DENSE_RANK", "LAG", "LEAD", "FIRST_VALUE", "LAST_VALUE"}
-    
+    WINDOW_FUNCTIONS = {
+        "ROW_NUMBER",
+        "RANK",
+        "DENSE_RANK",
+        "LAG",
+        "LEAD",
+        "FIRST_VALUE",
+        "LAST_VALUE",
+    }
+
     # String functions
     STRING_FUNCTIONS = {"SUBSTRING", "SUBSTR", "CONCAT", "UPPER", "LOWER", "TRIM", "LENGTH"}
-    
+
     # Date functions
-    DATE_FUNCTIONS = {"CURRENT_DATE", "CURRENT_TIMESTAMP", "NOW", "DATE_ADD", "DATE_SUB", "DATE_DIFF", "EXTRACT"}
-    
+    DATE_FUNCTIONS = {
+        "CURRENT_DATE",
+        "CURRENT_TIMESTAMP",
+        "NOW",
+        "DATE_ADD",
+        "DATE_SUB",
+        "DATE_DIFF",
+        "EXTRACT",
+    }
+
     # Other functions
     OTHER_FUNCTIONS = {"COALESCE", "NULLIF"}
 
@@ -123,13 +139,13 @@ class SQLExecutor:
         # Handle set operations (UNION, INTERSECT, EXCEPT)
         if stmt.set_operation:
             return self._execute_set_operation(stmt.set_operation)
-        
+
         # Process CTEs (WITH clause)
         cte_catalog = {}
         for cte in stmt.ctes:
             cte_result = self.execute(cte.query)
             cte_catalog[cte.name.lower()] = cte_result
-        
+
         # Build query plan
         plan = self._build_plan(stmt)
 
@@ -220,11 +236,13 @@ class SQLExecutor:
         root = nodes[0] if nodes else default_node
         return QueryPlan(root=root, tables=tables)
 
-    def _execute_plan(self, plan: QueryPlan, stmt: SQLStatement, cte_catalog: Dict[str, HiveDataFrame] = None) -> HiveDataFrame:
+    def _execute_plan(
+        self, plan: QueryPlan, stmt: SQLStatement, cte_catalog: Dict[str, HiveDataFrame] = None
+    ) -> HiveDataFrame:
         """Execute the query plan."""
         if cte_catalog is None:
             cte_catalog = {}
-        
+
         # Get base DataFrame
         if not stmt.from_table:
             # SELECT without FROM (e.g., SELECT 1+1)
@@ -250,7 +268,7 @@ class SQLExecutor:
                 # In production, this would trigger adaptive join strategy selection
                 # For now, treat as inner join with hint metadata
                 join.type = "INNER"
-            
+
             # Check if join table is CTE
             join_table_name = join.table.name.lower()
             if join_table_name in cte_catalog:
@@ -329,14 +347,18 @@ class SQLExecutor:
             # Cross join if no condition
             return left.crossJoin(right)
 
-    def _execute_filter(self, df: HiveDataFrame, expr: Expression, cte_catalog: Dict[str, HiveDataFrame] = None) -> HiveDataFrame:
+    def _execute_filter(
+        self, df: HiveDataFrame, expr: Expression, cte_catalog: Dict[str, HiveDataFrame] = None
+    ) -> HiveDataFrame:
         """Execute WHERE filter."""
         if cte_catalog is None:
             cte_catalog = {}
         filter_col = self._expr_to_column(expr, cte_catalog)
         return df.filter(filter_col)
 
-    def _execute_aggregate(self, df: HiveDataFrame, stmt: SQLStatement, cte_catalog: Dict[str, HiveDataFrame] = None) -> HiveDataFrame:
+    def _execute_aggregate(
+        self, df: HiveDataFrame, stmt: SQLStatement, cte_catalog: Dict[str, HiveDataFrame] = None
+    ) -> HiveDataFrame:
         """Execute GROUP BY with aggregations."""
         if cte_catalog is None:
             cte_catalog = {}
@@ -383,7 +405,10 @@ class SQLExecutor:
         return result
 
     def _execute_projection(
-        self, df: HiveDataFrame, select_cols: List[SelectColumn], cte_catalog: Dict[str, HiveDataFrame] = None
+        self,
+        df: HiveDataFrame,
+        select_cols: List[SelectColumn],
+        cte_catalog: Dict[str, HiveDataFrame] = None,
     ) -> HiveDataFrame:
         """Execute SELECT projection."""
         if cte_catalog is None:
@@ -413,11 +438,13 @@ class SQLExecutor:
             return df.orderBy(col_expr, ascending=item.ascending)
         return df
 
-    def _expr_to_column(self, expr: Expression, cte_catalog: Dict[str, HiveDataFrame] = None) -> Column:
+    def _expr_to_column(
+        self, expr: Expression, cte_catalog: Dict[str, HiveDataFrame] = None
+    ) -> Column:
         """Convert SQL expression to Column."""
         if cte_catalog is None:
             cte_catalog = {}
-            
+
         if isinstance(expr, ColumnRef):
             return col(expr.name)
 
@@ -426,7 +453,7 @@ class SQLExecutor:
 
         if isinstance(expr, FunctionCall):
             return self._function_to_column(expr, cte_catalog)
-        
+
         if isinstance(expr, WindowFunction):
             return self._window_function_to_column(expr, cte_catalog)
 
@@ -477,7 +504,7 @@ class SQLExecutor:
 
         if isinstance(expr, InExpr):
             col_expr = self._expr_to_column(expr.expr, cte_catalog)
-            
+
             # Handle IN with subquery
             if expr.subquery:
                 # Execute subquery and get values
@@ -499,14 +526,14 @@ class SQLExecutor:
                 return val in values
 
             return Column("in_check", _expr=check_in)  # type: ignore
-        
+
         if isinstance(expr, ExistsExpr):
             # EXISTS subquery
             subquery_df = self.execute(expr.subquery)
             exists = subquery_df.count() > 0
             result = not exists if expr.negated else exists
             return lit(result)
-        
+
         if isinstance(expr, SubqueryExpr):
             # Scalar subquery - should return single value
             subquery_df = self.execute(expr.query)
@@ -525,7 +552,9 @@ class SQLExecutor:
 
         raise ValueError(f"Unsupported expression type: {type(expr)}")
 
-    def _function_to_column(self, func: FunctionCall, cte_catalog: Dict[str, HiveDataFrame] = None) -> Column:
+    def _function_to_column(
+        self, func: FunctionCall, cte_catalog: Dict[str, HiveDataFrame] = None
+    ) -> Column:
         """Convert function call to Column."""
         if cte_catalog is None:
             cte_catalog = {}
@@ -622,38 +651,40 @@ class SQLExecutor:
         if name == "DATE_ADD":
             date_arg = self._expr_to_column(func.args[0], cte_catalog)
             days = self._eval_constant_expr(func.args[1])
-            
+
             def date_add_fn(row: Dict) -> Any:
                 from datetime import timedelta
+
                 val = date_arg.eval(row)
                 if val is not None:
                     return val + timedelta(days=days)
                 return None
-            
+
             return Column("date_add", _expr=date_add_fn)  # type: ignore
         if name == "DATE_SUB":
             date_arg = self._expr_to_column(func.args[0], cte_catalog)
             days = self._eval_constant_expr(func.args[1])
-            
+
             def date_sub_fn(row: Dict) -> Any:
                 from datetime import timedelta
+
                 val = date_arg.eval(row)
                 if val is not None:
                     return val - timedelta(days=days)
                 return None
-            
+
             return Column("date_sub", _expr=date_sub_fn)  # type: ignore
         if name == "DATE_DIFF":
             date1 = self._expr_to_column(func.args[0], cte_catalog)
             date2 = self._expr_to_column(func.args[1], cte_catalog)
-            
+
             def date_diff_fn(row: Dict) -> Any:
                 val1 = date1.eval(row)
                 val2 = date2.eval(row)
                 if val1 is not None and val2 is not None:
                     return (val1 - val2).days
                 return None
-            
+
             return Column("date_diff", _expr=date_diff_fn)  # type: ignore
         if name == "EXTRACT":
             # EXTRACT(field FROM source)
@@ -664,7 +695,7 @@ class SQLExecutor:
             else:
                 field_name = str(field)
             source = self._expr_to_column(func.args[1], cte_catalog)
-            
+
             def extract_fn(row: Dict) -> Any:
                 val = source.eval(row)
                 if val is not None:
@@ -675,13 +706,13 @@ class SQLExecutor:
                     elif field_name == "DAY":
                         return val.day
                     elif field_name == "HOUR":
-                        return val.hour if hasattr(val, 'hour') else None
+                        return val.hour if hasattr(val, "hour") else None
                     elif field_name == "MINUTE":
-                        return val.minute if hasattr(val, 'minute') else None
+                        return val.minute if hasattr(val, "minute") else None
                     elif field_name == "SECOND":
-                        return val.second if hasattr(val, 'second') else None
+                        return val.second if hasattr(val, "second") else None
                 return None
-            
+
             return Column("extract", _expr=extract_fn)  # type: ignore
 
         # Coalesce and NULLIF
@@ -690,14 +721,14 @@ class SQLExecutor:
         if name == "NULLIF":
             arg1 = self._expr_to_column(func.args[0], cte_catalog)
             arg2 = self._expr_to_column(func.args[1], cte_catalog)
-            
+
             def nullif_fn(row: Dict) -> Any:
                 val1 = arg1.eval(row)
                 val2 = arg2.eval(row)
                 if val1 == val2:
                     return None
                 return val1
-            
+
             return Column("nullif", _expr=nullif_fn)  # type: ignore
 
         # Aggregations (these return Column for use in select)
@@ -707,7 +738,9 @@ class SQLExecutor:
 
         raise ValueError(f"Unsupported function: {name}")
 
-    def _case_to_column(self, case: CaseExpr, cte_catalog: Dict[str, HiveDataFrame] = None) -> Column:
+    def _case_to_column(
+        self, case: CaseExpr, cte_catalog: Dict[str, HiveDataFrame] = None
+    ) -> Column:
         """Convert CASE expression to Column."""
         if cte_catalog is None:
             cte_catalog = {}
@@ -732,7 +765,9 @@ class SQLExecutor:
 
         return Column("case", _expr=eval_case)  # type: ignore
 
-    def _coalesce_column(self, args: List[Expression], cte_catalog: Dict[str, HiveDataFrame] = None) -> Column:
+    def _coalesce_column(
+        self, args: List[Expression], cte_catalog: Dict[str, HiveDataFrame] = None
+    ) -> Column:
         """Create COALESCE column."""
         if cte_catalog is None:
             cte_catalog = {}
@@ -746,7 +781,9 @@ class SQLExecutor:
 
         return Column("coalesce", _expr=eval_coalesce)  # type: ignore
 
-    def _eval_expr_on_row(self, expr: Expression, row: Dict, cte_catalog: Dict[str, HiveDataFrame] = None) -> Any:
+    def _eval_expr_on_row(
+        self, expr: Expression, row: Dict, cte_catalog: Dict[str, HiveDataFrame] = None
+    ) -> Any:
         """Evaluate expression on a row."""
         if cte_catalog is None:
             cte_catalog = {}
@@ -853,9 +890,11 @@ class SQLExecutor:
                 return None
             if name == "CURRENT_DATE":
                 from datetime import date
+
                 return date.today()
             if name == "CURRENT_TIMESTAMP" or name == "NOW":
                 from datetime import datetime
+
                 return datetime.now()
             # For other functions, return None
             return None
@@ -990,12 +1029,12 @@ class SQLExecutor:
     def _execute_set_operation(self, set_op: SetOperation) -> HiveDataFrame:
         """
         Execute set operations (UNION, INTERSECT, EXCEPT).
-        
+
         Set operations combine results from two SELECT statements.
         """
         left_df = self.execute(set_op.left)
         right_df = self.execute(set_op.right)
-        
+
         if set_op.type == "UNION":
             if set_op.all:
                 # UNION ALL: keep duplicates
@@ -1005,81 +1044,88 @@ class SQLExecutor:
             else:
                 # UNION: remove duplicates
                 return left_df.union(right_df).distinct()
-        
+
         elif set_op.type == "INTERSECT":
             # Return rows that appear in both datasets
             left_data = left_df.collect()
             right_data = right_df.collect()
-            
+
             # Convert to hashable tuples for set intersection
             left_set = {tuple(sorted(row.items())) for row in left_data}
             right_set = {tuple(sorted(row.items())) for row in right_data}
-            
+
             intersect = left_set & right_set
             result_data = [dict(item) for item in intersect]
             return HiveDataFrame(result_data, left_df._hive)
-        
+
         elif set_op.type == "EXCEPT":
             # Return rows in left that are not in right
             left_data = left_df.collect()
             right_data = right_df.collect()
-            
+
             left_set = {tuple(sorted(row.items())) for row in left_data}
             right_set = {tuple(sorted(row.items())) for row in right_data}
-            
+
             except_set = left_set - right_set
             result_data = [dict(item) for item in except_set]
             return HiveDataFrame(result_data, left_df._hive)
-        
+
         raise ValueError(f"Unsupported set operation: {set_op.type}")
 
-    def _window_function_to_column(self, window_func: WindowFunction, cte_catalog: Dict[str, HiveDataFrame] = None) -> Column:
+    def _window_function_to_column(
+        self, window_func: WindowFunction, cte_catalog: Dict[str, HiveDataFrame] = None
+    ) -> Column:
         """
         Convert window function to Column.
-        
+
         Window functions perform calculations across a set of rows related to the current row.
         Supports: ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, etc.
         """
         if cte_catalog is None:
             cte_catalog = {}
-        
+
         func_name = window_func.function.name.upper()
-        
+
         # For window functions, we need access to all data
         # This is a simplified implementation
         # In production, this would be more efficient
-        
+
         if func_name == "ROW_NUMBER":
             # Assign sequential number to each row within partition
             def row_number_fn(row: Dict) -> Any:
                 # This is simplified - proper implementation would need partition context
                 return 1
+
             return Column("row_number", _expr=row_number_fn)  # type: ignore
-        
+
         elif func_name == "RANK":
             # Assign rank with gaps for ties
             def rank_fn(row: Dict) -> Any:
                 return 1
+
             return Column("rank", _expr=rank_fn)  # type: ignore
-        
+
         elif func_name == "DENSE_RANK":
             # Assign rank without gaps for ties
             def dense_rank_fn(row: Dict) -> Any:
                 return 1
+
             return Column("dense_rank", _expr=dense_rank_fn)  # type: ignore
-        
+
         elif func_name == "LAG":
             # Access previous row value
             def lag_fn(row: Dict) -> Any:
                 return None
+
             return Column("lag", _expr=lag_fn)  # type: ignore
-        
+
         elif func_name == "LEAD":
             # Access next row value
             def lead_fn(row: Dict) -> Any:
                 return None
+
             return Column("lead", _expr=lead_fn)  # type: ignore
-        
+
         raise ValueError(f"Unsupported window function: {func_name}")
 
 

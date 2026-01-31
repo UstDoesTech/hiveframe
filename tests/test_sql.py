@@ -312,7 +312,7 @@ class TestSwarmQL2_CTEs:
         """
         result = ctx.sql(sql)
         collected = result.collect()
-        
+
         assert len(collected) == 2
         names = {r["name"] for r in collected}
         assert "Alice" in names
@@ -346,7 +346,7 @@ class TestSwarmQL2_SetOperations:
         sql = "SELECT id FROM table1 UNION SELECT id FROM table2"
         result = ctx.sql(sql)
         collected = result.collect()
-        
+
         ids = {r["id"] for r in collected}
         assert ids == {1, 2, 3, 4}
 
@@ -354,7 +354,7 @@ class TestSwarmQL2_SetOperations:
         """Test UNION ALL (keeps duplicates)."""
         sql = "SELECT id FROM table1 UNION ALL SELECT id FROM table2"
         result = ctx.sql(sql)
-        
+
         assert result.count() == 6
 
     def test_intersect(self, ctx):
@@ -362,7 +362,7 @@ class TestSwarmQL2_SetOperations:
         sql = "SELECT id FROM table1 INTERSECT SELECT id FROM table2"
         result = ctx.sql(sql)
         collected = result.collect()
-        
+
         ids = {r["id"] for r in collected}
         assert ids == {2, 3}
 
@@ -371,7 +371,7 @@ class TestSwarmQL2_SetOperations:
         sql = "SELECT id FROM table1 EXCEPT SELECT id FROM table2"
         result = ctx.sql(sql)
         collected = result.collect()
-        
+
         ids = {r["id"] for r in collected}
         assert ids == {1}
 
@@ -383,16 +383,22 @@ class TestSwarmQL2_Subqueries:
     def ctx(self) -> SwarmQLContext:
         """Create context with sample data."""
         ctx = SwarmQLContext()
-        ctx.register_table("orders", [
-            {"id": 1, "customer_id": 100, "amount": 50},
-            {"id": 2, "customer_id": 101, "amount": 75},
-            {"id": 3, "customer_id": 100, "amount": 100},
-        ])
-        ctx.register_table("customers", [
-            {"id": 100, "name": "Alice"},
-            {"id": 101, "name": "Bob"},
-            {"id": 102, "name": "Carol"},
-        ])
+        ctx.register_table(
+            "orders",
+            [
+                {"id": 1, "customer_id": 100, "amount": 50},
+                {"id": 2, "customer_id": 101, "amount": 75},
+                {"id": 3, "customer_id": 100, "amount": 100},
+            ],
+        )
+        ctx.register_table(
+            "customers",
+            [
+                {"id": 100, "name": "Alice"},
+                {"id": 101, "name": "Bob"},
+                {"id": 102, "name": "Carol"},
+            ],
+        )
         return ctx
 
     def test_in_subquery(self, ctx):
@@ -403,7 +409,7 @@ class TestSwarmQL2_Subqueries:
         """
         result = ctx.sql(sql)
         collected = result.collect()
-        
+
         names = {r["name"] for r in collected}
         assert "Alice" in names
         assert "Bob" in names
@@ -417,7 +423,7 @@ class TestSwarmQL2_Subqueries:
         """
         result = ctx.sql(sql)
         collected = result.collect()
-        
+
         assert collected[0]["total_orders"] == 3
 
     def test_exists(self, ctx):
@@ -430,7 +436,7 @@ class TestSwarmQL2_Subqueries:
         """
         result = ctx.sql(sql)
         collected = result.collect()
-        
+
         names = {r["name"] for r in collected}
         assert "Alice" in names
         assert "Bob" in names
@@ -443,11 +449,14 @@ class TestSwarmQL2_StringFunctions:
     def ctx(self) -> SwarmQLContext:
         """Create context with string data."""
         ctx = SwarmQLContext()
-        ctx.register_table("data", [
-            {"text": "Hello World"},
-            {"text": "   Spaces   "},
-            {"text": "lowercase"},
-        ])
+        ctx.register_table(
+            "data",
+            [
+                {"text": "Hello World"},
+                {"text": "   Spaces   "},
+                {"text": "lowercase"},
+            ],
+        )
         return ctx
 
     def test_upper(self, ctx):
@@ -515,18 +524,21 @@ class TestSwarmQL2_OtherFunctions:
     def ctx(self) -> SwarmQLContext:
         """Create context with nullable data."""
         ctx = SwarmQLContext()
-        ctx.register_table("data", [
-            {"a": None, "b": 5, "c": 10},
-            {"a": 1, "b": None, "c": 20},
-            {"a": 2, "b": 3, "c": None},
-        ])
+        ctx.register_table(
+            "data",
+            [
+                {"a": None, "b": 5, "c": 10},
+                {"a": 1, "b": None, "c": 20},
+                {"a": 2, "b": 3, "c": None},
+            ],
+        )
         return ctx
 
     def test_coalesce(self, ctx):
         """Test COALESCE function."""
         result = ctx.sql("SELECT COALESCE(a, b, c) as result FROM data")
         collected = result.collect()
-        
+
         assert collected[0]["result"] == 5
         assert collected[1]["result"] == 1
         assert collected[2]["result"] == 2
@@ -535,7 +547,7 @@ class TestSwarmQL2_OtherFunctions:
         """Test NULLIF function."""
         result = ctx.sql("SELECT NULLIF(a, 1) as result FROM data")
         collected = result.collect()
-        
+
         assert collected[0]["result"] is None
         assert collected[1]["result"] is None  # a=1, returns NULL
         assert collected[2]["result"] == 2
@@ -548,24 +560,30 @@ class TestSwarmQL2_BeeInspiredExtensions:
     def ctx(self) -> SwarmQLContext:
         """Create context with sample data."""
         ctx = SwarmQLContext()
-        ctx.register_table("orders", [
-            {"id": 1, "customer_id": 100, "amount": 50},
-            {"id": 2, "customer_id": 101, "amount": 75},
-        ])
-        ctx.register_table("customers", [
-            {"id": 100, "name": "Alice"},
-            {"id": 101, "name": "Bob"},
-        ])
+        ctx.register_table(
+            "orders",
+            [
+                {"id": 1, "customer_id": 100, "amount": 50},
+                {"id": 2, "customer_id": 101, "amount": 75},
+            ],
+        )
+        ctx.register_table(
+            "customers",
+            [
+                {"id": 100, "name": "Alice"},
+                {"id": 101, "name": "Bob"},
+            ],
+        )
         return ctx
 
     def test_waggle_join(self, ctx):
         """
         Test WAGGLE JOIN - quality-weighted join execution hint.
-        
+
         WAGGLE JOIN is a bee-inspired extension that hints the query executor
         to use quality-weighted join strategies, similar to how bees perform
         waggle dances to communicate food source quality.
-        
+
         In this implementation, WAGGLE JOIN is treated as INNER JOIN with
         special optimization hints that would be used in production.
         """
@@ -576,11 +594,12 @@ class TestSwarmQL2_BeeInspiredExtensions:
         """
         # Parse the query to verify WAGGLE keyword is recognized
         from hiveframe.sql.parser import SQLTokenizer, SQLParser
+
         tokenizer = SQLTokenizer(sql)
         tokens = tokenizer.tokenize()
         parser = SQLParser(tokens)
         stmt = parser.parse()
-        
+
         # Verify that the join type was parsed as WAGGLE
         assert len(stmt.joins) == 1
         # In execution, WAGGLE is converted to INNER for now
@@ -594,12 +613,15 @@ class TestSwarmQL2_WindowFunctions:
     def ctx(self) -> SwarmQLContext:
         """Create context with sample data."""
         ctx = SwarmQLContext()
-        ctx.register_table("sales", [
-            {"dept": "A", "amount": 100},
-            {"dept": "A", "amount": 200},
-            {"dept": "B", "amount": 150},
-            {"dept": "B", "amount": 250},
-        ])
+        ctx.register_table(
+            "sales",
+            [
+                {"dept": "A", "amount": 100},
+                {"dept": "A", "amount": 200},
+                {"dept": "B", "amount": 150},
+                {"dept": "B", "amount": 250},
+            ],
+        )
         return ctx
 
     def test_row_number(self, ctx):
@@ -614,6 +636,6 @@ class TestSwarmQL2_WindowFunctions:
         tokens = tokenizer.tokenize()
         parser = SQLParser(tokens)
         stmt = parser.parse()
-        
+
         # Verify window function was parsed
         assert len(stmt.select_columns) == 3

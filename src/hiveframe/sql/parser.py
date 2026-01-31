@@ -68,7 +68,7 @@ class TokenType(Enum):
     CURRENT = auto()
     ROW = auto()
     EXISTS = auto()
-    
+
     # Bee-inspired keywords
     WAGGLE = auto()
     SWARM = auto()
@@ -753,16 +753,16 @@ class SQLParser:
             self._advance()
             subquery = self._parse_select()
             self._expect(TokenType.RPAREN)
-            
+
             alias = None
             if self._match(TokenType.AS):
                 self._advance()
                 alias = self._expect(TokenType.IDENTIFIER).value
             elif self._match(TokenType.IDENTIFIER):
                 alias = self._advance().value
-            
+
             return TableRef("", alias, is_subquery=True, subquery=subquery)
-        
+
         name = self._expect(TokenType.IDENTIFIER).value
 
         alias = None
@@ -884,7 +884,7 @@ class SQLParser:
                 self._expect(TokenType.RPAREN)
                 return ExistsExpr(subquery, negated=True)
             return UnaryOp("NOT", self._parse_not_expr())
-        
+
         # Handle EXISTS
         if self._match(TokenType.EXISTS):
             self._advance()
@@ -892,7 +892,7 @@ class SQLParser:
             subquery = self._parse_select()
             self._expect(TokenType.RPAREN)
             return ExistsExpr(subquery, negated=False)
-        
+
         return self._parse_comparison()
 
     def _parse_comparison(self) -> Expression:
@@ -921,7 +921,7 @@ class SQLParser:
         if self._match(TokenType.IN):
             self._advance()
             self._expect(TokenType.LPAREN)
-            
+
             # Check if it's a subquery
             if self._match(TokenType.SELECT):
                 subquery = self._parse_select()
@@ -1119,7 +1119,7 @@ class SQLParser:
 
         while True:
             name = self._expect(TokenType.IDENTIFIER).value
-            
+
             # Optional column list
             columns = []
             if self._match(TokenType.LPAREN):
@@ -1129,14 +1129,14 @@ class SQLParser:
                     self._advance()
                     columns.append(self._expect(TokenType.IDENTIFIER).value)
                 self._expect(TokenType.RPAREN)
-            
+
             self._expect(TokenType.AS)
             self._expect(TokenType.LPAREN)
             query = self._parse_select()
             self._expect(TokenType.RPAREN)
-            
+
             ctes.append(CommonTableExpression(name, columns, query))
-            
+
             if not self._match(TokenType.COMMA):
                 break
             self._advance()
@@ -1163,58 +1163,58 @@ class SQLParser:
         }
 
         set_op = SetOperation(op_names[op_type], left, right, all_flag)
-        
+
         # Create a wrapper statement with the set operation
         result = SQLStatement(select_columns=[])
         result.set_operation = set_op
-        
+
         return result
 
     def _parse_hints(self) -> QueryHints:
         """Parse bee-inspired query hints."""
         hints = QueryHints()
-        
+
         # Look for hint comments
         # Format: /*+ HINT_NAME */
         # For now, check for specific keywords in the query
         # This is simplified; full implementation would parse comments
-        
+
         return hints
 
     def _parse_window_spec(self) -> WindowSpec:
         """
         Parse window specification for window functions.
-        
+
         Supports:
         - PARTITION BY columns
-        - ORDER BY columns 
+        - ORDER BY columns
         - ROWS/RANGE frame specification
         """
         self._expect(TokenType.LPAREN)
-        
+
         partition_by = []
         order_by = []
         frame_type = None
         frame_start = None
         frame_end = None
-        
+
         # PARTITION BY clause
         if self._match(TokenType.PARTITION):
             self._advance()
             self._expect(TokenType.BY)
             partition_by = self._parse_expression_list()
-        
+
         # ORDER BY clause
         if self._match(TokenType.ORDER):
             self._advance()
             self._expect(TokenType.BY)
             order_by = self._parse_order_by_items()
-        
+
         # Frame specification (ROWS or RANGE)
         if self._match(TokenType.ROWS, TokenType.RANGE):
             frame_type = "ROWS" if self._current().type == TokenType.ROWS else "RANGE"
             self._advance()
-            
+
             # Frame start
             if self._match(TokenType.UNBOUNDED):
                 self._advance()
@@ -1232,7 +1232,7 @@ class SQLParser:
                 elif self._match(TokenType.FOLLOWING):
                     self._advance()
                     frame_start = f"{num} FOLLOWING"
-            
+
             # Check for BETWEEN (frame start AND frame end)
             if self._match(TokenType.BETWEEN):
                 self._advance()
@@ -1255,7 +1255,7 @@ class SQLParser:
                     elif self._match(TokenType.FOLLOWING):
                         self._advance()
                         frame_end = f"{num} FOLLOWING"
-        
+
         self._expect(TokenType.RPAREN)
-        
+
         return WindowSpec(partition_by, order_by, frame_type, frame_start, frame_end)

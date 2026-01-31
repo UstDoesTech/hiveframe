@@ -139,7 +139,11 @@ def demo_locality_aware_scheduling():
         preferred_hive = manager.select_hive_for_data(
             data["location"], available_hives=["us-east", "us-west", "eu-central"]
         )
-        locality = LocalityLevel.DATACENTER_LOCAL if preferred_hive == data["location"] else LocalityLevel.REMOTE
+        locality = (
+            LocalityLevel.DATACENTER_LOCAL
+            if preferred_hive == data["location"]
+            else LocalityLevel.REMOTE
+        )
 
         print(f"  {data['data_id']} ({data['size_mb']}MB) @ {data['location']}")
         print(f"    → Scheduled to: {preferred_hive}")
