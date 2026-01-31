@@ -287,7 +287,7 @@ if __name__ == "__main__":
     pytest.main([__file__, "-v"])
 
 
-class TestSwarmQL2_CTEs:
+class TestSwarmQL2CTEs:
     """Test Common Table Expressions (WITH clause)."""
 
     @pytest.fixture
@@ -321,7 +321,7 @@ class TestSwarmQL2_CTEs:
     def test_multiple_ctes(self, ctx):
         """Test multiple CTEs."""
         sql = """
-        WITH 
+        WITH
             dept10 AS (SELECT * FROM employees WHERE dept_id = 10),
             dept20 AS (SELECT * FROM employees WHERE dept_id = 20)
         SELECT name FROM dept10
@@ -330,7 +330,7 @@ class TestSwarmQL2_CTEs:
         assert result.count() == 2
 
 
-class TestSwarmQL2_SetOperations:
+class TestSwarmQL2SetOperations:
     """Test set operations (UNION, INTERSECT, EXCEPT)."""
 
     @pytest.fixture
@@ -376,7 +376,7 @@ class TestSwarmQL2_SetOperations:
         assert ids == {1}
 
 
-class TestSwarmQL2_Subqueries:
+class TestSwarmQL2Subqueries:
     """Test subquery support."""
 
     @pytest.fixture
@@ -404,7 +404,7 @@ class TestSwarmQL2_Subqueries:
     def test_in_subquery(self, ctx):
         """Test IN with subquery."""
         sql = """
-        SELECT name FROM customers 
+        SELECT name FROM customers
         WHERE id IN (SELECT customer_id FROM orders WHERE amount > 60)
         """
         result = ctx.sql(sql)
@@ -442,7 +442,7 @@ class TestSwarmQL2_Subqueries:
         assert "Bob" in names
 
 
-class TestSwarmQL2_StringFunctions:
+class TestSwarmQL2StringFunctions:
     """Test string functions."""
 
     @pytest.fixture
@@ -496,7 +496,7 @@ class TestSwarmQL2_StringFunctions:
         assert collected[0]["sub"] == "Hello"
 
 
-class TestSwarmQL2_DateFunctions:
+class TestSwarmQL2DateFunctions:
     """Test date/time functions."""
 
     @pytest.fixture
@@ -517,7 +517,7 @@ class TestSwarmQL2_DateFunctions:
         assert "now" in collected[0]
 
 
-class TestSwarmQL2_OtherFunctions:
+class TestSwarmQL2OtherFunctions:
     """Test COALESCE and NULLIF."""
 
     @pytest.fixture
@@ -553,7 +553,7 @@ class TestSwarmQL2_OtherFunctions:
         assert collected[2]["result"] == 2
 
 
-class TestSwarmQL2_BeeInspiredExtensions:
+class TestSwarmQL2BeeInspiredExtensions:
     """Test bee-inspired SQL extensions."""
 
     @pytest.fixture
@@ -588,13 +588,11 @@ class TestSwarmQL2_BeeInspiredExtensions:
         special optimization hints that would be used in production.
         """
         sql = """
-        SELECT o.id, c.name 
+        SELECT o.id, c.name
         FROM orders o
         WAGGLE JOIN customers c ON o.customer_id = c.id
         """
         # Parse the query to verify WAGGLE keyword is recognized
-        from hiveframe.sql.parser import SQLTokenizer, SQLParser
-
         tokenizer = SQLTokenizer(sql)
         tokens = tokenizer.tokenize()
         parser = SQLParser(tokens)
@@ -606,7 +604,7 @@ class TestSwarmQL2_BeeInspiredExtensions:
         # Future versions would use this hint for adaptive join strategies
 
 
-class TestSwarmQL2_WindowFunctions:
+class TestSwarmQL2WindowFunctions:
     """Test window functions."""
 
     @pytest.fixture
@@ -627,7 +625,7 @@ class TestSwarmQL2_WindowFunctions:
     def test_row_number(self, ctx):
         """Test ROW_NUMBER window function."""
         sql = """
-        SELECT dept, amount, 
+        SELECT dept, amount,
                ROW_NUMBER() OVER (PARTITION BY dept ORDER BY amount) as rn
         FROM sales
         """
