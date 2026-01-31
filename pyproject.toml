@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hiveframe"
-version = "0.2.0-dev"
+version = "0.3.0-dev"
 description = "A bee-inspired distributed data processing framework - biomimetic alternative to Apache Spark"
 readme = "README.md"
 license = {text = "MIT"}
