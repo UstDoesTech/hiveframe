@@ -36,6 +36,17 @@ This reference section provides comprehensive documentation for all HiveFrame AP
 | [Resilience](./resilience) | Retry, circuit breaker, timeout patterns |
 | [Monitoring](./monitoring) | Metrics, logging, health checks |
 
+### Phase 3: Enterprise Platform (New!)
+
+| Module | Description | Status |
+|--------|-------------|--------|
+| Lakehouse | Unity Hive Catalog, access control, lineage | ✅ Implemented |
+| ML (HiveMind) | AutoML Swarm, Feature Store, Model Serving | ✅ Implemented |
+| Notebooks | Multi-language interactive execution environment | ✅ Implemented |
+
+> **Phase 3 Status**: Lakehouse, ML Platform, and Notebooks modules are implemented!
+> Documentation pages are being written. For now, see `examples/demo_phase3.py`.
+
 ### Deployment
 
 | Module | Description |
@@ -79,6 +90,24 @@ from hiveframe.k8s import HiveFrameCluster, ClusterConfig
 
 # Dashboard
 from hiveframe.dashboard import DashboardServer
+
+# Phase 3: Lakehouse
+from hiveframe.lakehouse import (
+    UnityHiveCatalog, AccessControl, LineageTracker,
+    PIIDetector, DeltaSharing
+)
+
+# Phase 3: Machine Learning
+from hiveframe.ml import (
+    AutoMLSwarm, FeatureHive, ModelServer,
+    DistributedTrainer, MLflowIntegration
+)
+
+# Phase 3: Notebooks
+from hiveframe.notebooks import (
+    NotebookKernel, NotebookSession, CollaborationManager,
+    GPUCell
+)
 
 # Exceptions
 from hiveframe.exceptions import (

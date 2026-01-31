@@ -68,6 +68,22 @@ How-To Guides are **problem-oriented** - they take you through the steps needed 
 > **Note**: Phase 2 features are fully implemented and available! The how-to guides are being written.
 > For now, see the comprehensive examples in `examples/demo_phase2_*.py` files.
 
+### 🏢 Phase 3: Enterprise Platform (New!)
+
+| Guide | Description | Status |
+|-------|-------------|--------|
+| Setup Unity Hive Catalog | Data governance and access control | 📝 Coming Soon |
+| Track Data Lineage | Transformation dependencies and impact analysis | 📝 Coming Soon |
+| Use AutoML Swarm | Bee-inspired hyperparameter optimization | 📝 Coming Soon |
+| Setup Feature Store | Centralized feature management and versioning | 📝 Coming Soon |
+| Deploy Model Server | Production inference with swarm load balancing | 📝 Coming Soon |
+| Use HiveFrame Notebooks | Interactive multi-language data science | 📝 Coming Soon |
+| Configure Delta Sharing | Secure cross-organization data sharing | 📝 Coming Soon |
+| Integrate with MLflow | Experiment tracking and model registry | 📝 Coming Soon |
+
+> **Phase 3 Status**: Lakehouse, ML Platform, and Notebooks modules are implemented!
+> How-to guides are being written. For now, see `examples/demo_phase3.py`.
+
 ## Finding the Right Guide
 
 - **New to HiveFrame?** Start with [Tutorials](/docs/tutorials) instead
