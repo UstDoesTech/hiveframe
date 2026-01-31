@@ -8,8 +8,8 @@ Features are organized like honeycomb cells with metadata stored as nectar.
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Set
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Set
 
 
 class FeatureType(Enum):

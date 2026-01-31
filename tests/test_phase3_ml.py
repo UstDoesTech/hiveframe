@@ -2,16 +2,14 @@
 Tests for Phase 3 Machine Learning Platform (HiveMind ML)
 """
 
-import pytest
-
 from hiveframe.ml import (
     AutoMLSwarm,
-    FeatureHive,
-    ModelServer,
     DistributedTrainer,
+    FeatureHive,
     MLflowIntegration,
+    ModelServer,
 )
-from hiveframe.ml.automl import HyperparameterSpace, TaskType
+from hiveframe.ml.automl import HyperparameterSpace
 from hiveframe.ml.feature_store import FeatureType
 from hiveframe.ml.mlflow_integration import ModelStage
 

@@ -6,7 +6,6 @@ Implementation of Delta Sharing protocol for secure, bee-inspired
 data sharing across organizations.
 """
 
-import json
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta

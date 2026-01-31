@@ -5,10 +5,10 @@ Model Serving - Production Inference with Swarm Load Balancing
 Serve ML models with bee-inspired load balancing and fault tolerance.
 """
 
+import random
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional
-import random
+from typing import Any, Callable, Dict, List
 
 
 @dataclass

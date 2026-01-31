@@ -8,8 +8,8 @@ where each bee explores a different hyperparameter configuration.
 
 import random
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 
 class TaskType(Enum):
@@ -280,7 +280,7 @@ class AutoMLSwarm:
                 print(f"Iteration {iteration}: Best score = {self.best_config.score:.4f}")
 
         if verbose:
-            print(f"\nOptimization complete!")
+            print("\nOptimization complete!")
             print(f"Best score: {self.best_config.score:.4f}")
             print(f"Best parameters: {self.best_config.params}")
 

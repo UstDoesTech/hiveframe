@@ -7,8 +7,8 @@ Integration with MLflow for tracking experiments and managing models.
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class ModelStage(Enum):

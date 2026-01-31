@@ -2,20 +2,19 @@
 Tests for Phase 3 HiveFrame Notebooks
 """
 
-import pytest
-import tempfile
 import os
+import tempfile
 
 from hiveframe.notebooks import (
+    CollaborationManager,
+    GPUCell,
+    NotebookFormat,
     NotebookKernel,
     NotebookSession,
-    CollaborationManager,
-    NotebookFormat,
-    GPUCell,
 )
-from hiveframe.notebooks.kernel import KernelLanguage, CellStatus
 from hiveframe.notebooks.collaboration import OperationType
 from hiveframe.notebooks.format import CellType
+from hiveframe.notebooks.kernel import CellStatus, KernelLanguage
 
 
 class TestNotebookKernel:
@@ -238,8 +237,8 @@ class TestCollaborationManager:
         collab = CollaborationManager()
         session = collab.create_session("notebook_123")
 
-        user1 = collab.add_user(session.session_id, "alice", "alice@example.com")
-        user2 = collab.add_user(session.session_id, "bob", "bob@example.com")
+        _ = collab.add_user(session.session_id, "alice", "alice@example.com")
+        _ = collab.add_user(session.session_id, "bob", "bob@example.com")
 
         active_users = collab.get_active_users(session.session_id)
         assert len(active_users) == 2
@@ -282,7 +281,7 @@ class TestNotebookFormat:
         fmt = NotebookFormat()
 
         # Create a notebook
-        from hiveframe.notebooks.format import Notebook, NotebookCell, CellType
+        from hiveframe.notebooks.format import CellType, Notebook, NotebookCell
 
         notebook = Notebook()
         notebook.cells.append(
@@ -393,7 +392,7 @@ result = 42
         """Test retrieving a task."""
         gpu_cell = GPUCell(auto_detect=True)
 
-        task = gpu_cell.execute("x = 1", task_id="task_123")
+        _ = gpu_cell.execute("x = 1", task_id="task_123")
 
         retrieved = gpu_cell.get_task("task_123")
         assert retrieved is not None

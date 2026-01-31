@@ -49,5 +49,5 @@ __all__ = [
 
 from .automl import AutoMLSwarm, HyperparameterSpace, TaskType
 from .feature_store import FeatureHive, FeatureType
-from .model_serving import ModelServer, DistributedTrainer
 from .mlflow_integration import MLflowIntegration, ModelStage
+from .model_serving import DistributedTrainer, ModelServer

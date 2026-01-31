@@ -176,6 +176,35 @@ from .k8s import (
     generate_service,
 )
 
+# Phase 3: Lakehouse Architecture (Unity Hive Catalog, Delta Sharing)
+from .lakehouse import (
+    AccessControl,
+    DeltaSharing,
+    LineageNode,
+    LineageTracker,
+    PermissionType,
+    PIIDetector,
+    PIISensitivity,
+    Share,
+    ShareAccessLevel,
+    ShareRecipient,
+    TableMetadata,
+    UnityHiveCatalog,
+)
+
+# Phase 3: Machine Learning Platform (HiveMind ML)
+from .ml import (
+    AutoMLSwarm,
+    DistributedTrainer,
+    FeatureHive,
+    FeatureType,
+    HyperparameterSpace,
+    MLflowIntegration,
+    ModelServer,
+    ModelStage,
+    TaskType,
+)
+
 # Monitoring
 from .monitoring import (
     ColonyHealthMonitor,
@@ -193,6 +222,19 @@ from .monitoring import (
     get_profiler,
     get_registry,
     get_tracer,
+)
+
+# Phase 3: HiveFrame Notebooks
+from .notebooks import (
+    CellStatus,
+    CellType,
+    CollaborationManager,
+    GPUCell,
+    KernelLanguage,
+    NotebookFormat,
+    NotebookKernel,
+    NotebookSession,
+    OperationType,
 )
 
 # Query Optimizer - Phase 1
@@ -339,48 +381,6 @@ from .utils import (
     Serializable,
     ThreadSafeMixin,
     deprecated_param,
-)
-
-# Phase 3: Lakehouse Architecture (Unity Hive Catalog, Delta Sharing)
-from .lakehouse import (
-    AccessControl,
-    DeltaSharing,
-    LineageNode,
-    LineageTracker,
-    PIIDetector,
-    PIISensitivity,
-    PermissionType,
-    Share,
-    ShareAccessLevel,
-    ShareRecipient,
-    TableMetadata,
-    UnityHiveCatalog,
-)
-
-# Phase 3: Machine Learning Platform (HiveMind ML)
-from .ml import (
-    AutoMLSwarm,
-    DistributedTrainer,
-    FeatureHive,
-    FeatureType,
-    HyperparameterSpace,
-    MLflowIntegration,
-    ModelServer,
-    ModelStage,
-    TaskType,
-)
-
-# Phase 3: HiveFrame Notebooks
-from .notebooks import (
-    CellStatus,
-    CellType,
-    CollaborationManager,
-    GPUCell,
-    KernelLanguage,
-    NotebookFormat,
-    NotebookKernel,
-    NotebookSession,
-    OperationType,
 )
 
 __all__ = [
