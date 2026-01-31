@@ -2,7 +2,6 @@
 Tests for Phase 3 Lakehouse features (Unity Hive Catalog, Delta Sharing)
 """
 
-
 from hiveframe.lakehouse import (
     AccessControl,
     DeltaSharing,
