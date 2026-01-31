@@ -173,10 +173,7 @@ def demo_partition_merging():
     print("  After filter: 500K records remain (95% filtered)")
 
     print("\nPartitions after filtering:")
-    filtered = [
-        {"id": f"p{i+1}", "records": 50_000, "time": 1.2}
-        for i in range(10)
-    ]
+    filtered = [{"id": f"p{i+1}", "records": 50_000, "time": 1.2} for i in range(10)]
 
     for p in filtered:
         print(f"  {p['id']}: {p['records']:>8,} records | {p['time']:.1f}s")
@@ -233,18 +230,22 @@ def demo_speculative_execution():
 
     # Most tasks complete normally
     for i in range(17):
-        tasks.append({
-            "id": f"task_{i+1}",
-            "time": round(random.uniform(8.0, 12.0), 1),
-            "status": "completed",
-        })
+        tasks.append(
+            {
+                "id": f"task_{i+1}",
+                "time": round(random.uniform(8.0, 12.0), 1),
+                "status": "completed",
+            }
+        )
 
     # 3 stragglers
-    tasks.extend([
-        {"id": "task_18", "time": 28.5, "status": "slow"},
-        {"id": "task_19", "time": 31.2, "status": "slow"},
-        {"id": "task_20", "time": 25.8, "status": "slow"},
-    ])
+    tasks.extend(
+        [
+            {"id": "task_18", "time": 28.5, "status": "slow"},
+            {"id": "task_19", "time": 31.2, "status": "slow"},
+            {"id": "task_20", "time": 25.8, "status": "slow"},
+        ]
+    )
 
     # Calculate median time
     normal_times = [t["time"] for t in tasks if t["status"] == "completed"]
@@ -266,9 +267,7 @@ def demo_speculative_execution():
 
     print("\nPerformance improvement:")
     without_speculation = max(t["time"] for t in tasks)
-    with_speculation = max(
-        [t["time"] for t in tasks if t["status"] == "completed"] + [11.2]
-    )
+    with_speculation = max([t["time"] for t in tasks if t["status"] == "completed"] + [11.2])
     improvement = ((without_speculation - with_speculation) / without_speculation) * 100
 
     print(f"  Job completion time without speculation: {without_speculation:.1f}s")
@@ -289,12 +288,14 @@ def demo_real_world_scenario():
     data = []
     for i in range(10000):  # Simulating larger dataset
         country = "US" if random.random() < 0.6 else random.choice(["UK", "CA", "DE", "FR"])
-        data.append({
-            "id": i,
-            "country": country,
-            "category": random.choice(["Electronics", "Clothing", "Food"]),
-            "revenue": round(random.uniform(10, 1000), 2),
-        })
+        data.append(
+            {
+                "id": i,
+                "country": country,
+                "category": random.choice(["Electronics", "Clothing", "Food"]),
+                "revenue": round(random.uniform(10, 1000), 2),
+            }
+        )
 
     df = HiveDataFrame.from_records(data)
 
@@ -347,6 +348,7 @@ def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
 

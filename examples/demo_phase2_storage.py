@@ -277,7 +277,9 @@ def demo_caching_swarm_basics():
     for access in accesses:
         # Increase pheromone with each access
         pheromone = min(10.0, pheromone * (1.0 + access["hits"] * 0.1))
-        print(f"  {access['time']}  |    {access['hits']:2d}    |      {pheromone:5.2f}      | Cached")
+        print(
+            f"  {access['time']}  |    {access['hits']:2d}    |      {pheromone:5.2f}      | Cached"
+        )
 
     print(f"\n  Final pheromone level: {pheromone:.2f}/10.0")
     print("  Cache retention: HIGH (strong trail)")
@@ -319,7 +321,9 @@ def demo_cache_eviction():
     candidates = sorted(cached_items, key=lambda x: x["pheromone"])
 
     for i, item in enumerate(candidates[:3], 1):
-        print(f"  {i}. {item['name']}: pheromone={item['pheromone']:.1f}, size={item['size_gb']:.1f}GB")
+        print(
+            f"  {i}. {item['name']}: pheromone={item['pheromone']:.1f}, size={item['size_gb']:.1f}GB"
+        )
 
     print("\nEviction decision:")
     print("  ✓ Evicting: temp_results (0.8 pheromone, 1.8 GB)")
@@ -329,10 +333,14 @@ def demo_cache_eviction():
 
     print("\nCache after eviction (8.1 GB / 10.0 GB):")
     remaining = [item for item in cached_items if item["name"] != "temp_results"]
-    remaining.append({"name": "analytics_summary", "size_gb": 1.5, "pheromone": 1.0, "last_access": "now"})
+    remaining.append(
+        {"name": "analytics_summary", "size_gb": 1.5, "pheromone": 1.0, "last_access": "now"}
+    )
 
     for item in remaining:
-        print(f"  • {item['name']:<20} {item['size_gb']:>5.1f} GB   pheromone={item['pheromone']:.1f}")
+        print(
+            f"  • {item['name']:<20} {item['size_gb']:>5.1f} GB   pheromone={item['pheromone']:.1f}"
+        )
 
 
 def demo_intelligent_prefetching():
@@ -404,6 +412,7 @@ def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
 
