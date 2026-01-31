@@ -235,7 +235,10 @@ class SQLExecutor:
         return QueryPlan(root=root, tables=tables)
 
     def _execute_plan(
-        self, plan: QueryPlan, stmt: SQLStatement, cte_catalog: Dict[str, HiveDataFrame] = None
+        self,
+        plan: QueryPlan,
+        stmt: SQLStatement,
+        cte_catalog: Optional[Dict[str, HiveDataFrame]] = None,
     ) -> HiveDataFrame:
         """Execute the query plan."""
         if cte_catalog is None:
@@ -254,9 +257,10 @@ class SQLExecutor:
             # Subquery in FROM clause
             df = self.execute(stmt.from_table.subquery)
         else:
-            df = self.catalog.get_table(stmt.from_table.name)
-            if df is None:
+            df_maybe = self.catalog.get_table(stmt.from_table.name)
+            if df_maybe is None:
                 raise ValueError(f"Table '{stmt.from_table.name}' not found")
+            df = df_maybe
 
         # Handle JOINs
         for join in stmt.joins:
@@ -274,9 +278,10 @@ class SQLExecutor:
             elif join.table.is_subquery and join.table.subquery:
                 other_df = self.execute(join.table.subquery)
             else:
-                other_df = self.catalog.get_table(join.table.name)
-                if other_df is None:
+                other_df_maybe = self.catalog.get_table(join.table.name)
+                if other_df_maybe is None:
                     raise ValueError(f"Table '{join.table.name}' not found")
+                other_df = other_df_maybe
             df = self._execute_join(df, other_df, join)
 
         # Handle WHERE
@@ -346,7 +351,10 @@ class SQLExecutor:
             return left.crossJoin(right)
 
     def _execute_filter(
-        self, df: HiveDataFrame, expr: Expression, cte_catalog: Dict[str, HiveDataFrame] = None
+        self,
+        df: HiveDataFrame,
+        expr: Expression,
+        cte_catalog: Optional[Dict[str, HiveDataFrame]] = None,
     ) -> HiveDataFrame:
         """Execute WHERE filter."""
         if cte_catalog is None:
@@ -355,7 +363,10 @@ class SQLExecutor:
         return df.filter(filter_col)
 
     def _execute_aggregate(
-        self, df: HiveDataFrame, stmt: SQLStatement, cte_catalog: Dict[str, HiveDataFrame] = None
+        self,
+        df: HiveDataFrame,
+        stmt: SQLStatement,
+        cte_catalog: Optional[Dict[str, HiveDataFrame]] = None,
     ) -> HiveDataFrame:
         """Execute GROUP BY with aggregations."""
         if cte_catalog is None:
@@ -406,7 +417,7 @@ class SQLExecutor:
         self,
         df: HiveDataFrame,
         select_cols: List[SelectColumn],
-        cte_catalog: Dict[str, HiveDataFrame] = None,
+        cte_catalog: Optional[Dict[str, HiveDataFrame]] = None,
     ) -> HiveDataFrame:
         """Execute SELECT projection."""
         if cte_catalog is None:
@@ -437,7 +448,7 @@ class SQLExecutor:
         return df
 
     def _expr_to_column(
-        self, expr: Expression, cte_catalog: Dict[str, HiveDataFrame] = None
+        self, expr: Expression, cte_catalog: Optional[Dict[str, HiveDataFrame]] = None
     ) -> Column:
         """Convert SQL expression to Column."""
         if cte_catalog is None:
@@ -551,7 +562,7 @@ class SQLExecutor:
         raise ValueError(f"Unsupported expression type: {type(expr)}")
 
     def _function_to_column(
-        self, func: FunctionCall, cte_catalog: Dict[str, HiveDataFrame] = None
+        self, func: FunctionCall, cte_catalog: Optional[Dict[str, HiveDataFrame]] = None
     ) -> Column:
         """Convert function call to Column."""
         if cte_catalog is None:
@@ -737,7 +748,7 @@ class SQLExecutor:
         raise ValueError(f"Unsupported function: {name}")
 
     def _case_to_column(
-        self, case: CaseExpr, cte_catalog: Dict[str, HiveDataFrame] = None
+        self, case: CaseExpr, cte_catalog: Optional[Dict[str, HiveDataFrame]] = None
     ) -> Column:
         """Convert CASE expression to Column."""
         if cte_catalog is None:
@@ -764,7 +775,7 @@ class SQLExecutor:
         return Column("case", _expr=eval_case)  # type: ignore
 
     def _coalesce_column(
-        self, args: List[Expression], cte_catalog: Dict[str, HiveDataFrame] = None
+        self, args: List[Expression], cte_catalog: Optional[Dict[str, HiveDataFrame]] = None
     ) -> Column:
         """Create COALESCE column."""
         if cte_catalog is None:
@@ -780,7 +791,7 @@ class SQLExecutor:
         return Column("coalesce", _expr=eval_coalesce)  # type: ignore
 
     def _eval_expr_on_row(
-        self, expr: Expression, row: Dict, cte_catalog: Dict[str, HiveDataFrame] = None
+        self, expr: Expression, row: Dict, cte_catalog: Optional[Dict[str, HiveDataFrame]] = None
     ) -> Any:
         """Evaluate expression on a row."""
         if cte_catalog is None:
@@ -1071,7 +1082,7 @@ class SQLExecutor:
         raise ValueError(f"Unsupported set operation: {set_op.type}")
 
     def _window_function_to_column(
-        self, window_func: WindowFunction, cte_catalog: Dict[str, HiveDataFrame] = None
+        self, window_func: WindowFunction, cte_catalog: Optional[Dict[str, HiveDataFrame]] = None
     ) -> Column:
         """
         Convert window function to Column.
