@@ -16,7 +16,6 @@ from .parser import (
     BinaryOp,
     CaseExpr,
     ColumnRef,
-    CommonTableExpression,
     ExistsExpr,
     Expression,
     FunctionCall,
@@ -30,7 +29,6 @@ from .parser import (
     SubqueryExpr,
     UnaryOp,
     WindowFunction,
-    WindowSpec,
 )
 
 
