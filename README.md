@@ -1271,6 +1271,123 @@ failed = dlq.pop(count=10)
 stats = dlq.stats()  # {"total": 150, "by_error": {...}}
 ```
 
+### Lakehouse (Unity Hive Catalog)
+
+```python
+from hiveframe.lakehouse import (
+    UnityHiveCatalog, AccessControl, LineageTracker,
+    PIIDetector, DeltaSharing, PermissionType
+)
+
+# Catalog management
+catalog = UnityHiveCatalog()
+catalog.register_table(name, schema, location, format='parquet')
+tables = catalog.list_tables()
+metadata = catalog.get_table_metadata(name)
+catalog.search_by_tags({'production', 'analytics'})
+
+# Access control
+acl = AccessControl(catalog)
+acl.grant(user, table, [PermissionType.SELECT, PermissionType.INSERT])
+acl.revoke(user, table, [PermissionType.DELETE])
+has_access = acl.check_permission(user, table, PermissionType.SELECT)
+
+# Lineage tracking
+tracker = LineageTracker(catalog)
+tracker.record_lineage(output_table, input_tables, operation)
+upstream = tracker.get_upstream(table, recursive=True)
+downstream = tracker.get_downstream(table)
+
+# PII detection
+detector = PIIDetector()
+pii_fields = detector.scan_table(catalog, table)
+# Returns: {'email': 'EMAIL', 'ssn': 'SSN', ...}
+
+# Delta sharing
+sharing = DeltaSharing(catalog)
+share = sharing.create_share(name, description)
+sharing.add_table_to_share(share_name, table_name, access_level)
+recipient = sharing.create_recipient(name, email)
+sharing.grant_access(share_name, recipient_name, expiration_days)
+```
+
+### Machine Learning (HiveMind ML)
+
+```python
+from hiveframe.ml import (
+    AutoMLSwarm, FeatureHive, ModelServer, 
+    DistributedTrainer, MLflowIntegration,
+    HyperparameterSpace, TaskType, FeatureType
+)
+
+# AutoML with bee-inspired optimization
+search_space = HyperparameterSpace({
+    'learning_rate': (0.001, 0.1, 'log'),
+    'max_depth': (3, 10, 'int'),
+})
+automl = AutoMLSwarm(n_workers=8, max_iterations=50, task=TaskType.CLASSIFICATION)
+best_model = automl.fit(X_train, y_train, search_space=search_space)
+print(automl.best_score_, automl.best_params_)
+
+# Feature store
+feature_store = FeatureHive(storage_path='features/')
+feature_store.register_feature(name, feature_type, compute_fn, version)
+features = feature_store.get_features(feature_names, entity_ids, timestamp)
+historical = feature_store.get_historical_features(feature_names, entity_ids, timestamps)
+
+# Model serving
+server = ModelServer(model, num_workers=4, batch_size=32)
+server.start(port=8080)
+predictions = server.predict(input_data)
+metrics = server.get_metrics()  # requests/sec, latency, utilization
+
+# Distributed training
+trainer = DistributedTrainer(model_class, num_workers=8, strategy='data_parallel')
+history = trainer.fit(train_data, val_data, epochs=10)
+
+# MLflow integration
+mlflow_client = MLflowIntegration(tracking_uri, experiment_name)
+with mlflow_client.start_run() as run:
+    mlflow_client.log_params(params)
+    mlflow_client.log_metrics(metrics)
+    mlflow_client.log_model(model, 'model')
+mlflow_client.register_model(model_uri, name, stage)
+```
+
+### Notebooks
+
+```python
+from hiveframe.notebooks import (
+    NotebookKernel, NotebookSession, CollaborationManager,
+    NotebookFormat, GPUCell, KernelLanguage
+)
+
+# Kernel and session
+kernel = NotebookKernel(language=KernelLanguage.PYTHON)
+session = NotebookSession(kernel)
+result = session.execute_cell(code_string)
+
+# Multi-language support
+sql_kernel = NotebookKernel(language=KernelLanguage.SQL)
+r_kernel = NotebookKernel(language=KernelLanguage.R)
+scala_kernel = NotebookKernel(language=KernelLanguage.SCALA)
+
+# Real-time collaboration
+collab = CollaborationManager()
+collab.create_session(notebook_id, owner)
+collab.join_session(notebook_id, user)
+shared_state = collab.get_shared_state(notebook_id)
+
+# Notebook format
+nb_format = NotebookFormat()
+notebook = nb_format.read('notebook.ipynb')
+nb_format.write(notebook, 'output.ipynb')
+
+# GPU-accelerated cells
+gpu_cell = GPUCell(device='cuda:0')
+result = gpu_cell.execute(gpu_code)
+```
+
 ## Biomimicry Mapping
 
 | Bee Behavior | HiveFrame Implementation |
