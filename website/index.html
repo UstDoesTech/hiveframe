@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HiveFrame - A bee-inspired distributed data processing framework. Biomimetic alternative to Apache Spark with self-organizing workers and emergent intelligence.">
+    <meta name="keywords" content="distributed computing, data processing, Apache Spark alternative, bee algorithm, swarm intelligence, biomimicry">
+    <title>HiveFrame - Bee-Inspired Data Processing</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="#" class="logo">
+                    <span class="logo-icon">🐝</span>
+                    <span class="logo-text">HiveFrame</span>
+                </a>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#why-hiveframe">Why HiveFrame</a>
+                    <a href="#comparison">Comparison</a>
+                    <a href="https://github.com/UstDoesTech/hiveframe" target="_blank" rel="noopener">GitHub</a>
+                    <a href="#" class="btn-docs">Documentation</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span>🐝 Biomimetic Computing</span>
+                </div>
+                <h1 class="hero-title">
+                    Distributed Data Processing, <br>
+                    <span class="gradient-text">Inspired by Nature</span>
+                </h1>
+                <p class="hero-subtitle">
+                    HiveFrame replaces centralized schedulers with self-organizing bee workers. 
+                    No single point of failure. Quality-weighted task distribution. Emergent load balancing.
+                </p>
+                <div class="hero-actions">
+                    <a href="#get-started" class="btn btn-primary">
+                        Get Started
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <a href="https://github.com/UstDoesTech/hiveframe" target="_blank" rel="noopener" class="btn btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                        </svg>
+                        View on GitHub
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">0ms</div>
+                        <div class="stat-label">Driver Overhead</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">100%</div>
+                        <div class="stat-label">Self-Healing</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">∞</div>
+                        <div class="stat-label">Fault Tolerance</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="swarm-container">
+                    <div class="bee bee-1">🐝</div>
+                    <div class="bee bee-2">🐝</div>
+                    <div class="bee bee-3">🐝</div>
+                    <div class="bee bee-4">🐝</div>
+                    <div class="bee bee-5">🐝</div>
+                    <div class="bee bee-6">🐝</div>
+                    <div class="connection con-1"></div>
+                    <div class="connection con-2"></div>
+                    <div class="connection con-3"></div>
+                    <div class="connection con-4"></div>
+                    <div class="connection con-5"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Comparison -->
+    <section class="architecture-section">
+        <div class="container">
+            <h2 class="section-title">Rethinking Distributed Architecture</h2>
+            <div class="architecture-comparison">
+                <div class="arch-column">
+                    <h3>❌ Traditional (Spark)</h3>
+                    <div class="arch-diagram spark-arch">
+                        <div class="driver-node">
+                            <div class="node-label">Driver</div>
+                            <div class="node-subtitle">Single Point of Failure</div>
+                        </div>
+                        <div class="executors">
+                            <div class="executor">E</div>
+                            <div class="executor">E</div>
+                            <div class="executor">E</div>
+                        </div>
+                    </div>
+                    <ul class="arch-features">
+                        <li>❌ Centralized scheduler bottleneck</li>
+                        <li>❌ Driver becomes single point of failure</li>
+                        <li>❌ Static task distribution</li>
+                        <li>❌ Manual tuning required</li>
+                    </ul>
+                </div>
+                <div class="arch-column">
+                    <h3>✅ HiveFrame (Bee Colony)</h3>
+                    <div class="arch-diagram hive-arch">
+                        <div class="colony">
+                            <div class="worker">🐝</div>
+                            <div class="worker">🐝</div>
+                            <div class="worker">🐝</div>
+                            <div class="worker">🐝</div>
+                            <div class="worker">🐝</div>
+                            <div class="worker">🐝</div>
+                        </div>
+                        <div class="dance-floor">
+                            <div class="dance-label">Waggle Dance Protocol</div>
+                        </div>
+                    </div>
+                    <ul class="arch-features">
+                        <li>✅ Decentralized self-organization</li>
+                        <li>✅ No single point of failure</li>
+                        <li>✅ Quality-weighted task distribution</li>
+                        <li>✅ Emergent load balancing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <h2 class="section-title">Nature-Inspired Features</h2>
+            <p class="section-subtitle">Every feature is inspired by how bee colonies solve complex problems</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🕺</div>
+                    <h3>Waggle Dance Protocol</h3>
+                    <p>Workers advertise task quality through dance signals. Better tasks attract more workers, naturally balancing the workload.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👷</div>
+                    <h3>Three-Tier Workers</h3>
+                    <p>Employed bees exploit current tasks, onlookers reinforce successful work, scouts explore new opportunities. Adaptive workforce allocation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧪</div>
+                    <h3>Pheromone Signaling</h3>
+                    <p>Chemical trails for coordination become adaptive backpressure and rate limiting. System naturally regulates its own load.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Self-Healing</h3>
+                    <p>ABC algorithm enables automatic recovery. Failed tasks are abandoned and reassigned. No manual intervention needed.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌡️</div>
+                    <h3>Colony Homeostasis</h3>
+                    <p>Like bees maintaining hive temperature, the system self-regulates load and resource usage through distributed feedback loops.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Stigmergic Coordination</h3>
+                    <p>Indirect communication through shared state. Workers coordinate without central control, emerging collective intelligence.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why HiveFrame Section -->
+    <section id="why-hiveframe" class="why-section">
+        <div class="container">
+            <h2 class="section-title">Why Choose HiveFrame?</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-number">01</div>
+                    <h3>No Single Point of Failure</h3>
+                    <p>Unlike Spark's driver model, there's no central coordinator to become a bottleneck or crash. Every worker is autonomous.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">02</div>
+                    <h3>Quality-Aware Scheduling</h3>
+                    <p>Tasks with higher quality metrics automatically attract more workers. The best work gets the most resources.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">03</div>
+                    <h3>Emergent Load Balancing</h3>
+                    <p>No manual tuning needed. Workers self-organize based on local information, achieving global optimization.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">04</div>
+                    <h3>Adaptive Backpressure</h3>
+                    <p>Pheromone-based flow control naturally prevents system overload. Pressure signals propagate through the colony.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">05</div>
+                    <h3>Production-Ready</h3>
+                    <p>Full SQL engine, Parquet & Delta Lake support, Kubernetes native, comprehensive monitoring, and enterprise features.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-number">06</div>
+                    <h3>Drop-In Replacement</h3>
+                    <p>Familiar DataFrame API and SQL interface. Migrate from Spark without rewriting your applications.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section id="comparison" class="comparison-section">
+        <div class="container">
+            <h2 class="section-title">HiveFrame vs Apache Spark</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Apache Spark</th>
+                            <th>HiveFrame</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Architecture</td>
+                            <td>Centralized driver + executors</td>
+                            <td>Decentralized bee colony</td>
+                        </tr>
+                        <tr>
+                            <td>Scheduling</td>
+                            <td>Driver schedules all tasks</td>
+                            <td>Self-organizing through waggle dance</td>
+                        </tr>
+                        <tr>
+                            <td>Fault Tolerance</td>
+                            <td>Driver is single point of failure</td>
+                            <td>No single point of failure</td>
+                        </tr>
+                        <tr>
+                            <td>Load Balancing</td>
+                            <td>Static, requires tuning</td>
+                            <td>Emergent, self-adjusting</td>
+                        </tr>
+                        <tr>
+                            <td>Backpressure</td>
+                            <td>Manual configuration</td>
+                            <td>Adaptive pheromone signaling</td>
+                        </tr>
+                        <tr>
+                            <td>Recovery</td>
+                            <td>Restart from checkpoints</td>
+                            <td>Self-healing through ABC algorithm</td>
+                        </tr>
+                        <tr>
+                            <td>API Compatibility</td>
+                            <td>Native</td>
+                            <td>Compatible DataFrame & SQL API</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Get Started Section -->
+    <section id="get-started" class="get-started-section">
+        <div class="container">
+            <div class="get-started-content">
+                <h2 class="section-title">Get Started in Minutes</h2>
+                <p class="section-subtitle">Start processing data with HiveFrame in just a few steps</p>
+                
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Install HiveFrame</h3>
+                            <div class="code-block">
+                                <code>pip install hiveframe</code>
+                                <button class="copy-btn" onclick="copyToClipboard('pip install hiveframe')">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M5.5 4.5H2.5C2.224 4.5 2 4.724 2 5V13.5C2 13.776 2.224 14 2.5 14H10.5C10.776 14 11 13.776 11 13.5V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M5.5 2H13.5C13.776 2 14 2.224 14 2.5V10.5C14 10.776 13.776 11 13.5 11H5.5C5.224 11 5 10.776 5 10.5V2.5C5 2.224 5.224 2 5.5 2Z" stroke="currentColor" stroke-width="1.5"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Create Your First Colony</h3>
+                            <div class="code-block">
+                                <pre><code>from hiveframe import Colony
+
+# Initialize a bee colony
+colony = Colony(n_workers=4)
+
+# Process data
+df = colony.read_parquet("data.parquet")
+result = df.groupBy("category").agg({"value": "sum"})
+result.show()</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Watch the Colony Work</h3>
+                            <p>See the waggle dance protocol in action as workers self-organize and process your data efficiently.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary btn-lg">View Full Documentation</a>
+                    <a href="https://github.com/UstDoesTech/hiveframe/tree/main/examples" class="btn btn-secondary btn-lg">Browse Examples</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section class="use-cases-section">
+        <div class="container">
+            <h2 class="section-title">Built for Scale</h2>
+            <div class="use-cases-grid">
+                <div class="use-case-card">
+                    <h3>🔄 Real-Time Streaming</h3>
+                    <p>Process millions of events per second with adaptive backpressure and exactly-once delivery guarantees.</p>
+                </div>
+                <div class="use-case-card">
+                    <h3>📊 Batch Processing</h3>
+                    <p>Analyze terabytes of data with self-optimizing query execution and intelligent caching.</p>
+                </div>
+                <div class="use-case-card">
+                    <h3>🤖 ML Pipelines</h3>
+                    <p>Train models with AutoML Swarm for automated hyperparameter optimization using bee algorithms.</p>
+                </div>
+                <div class="use-case-card">
+                    <h3>🌐 Multi-Cluster</h3>
+                    <p>Federate multiple hives across regions like allied bee colonies coordinating on global tasks.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="final-cta-section">
+        <div class="container">
+            <div class="final-cta-content">
+                <h2>Ready to Join the Swarm?</h2>
+                <p>Start building with HiveFrame today and experience distributed computing the way nature intended.</p>
+                <div class="cta-buttons">
+                    <a href="#get-started" class="btn btn-primary btn-xl">Get Started Now</a>
+                    <a href="https://github.com/UstDoesTech/hiveframe" target="_blank" rel="noopener" class="btn btn-secondary btn-xl">Star on GitHub ⭐</a>
+                </div>
+                <div class="final-stats">
+                    <div class="final-stat">
+                        <div class="final-stat-value">Python 3.9+</div>
+                        <div class="final-stat-label">Minimum Version</div>
+                    </div>
+                    <div class="final-stat">
+                        <div class="final-stat-value">MIT</div>
+                        <div class="final-stat-label">License</div>
+                    </div>
+                    <div class="final-stat">
+                        <div class="final-stat-value">0.3.0</div>
+                        <div class="final-stat-label">Current Version</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <span class="logo-icon">🐝</span>
+                        <span class="logo-text">HiveFrame</span>
+                    </div>
+                    <p>Biomimetic distributed data processing framework</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#comparison">Comparison</a></li>
+                        <li><a href="#get-started">Get Started</a></li>
+                        <li><a href="#">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/UstDoesTech/hiveframe" target="_blank" rel="noopener">GitHub</a></li>
+                        <li><a href="https://github.com/UstDoesTech/hiveframe/issues" target="_blank" rel="noopener">Issues</a></li>
+                        <li><a href="https://github.com/UstDoesTech/hiveframe/discussions" target="_blank" rel="noopener">Discussions</a></li>
+                        <li><a href="https://github.com/UstDoesTech/hiveframe/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="https://github.com/UstDoesTech/hiveframe/tree/main/examples">Examples</a></li>
+                        <li><a href="https://github.com/UstDoesTech/hiveframe/blob/main/ROADMAP.md">Roadmap</a></li>
+                        <li><a href="https://github.com/UstDoesTech/hiveframe/blob/main/CHANGELOG.md">Changelog</a></li>
+                        <li><a href="https://github.com/UstDoesTech/hiveframe/blob/main/LICENSE">License</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 HiveFrame Contributors. Released under the MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
