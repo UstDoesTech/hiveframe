@@ -9,6 +9,12 @@ Combines basic streaming and enhanced production-grade features:
 - Watermarks and late data handling
 - Exactly-once delivery guarantees
 - Checkpointing and state management
+
+Phase 3 Real-Time Analytics:
+- Structured Streaming 2.0: Sub-millisecond latency streaming
+- Complex Event Processing (CEP): Pattern detection in streaming data
+- Materialized Views: Automatically maintained aggregate tables
+- Change Data Capture (CDC): Database replication and synchronization
 """
 
 # Basic streaming components
@@ -21,6 +27,40 @@ from .aggregators import (
     min_aggregator,
     sum_aggregator,
 )
+
+# Phase 3: Change Data Capture (CDC)
+from .cdc import (
+    CaptureMode,
+    CDCReplicator,
+    CDCStream,
+    ChangeCapture,
+    ChangeEvent,
+    ChangeLog,
+    ChangeType,
+    ConflictResolution,
+    InMemoryCapture,
+    QueryBasedCapture,
+    ReplicationMode,
+    TableCheckpoint,
+    create_cdc_stream,
+    create_replicator,
+)
+
+# Phase 3: Complex Event Processing (CEP)
+from .cep import (
+    CEPEngine,
+    ContiguityType,
+    Pattern,
+    PatternCondition,
+    PatternElement,
+    PatternMatch,
+    PatternMatcher,
+    PatternState,
+    QuantifierType,
+    begin,
+    condition,
+    pattern,
+)
 from .core import (
     AsyncHiveStream,
     HiveStream,
@@ -28,6 +68,31 @@ from .core import (
     StreamBuffer,
     StreamPartitioner,
     StreamRecord,
+)
+
+# Phase 3: Materialized Views
+from .materialized_views import (
+    IncrementalDelta,
+    MaterializedView,
+    MaterializedViewManager,
+    RefreshStrategy,
+    ViewChange,
+    ViewMetadata,
+    ViewState,
+    create_materialized_view,
+)
+
+# Phase 3: Structured Streaming 2.0
+from .realtime import (
+    AdaptiveMicroBatcher,
+    AsyncStructuredStreaming2,
+    LatencyMetrics,
+    LockFreeQueue,
+    PriorityLevel,
+    PriorityQueue,
+    ProcessingMode,
+    StreamingRecord,
+    StructuredStreaming2,
 )
 
 # Delivery guarantees
@@ -116,4 +181,51 @@ __all__ = [
     "max_aggregator",
     "min_aggregator",
     "collect_aggregator",
+    # Phase 3: Structured Streaming 2.0
+    "StructuredStreaming2",
+    "AsyncStructuredStreaming2",
+    "StreamingRecord",
+    "ProcessingMode",
+    "PriorityLevel",
+    "LatencyMetrics",
+    "LockFreeQueue",
+    "PriorityQueue",
+    "AdaptiveMicroBatcher",
+    # Phase 3: Complex Event Processing (CEP)
+    "CEPEngine",
+    "Pattern",
+    "PatternElement",
+    "PatternCondition",
+    "PatternMatch",
+    "PatternMatcher",
+    "PatternState",
+    "QuantifierType",
+    "ContiguityType",
+    "pattern",
+    "begin",
+    "condition",
+    # Phase 3: Materialized Views
+    "MaterializedView",
+    "MaterializedViewManager",
+    "ViewMetadata",
+    "ViewState",
+    "ViewChange",
+    "RefreshStrategy",
+    "IncrementalDelta",
+    "create_materialized_view",
+    # Phase 3: Change Data Capture (CDC)
+    "CDCStream",
+    "CDCReplicator",
+    "ChangeEvent",
+    "ChangeLog",
+    "ChangeType",
+    "ChangeCapture",
+    "CaptureMode",
+    "ReplicationMode",
+    "ConflictResolution",
+    "TableCheckpoint",
+    "InMemoryCapture",
+    "QueryBasedCapture",
+    "create_cdc_stream",
+    "create_replicator",
 ]
