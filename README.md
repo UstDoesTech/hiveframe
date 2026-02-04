@@ -1098,17 +1098,18 @@ print(f"Best fitness: {result['best_fitness']}")
 print(f"Algorithm used: {result['algorithm_used']}")
 
 # Example: Routing optimization (uses ACO)
-# Assuming distance_matrix is defined for your problem
+# Note: This is a simplified 4-city example. For dimensions=20, you would need a 20x20 matrix.
+# The algorithm will optimize the order of visiting cities to minimize total distance.
 distance_matrix = [[0, 10, 15, 20], [10, 0, 35, 25], [15, 35, 0, 30], [20, 25, 30, 0]]
 
 def routing_fitness(path):
-    # Calculate total path distance
-    # Example: sum of distances between consecutive cities in TSP
+    # Calculate total path distance for your routing problem
+    # This example assumes path is a list of city indices
     return sum(distance_matrix[path[i]][path[i+1]] for i in range(len(path)-1))
 
 result = optimizer.optimize(
     fitness_fn=routing_fitness,
-    dimensions=20,
+    dimensions=4,  # Number of cities (matches distance_matrix size)
     problem_type=ProblemType.ROUTING
 )
 ```
@@ -1151,14 +1152,22 @@ fed_trainer = CrossOrgTrainer(n_organizations=5)
 # Each organization trains locally on private data
 # The swarm coordinates model updates with privacy guarantees
 
-# Note: You need to implement these functions for your specific use case:
-# - train_model_on_org_data(org_id): trains model on org's private data, returns weights
-# - get_local_dataset_size(org_id): returns number of training samples for the org
+# Note: You need to implement these functions for your specific ML framework:
+# 
+# def train_model_on_org_data(org_id: int) -> List[float]:
+#     """Train model on organization's private dataset.
+#     Returns: List of model weights/parameters (flattened)"""
+#     pass
+# 
+# def get_local_dataset_size(org_id: int) -> int:
+#     """Get number of training samples for the organization.
+#     Returns: Integer count of training samples"""
+#     pass
 
 for org_id in range(5):
     local_model = {
-        'weights': train_model_on_org_data(org_id),    # Your implementation
-        'n_samples': get_local_dataset_size(org_id)     # Your implementation
+        'weights': train_model_on_org_data(org_id),    # List[float]
+        'n_samples': get_local_dataset_size(org_id)     # int
     }
     fed_trainer.submit_local_model(org_id, local_model)
 
