@@ -122,7 +122,7 @@ Spark Model:                    HiveFrame Model:
 ### Phase 6 (Roadmap) 🔜
 | Feature | Description |
 |---------|-------------|
-| **Quantum Query Optimization** | Quantum annealing for query planning with IBM Qiskit, Google Cirq, AWS Braket |
+| **Quantum Query Optimization** | Quantum algorithms for query planning (quantum annealing, Grover's, QAOA) with IBM Qiskit, Google Cirq, AWS Braket |
 | **Quantum Machine Learning** | Quantum neural networks and variational circuits for ML acceleration |
 | **Quantum-Safe Cryptography** | Post-quantum encryption (CRYSTALS-Kyber, SPHINCS+, Classic McEliece) |
 | **Self-Evolving Optimizer** | Reinforcement learning for continuous query optimization improvement |

@@ -370,10 +370,12 @@ Traditional data platforms are built on centralized architectures that create:
   - Open API and protocol specifications
   - Cross-platform compatibility guarantees
 
-**Phase 6 Timeline**: 2030-2032
+**Phase 6 Timeline**: 2030-2032 (contingent on technology maturity)
 - **2030**: Quantum integration, causal inference, HiveFrame Cloud launch
 - **2031**: Graph analytics, neuro-symbolic AI, foundation establishment
 - **2032**: Optical computing, DNA storage, global conference series
+
+*Note: Timeline for advanced technologies (DNA storage, optical computing, BCI) depends on industry maturity and may shift based on technology readiness levels.*
 
 **Phase 6 Status**: 🔜 **Planned** — Development begins in 2030 after Phase 5 production deployment and ecosystem maturity.
 
@@ -511,7 +513,7 @@ Join us in building the future of data intelligence.
 
 **Last Updated**: February 4, 2026 (Phase 5 complete - Phase 6 roadmap established!)
 
-**Current Status**: 🎯 **All Phase 1-5 Features Complete** — HiveFrame has achieved its ambitious vision of becoming the world's first truly intelligent, bio-inspired, planet-scale data platform. Phase 6 charting the path to quantum intelligence and cognitive computing.
+**Current Status**: 🎯 **All Phase 1-5 Features Complete** — HiveFrame has achieved its ambitious vision of becoming the world's first truly intelligent, bio-inspired, planet-scale data platform, with Phase 6 charting the path to quantum intelligence and cognitive computing.
 
 **What's Next**: 
 - **Immediate (2026)**: Community growth, partner onboarding, production deployments
