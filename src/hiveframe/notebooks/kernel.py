@@ -212,15 +212,14 @@ class NotebookKernel:
             if rows:
                 # Format as a simple table
                 output_lines = []
-                if len(rows) > 0:
-                    # Get column names
-                    columns = list(rows[0].keys())
-                    output_lines.append(" | ".join(columns))
-                    output_lines.append("-" * len(output_lines[0]))
-                    
-                    # Add rows
-                    for row in rows:
-                        output_lines.append(" | ".join(str(row.get(col, "")) for col in columns))
+                # Get column names
+                columns = list(rows[0].keys())
+                output_lines.append(" | ".join(columns))
+                output_lines.append("-" * len(output_lines[0]))
+                
+                # Add rows
+                for row in rows:
+                    output_lines.append(" | ".join(str(row.get(col, "")) for col in columns))
                 
                 result_text = "\n".join(output_lines)
                 if result_df.count() > 100:
@@ -234,7 +233,7 @@ class NotebookKernel:
                 execution_count=self.execution_count,
             )
         except Exception as e:
-            # Return error instead of raising to match Python execution behavior
+            # Re-raise to let execute() method handle it consistently
             raise
 
     def _is_expression(self, code: str) -> bool:

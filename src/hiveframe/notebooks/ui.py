@@ -6,6 +6,8 @@ Web-based Jupyter-style UI for notebook authoring and execution.
 """
 
 import json
+import os
+import tempfile
 import uuid
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -641,9 +643,11 @@ NOTEBOOK_UI_HTML = """<!DOCTYPE html>
 class NotebookUIHandler(BaseHTTPRequestHandler):
     """HTTP request handler for notebook UI."""
 
-    def __init__(self, *args, session: Optional[NotebookSession] = None, **kwargs):
+    def __init__(self, *args, session: Optional[NotebookSession] = None, notebook_dir: Optional[str] = None, **kwargs):
         self.session = session or NotebookSession()
         self.notebook_format = NotebookFormat()
+        # Use provided directory or default to temp directory
+        self.notebook_dir = notebook_dir or tempfile.gettempdir()
         super().__init__(*args, **kwargs)
 
     def do_GET(self):
@@ -745,10 +749,12 @@ class NotebookUIHandler(BaseHTTPRequestHandler):
                 )
                 notebook.cells.append(cell)
 
-            # Generate filename
+            # Generate safe filename
+            safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).strip()
+            safe_title = safe_title.replace(' ', '_')
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"{title.replace(' ', '_')}_{timestamp}.ipynb"
-            filepath = f"/tmp/{filename}"
+            filename = f"{safe_title}_{timestamp}.ipynb"
+            filepath = os.path.join(self.notebook_dir, filename)
 
             # Save notebook
             self.notebook_format.write_notebook(notebook, filepath)
@@ -769,7 +775,21 @@ class NotebookUIHandler(BaseHTTPRequestHandler):
             if not filename:
                 raise ValueError("No filename provided")
 
-            filepath = f"/tmp/{filename}"
+            # Validate filename - no path separators allowed
+            if os.path.sep in filename or (os.path.altsep and os.path.altsep in filename):
+                raise ValueError("Invalid filename: path separators not allowed")
+            
+            # Ensure filename ends with .ipynb
+            if not filename.endswith('.ipynb'):
+                raise ValueError("Invalid filename: must be a .ipynb file")
+
+            filepath = os.path.join(self.notebook_dir, filename)
+            
+            # Verify the resolved path is still within the notebook directory
+            resolved_path = os.path.abspath(filepath)
+            resolved_dir = os.path.abspath(self.notebook_dir)
+            if not resolved_path.startswith(resolved_dir):
+                raise ValueError("Invalid filename: access denied")
 
             # Load notebook
             notebook = self.notebook_format.read_notebook(filepath)
@@ -819,16 +839,18 @@ class NotebookUIServer:
         # Open browser to http://localhost:8888
     """
 
-    def __init__(self, port: int = 8888, host: str = "localhost"):
+    def __init__(self, port: int = 8888, host: str = "localhost", notebook_dir: Optional[str] = None):
         """
         Initialize server.
 
         Args:
             port: Server port
             host: Server host
+            notebook_dir: Directory for saving/loading notebooks (defaults to system temp dir)
         """
         self.port = port
         self.host = host
+        self.notebook_dir = notebook_dir or tempfile.gettempdir()
         self.session = NotebookSession()
         self.server = None
 
@@ -841,11 +863,12 @@ class NotebookUIServer:
         """
 
         def handler(*args, **kwargs):
-            NotebookUIHandler(*args, session=self.session, **kwargs)
+            NotebookUIHandler(*args, session=self.session, notebook_dir=self.notebook_dir, **kwargs)
 
         self.server = HTTPServer((self.host, self.port), handler)
 
         print(f"🐝 HiveFrame Notebook UI running at http://{self.host}:{self.port}")
+        print(f"📁 Notebook directory: {self.notebook_dir}")
         print("Press Ctrl+C to stop")
 
         if blocking:
