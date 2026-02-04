@@ -396,21 +396,35 @@ class HandoffHandler:
         current_cell: str,
         signal_strength: float,
         mobility_state: MobilityState,
+        available_cells: Optional[List[str]] = None,
     ) -> Optional[str]:
         """
         Predict if handoff will be needed soon.
+        
+        Args:
+            device_id: Device identifier
+            current_cell: Current cell ID
+            signal_strength: Current signal strength (0.0-1.0)
+            mobility_state: Device mobility state
+            available_cells: Optional list of neighboring cells
         
         Returns likely target cell ID or None.
         """
         # Simple prediction based on signal strength
         if signal_strength < 0.3:
             # Signal is weak, handoff likely needed
-            # In real implementation, would use network topology
-            # and device movement patterns
+            if available_cells and len(available_cells) > 0:
+                # Return first available cell
+                return available_cells[0]
+            # Fallback for simulation when no cells provided
+            import random
             return f"cell_{random.randint(1, 10)}"
         
         if mobility_state == MobilityState.HIGH_SPEED and signal_strength < 0.5:
             # High speed + moderate signal = likely handoff
+            if available_cells and len(available_cells) > 0:
+                return available_cells[0]
+            import random
             return f"cell_{random.randint(1, 10)}"
         
         return None

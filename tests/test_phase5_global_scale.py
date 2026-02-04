@@ -392,8 +392,8 @@ class TestRetail:
         """Test demand forecasting"""
         forecaster = DemandForecaster()
         
-        for i in range(10):
-            forecaster.add_historical_data("prod1", f"2024-{i+1:02d}", 100 + i)
+        for month in range(10):
+            forecaster.add_historical_data("prod1", f"2024-{month+1:02d}", 100 + month)
         
         forecast = forecaster.forecast_demand("prod1", periods_ahead=7)
         assert forecast is not None

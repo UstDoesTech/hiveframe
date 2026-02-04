@@ -367,6 +367,10 @@ class PrivacyPreservingAnalytics:
         """
         Add Laplace noise for differential privacy.
         
+        Simplified implementation for simulation purposes.
+        For production use, consider using proper crypto libraries
+        like numpy.random.laplace or similar.
+        
         Returns noised value.
         """
         import random

@@ -276,15 +276,29 @@ class BandwidthOptimizer:
         data_size_kb: int,
         priority: int = 5,
         compressible: bool = True,
+        compression_ratio: Optional[float] = None,
     ) -> bool:
-        """Add a data transfer to the queue"""
+        """
+        Add a data transfer to the queue.
+        
+        Args:
+            transfer_id: Unique transfer identifier
+            data_size_kb: Original data size in KB
+            priority: Transfer priority (higher = more urgent)
+            compressible: Whether data can be compressed
+            compression_ratio: Optional fixed compression ratio (0.0-1.0)
+                             If None, simulates typical 30-70% reduction
+        """
         # Apply compression if enabled
         actual_size = data_size_kb
         if self.compression_enabled and compressible:
-            # Simulate compression (typical 30-70% reduction)
-            import random
-            compression_ratio = random.uniform(0.3, 0.7)
-            actual_size = int(data_size_kb * compression_ratio)
+            # Use fixed ratio if provided, otherwise simulate
+            if compression_ratio is not None:
+                ratio = max(0.0, min(1.0, compression_ratio))
+            else:
+                import random
+                ratio = random.uniform(0.3, 0.7)
+            actual_size = int(data_size_kb * ratio)
         
         transfer = {
             "transfer_id": transfer_id,
