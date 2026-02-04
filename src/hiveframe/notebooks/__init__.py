@@ -41,9 +41,11 @@ __all__ = [
     "CellStatus",
     "OperationType",
     "CellType",
+    "NotebookUIServer",
 ]
 
 from .collaboration import CollaborationManager, OperationType
 from .format import CellType, NotebookFormat
 from .gpu_cell import GPUCell
 from .kernel import CellStatus, KernelLanguage, NotebookKernel, NotebookSession
+from .ui import NotebookUIServer

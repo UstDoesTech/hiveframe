@@ -191,13 +191,50 @@ class NotebookKernel:
             sys.stdout = old_stdout
 
     def _execute_sql(self, code: str) -> CellOutput:
-        """Execute SQL code (stub implementation)."""
-        # In a real implementation, this would connect to a SQL engine
-        return CellOutput(
-            output_type="execute_result",
-            data={"text/plain": "SQL execution not yet implemented"},
-            execution_count=self.execution_count,
-        )
+        """Execute SQL code using SwarmQL."""
+        try:
+            # Import here to avoid circular dependencies
+            from ..sql import SwarmQLContext
+            
+            # Get or create SQL context in the execution context
+            if "_sql_context" not in self.context:
+                self.context["_sql_context"] = SwarmQLContext(num_workers=4)
+            
+            sql_context = self.context["_sql_context"]
+            
+            # Execute the SQL query
+            result_df = sql_context.sql(code)
+            
+            # Convert result to text representation
+            # Collect up to 100 rows for display
+            rows = result_df.limit(100).collect()
+            
+            if rows:
+                # Format as a simple table
+                output_lines = []
+                # Get column names
+                columns = list(rows[0].keys())
+                output_lines.append(" | ".join(columns))
+                output_lines.append("-" * len(output_lines[0]))
+                
+                # Add rows
+                for row in rows:
+                    output_lines.append(" | ".join(str(row.get(col, "")) for col in columns))
+                
+                result_text = "\n".join(output_lines)
+                if result_df.count() > 100:
+                    result_text += f"\n\n... ({result_df.count() - 100} more rows)"
+            else:
+                result_text = "Query returned no results"
+            
+            return CellOutput(
+                output_type="execute_result",
+                data={"text/plain": result_text},
+                execution_count=self.execution_count,
+            )
+        except Exception as e:
+            # Re-raise to let execute() method handle it consistently
+            raise
 
     def _is_expression(self, code: str) -> bool:
         """Check if code is a single expression."""
@@ -250,12 +287,31 @@ class NotebookSession:
         """Initialize notebook session."""
         self.kernels: Dict[KernelLanguage, NotebookKernel] = {}
         self.execution_history: List[CellExecution] = []
+        # Shared context for SQL - accessible by all kernels
+        self._shared_sql_context = None
 
     def get_kernel(self, language: KernelLanguage) -> NotebookKernel:
         """Get or create kernel for language."""
         if language not in self.kernels:
-            self.kernels[language] = NotebookKernel(language=language)
-        return self.kernels[language]
+            kernel = NotebookKernel(language=language)
+            self.kernels[language] = kernel
+        
+        # Ensure all kernels have access to the shared SQL context
+        kernel = self.kernels[language]
+        if "_sql_context" not in kernel.context:
+            kernel.context["_sql_context"] = self.get_sql_context()
+        
+        return kernel
+
+    def get_sql_context(self):
+        """Get or create shared SQL context."""
+        if self._shared_sql_context is None:
+            from ..sql import SwarmQLContext
+            self._shared_sql_context = SwarmQLContext(num_workers=4)
+            # Update all existing kernels with the SQL context
+            for kernel in self.kernels.values():
+                kernel.context["_sql_context"] = self._shared_sql_context
+        return self._shared_sql_context
 
     def execute_cell(
         self,

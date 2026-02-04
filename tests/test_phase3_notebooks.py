@@ -5,12 +5,14 @@ Tests for Phase 3 HiveFrame Notebooks
 import os
 import tempfile
 
+from hiveframe import HiveDataFrame
 from hiveframe.notebooks import (
     CollaborationManager,
     GPUCell,
     NotebookFormat,
     NotebookKernel,
     NotebookSession,
+    NotebookUIServer,
 )
 from hiveframe.notebooks.collaboration import OperationType
 from hiveframe.notebooks.format import CellType
@@ -407,3 +409,68 @@ result = 42
 
         tasks = gpu_cell.list_tasks()
         assert len(tasks) == 2
+
+
+class TestSQLExecution:
+    """Test SQL execution in notebooks."""
+
+    def test_sql_kernel_execution(self):
+        """Test SQL execution via kernel."""
+        session = NotebookSession()
+
+        # Get SQL context and register a table using Python
+        execution = session.execute_cell(
+            """
+from hiveframe import HiveDataFrame
+
+# Get the shared SQL context from the session
+sql_context = _sql_context
+
+# Create and register table
+data = [
+    {"name": "Alice", "age": 30},
+    {"name": "Bob", "age": 25},
+    {"name": "Charlie", "age": 35}
+]
+df = HiveDataFrame(data)
+sql_context.register_table("users", df)
+print("Table registered")
+""",
+            language=KernelLanguage.PYTHON,
+        )
+
+        assert execution.status == CellStatus.SUCCESS
+
+        # Now execute SQL
+        execution = session.execute_cell(
+            "SELECT name, age FROM users WHERE age > 25", language=KernelLanguage.SQL
+        )
+
+        assert execution.status == CellStatus.SUCCESS
+        assert len(execution.outputs) > 0
+        # Check that we got some result
+        output_text = str(execution.outputs[0].data)
+        assert "name" in output_text.lower() or "Alice" in output_text or "Charlie" in output_text
+
+
+class TestNotebookUIServer:
+    """Test notebook UI server."""
+
+    def test_server_initialization(self):
+        """Test server can be initialized."""
+        server = NotebookUIServer(port=8889)
+        assert server.port == 8889
+        assert server.session is not None
+
+    def test_server_start_nonblocking(self):
+        """Test server can start in non-blocking mode."""
+        import time
+
+        server = NotebookUIServer(port=8890)
+        try:
+            server.start(blocking=False)
+            time.sleep(0.5)  # Give it time to start
+            # If we get here without exception, server started
+            assert server.server is not None
+        finally:
+            server.stop()
