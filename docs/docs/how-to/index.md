@@ -84,6 +84,24 @@ How-To Guides are **problem-oriented** - they take you through the steps needed 
 > **Phase 3 Status**: Lakehouse, ML Platform, and Notebooks modules are implemented!
 > How-to guides are being written. For now, see `examples/demo_phase3.py`.
 
+### 🤖 Phase 4: Autonomous Data Intelligence (New!)
+
+| Guide | Description | Status |
+|-------|-------------|--------|
+| Configure Self-Tuning Colony | Automatic performance optimization | 📝 Coming Soon |
+| Setup Predictive Maintenance | Anticipate failures before they occur | 📝 Coming Soon |
+| Use Natural Language Queries | Ask questions in plain English | 📝 Coming Soon |
+| Enable AI Data Preparation | Automatic data quality improvements | 📝 Coming Soon |
+| Use Intelligent Data Discovery | AI-suggested joins and relationships | 📝 Coming Soon |
+| Generate Code from NL | Create HiveFrame code from descriptions | 📝 Coming Soon |
+| Fine-tune LLMs on Lakehouse | Train custom models on your data | 📝 Coming Soon |
+| Use Hybrid Swarm Optimization | PSO, ACO, and Firefly algorithms | 📝 Coming Soon |
+| Setup Quantum-Ready Computing | Quantum-classical hybrid optimization | 📝 Coming Soon |
+| Configure Federated Learning | Privacy-preserving cross-org ML | 📝 Coming Soon |
+
+> **Phase 4 Status**: All autonomous intelligence features are implemented and available!
+> How-to guides are being written. For now, see `examples/demo_phase4.py`.
+
 ## Finding the Right Guide
 
 - **New to HiveFrame?** Start with [Tutorials](/docs/tutorials) instead

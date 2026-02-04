@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # API Reference
 
-Complete reference documentation for HiveFrame v0.2.0.
+Complete reference documentation for HiveFrame v0.3.0.
 
 ## Overview
 
@@ -36,7 +36,7 @@ This reference section provides comprehensive documentation for all HiveFrame AP
 | [Resilience](./resilience) | Retry, circuit breaker, timeout patterns |
 | [Monitoring](./monitoring) | Metrics, logging, health checks |
 
-### Phase 3: Enterprise Platform (New!)
+### Phase 3: Enterprise Platform
 
 | Module | Description | Status |
 |--------|-------------|--------|
@@ -46,6 +46,17 @@ This reference section provides comprehensive documentation for all HiveFrame AP
 
 > **Phase 3 Status**: Lakehouse, ML Platform, and Notebooks modules are implemented!
 > Documentation pages are being written. For now, see `examples/demo_phase3.py`.
+
+### Phase 4: Autonomous Data Intelligence (New!)
+
+| Module | Description | Status |
+|--------|-------------|--------|
+| [Autonomous](./autonomous) | Self-tuning, predictive maintenance, cost optimization | ✅ Documented |
+| [AI Integration](./ai) | Natural language queries, data prep, code generation | ✅ Documented |
+| [Advanced Swarm](./advanced-swarm) | Hybrid swarm, quantum-ready, federated learning | ✅ Documented |
+
+> **Phase 4 Status**: All autonomous intelligence features are implemented and documented!
+> See comprehensive examples in `examples/demo_phase4.py`.
 
 ### Deployment
 
@@ -109,6 +120,24 @@ from hiveframe.notebooks import (
     GPUCell
 )
 
+# Phase 4: Autonomous Operations
+from hiveframe.autonomous import (
+    SelfTuningColony, PredictiveMaintenance, WorkloadPredictor,
+    CostOptimizer, MemoryStats, ResourceMetrics, HealthMetric
+)
+
+# Phase 4: AI Integration
+from hiveframe.ai import (
+    NaturalLanguageQuery, AIDataPrep, DataDiscovery,
+    HiveFrameCodeGen, LLMFineTuner
+)
+
+# Phase 4: Advanced Swarm
+from hiveframe.advanced_swarm import (
+    HybridSwarmOptimizer, ParticleSwarmOptimizer, AntColonyOptimizer,
+    FireflyAlgorithm, HybridQuantumClassical, CrossOrgTrainer
+)
+
 # Exceptions
 from hiveframe.exceptions import (
     HiveFrameError, ValidationError, TimeoutError
@@ -134,12 +163,13 @@ Throughout this documentation:
 
 ```python
 import hiveframe
-print(hiveframe.__version__)  # "0.2.0-dev"
+print(hiveframe.__version__)  # "0.3.0-dev"
 ```
 
 | Version | Python | Status |
 |---------|--------|--------|
-| 0.2.x | 3.9+ | Current |
+| 0.3.x | 3.9+ | Current |
+| 0.2.x | 3.9+ | Stable |
 | 0.1.x | 3.8+ | Deprecated |
 
 ## See Also
