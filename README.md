@@ -86,6 +86,22 @@ Spark Model:                    HiveFrame Model:
 | **Materialized Views** | Automatically maintained aggregate tables with incremental refresh |
 | **Change Data Capture** | Database replication and synchronization with conflict resolution |
 
+### Phase 4 (Complete) ✅
+| Feature | Description |
+|---------|-------------|
+| **Self-Tuning Colony** | Zero-configuration performance optimization with automatic memory and resource management |
+| **Predictive Maintenance** | Anticipate and prevent failures before they occur with health monitoring |
+| **Workload Prediction** | Pre-warm resources based on usage patterns and periodic workload detection |
+| **Cost Optimization** | Minimize cloud spend while meeting SLAs with automatic budget tracking |
+| **Natural Language Queries** | Ask questions in plain English with NL-to-SQL translation |
+| **AI-Powered Data Prep** | Automatic data cleaning and transformation with quality issue detection |
+| **Intelligent Data Discovery** | AI-suggested joins and relationships with schema graph generation |
+| **Code Generation** | Generate HiveFrame code from natural language descriptions |
+| **LLM Fine-tuning Platform** | Train custom models on your lakehouse data with hyperparameter optimization |
+| **Hybrid Swarm Intelligence** | Combine ABC with PSO, ACO, and Firefly algorithms for advanced optimization |
+| **Quantum-Ready Algorithms** | Quantum gate interfaces and quantum-inspired optimization for future integration |
+| **Federated Learning Swarm** | Privacy-preserving ML across organizations with differential privacy |
+
 ## Installation
 
 ```bash
@@ -850,7 +866,298 @@ production_model = mlflow_client.load_model(
 )
 ```
 
+## Phase 4: Autonomous Data Intelligence
+
+### Self-Tuning Colony
+
+```python
+from hiveframe.autonomous import (
+    SelfTuningColony, MemoryStats, ResourceMetrics, QueryPerformance
+)
+
+# Create self-tuning colony with automatic optimization
+colony = SelfTuningColony(total_memory_mb=8192, max_workers=50)
+
+# The colony automatically optimizes itself based on metrics
+# Record memory usage (happens automatically in production)
+stats = MemoryStats(
+    total_mb=8192,
+    used_mb=5000,
+    available_mb=3192,
+    cache_mb=1024,
+    buffer_mb=512
+)
+colony.memory_manager.record_usage(stats)
+
+# Record resource metrics
+metrics = ResourceMetrics(
+    cpu_percent=75.0,
+    memory_mb=5000,
+    disk_io_mb_per_sec=100.0,
+    network_mb_per_sec=50.0,
+    active_workers=25,
+    queued_tasks=15
+)
+colony.resource_allocator.record_metrics(metrics)
+
+# Perform automatic tuning
+result = colony.tune()
+print(f"Memory optimized: {result['memory']}")
+print(f"Workers adjusted: {result['resources']['workers']}")
+
+# Get query performance predictions
+recommendation = colony.get_query_recommendation(
+    query_id="complex_analytics",
+    rows=1000000,
+    bytes_to_scan=500000000
+)
+print(f"Estimated time: {recommendation['estimated_time_ms']}ms")
+print(f"Confidence: {recommendation['confidence']:.2f}")
+```
+
+### Predictive Maintenance
+
+```python
+from hiveframe.autonomous import PredictiveMaintenance, HealthMetric
+
+# Create predictive maintenance system
+maintenance = PredictiveMaintenance()
+
+# Health metrics are tracked automatically
+# The system predicts failures before they occur
+health_metric = HealthMetric(
+    component="worker_node_5",
+    cpu_percent=85.0,
+    memory_percent=90.0,
+    disk_percent=75.0,
+    network_errors=5,
+    response_time_ms=250.0
+)
+maintenance.health_monitor.record_health(health_metric)
+
+# Check for predicted failures
+prediction = maintenance.predict_failures()
+if prediction['will_fail']:
+    print(f"Failure predicted in {prediction['time_to_failure_hours']:.1f} hours")
+    print(f"Component: {prediction['component']}")
+    print(f"Confidence: {prediction['confidence']:.2f}")
+
+# Get maintenance recommendations
+recommendations = maintenance.get_recommendations()
+for rec in recommendations:
+    print(f"{rec['priority']}: {rec['action']} - {rec['reason']}")
+```
+
+### Natural Language Queries
+
+```python
+from hiveframe.ai import NaturalLanguageQuery
+
+# Create NL query interface
+nl_query = NaturalLanguageQuery()
+
+# Ask questions in plain English
+queries = [
+    "Show me all customers who spent more than $1000 last month",
+    "What are the top 5 products by revenue?",
+    "Find users who haven't logged in for 30 days"
+]
+
+for question in queries:
+    result = nl_query.query(question, context={"tables": ["customers", "orders", "products"]})
+    print(f"Question: {question}")
+    print(f"SQL: {result['sql']}")
+    print(f"Confidence: {result['confidence']:.2f}\n")
+
+# Learn from feedback
+nl_query.record_feedback(
+    question=queries[0],
+    sql=result['sql'],
+    was_correct=True
+)
+```
+
+### AI-Powered Data Preparation
+
+```python
+from hiveframe.ai import AIDataPrep
+from hiveframe import HiveDataFrame
+
+# Create AI data prep system
+data_prep = AIDataPrep()
+
+# Load raw data
+df = HiveDataFrame.from_csv('raw_customer_data.csv')
+
+# Analyze data quality
+quality_report = data_prep.analyze_quality(df)
+print("Quality Issues Found:")
+for issue in quality_report['issues']:
+    print(f"  {issue['column']}: {issue['type']} ({issue['count']} instances)")
+
+# Automatically clean data
+cleaned_df = data_prep.clean(df, quality_report)
+print(f"Cleaned {quality_report['total_issues']} quality issues")
+
+# Get transformation suggestions
+suggestions = data_prep.suggest_transformations(
+    cleaned_df,
+    use_case="machine_learning"
+)
+for suggestion in suggestions:
+    print(f"  {suggestion['transformation']}: {suggestion['reason']}")
+    print(f"  Example: {suggestion['example']}")
+```
+
+### Intelligent Data Discovery
+
+```python
+from hiveframe.ai import DataDiscovery
+
+# Create data discovery system
+discovery = DataDiscovery()
+
+# Register tables
+discovery.register_schema("users", {
+    "user_id": "int",
+    "name": "string",
+    "email": "string"
+})
+discovery.register_schema("orders", {
+    "order_id": "int",
+    "user_id": "int",
+    "amount": "float"
+})
+discovery.register_schema("products", {
+    "product_id": "int",
+    "name": "string",
+    "price": "float"
+})
+
+# Detect relationships automatically
+relationships = discovery.detect_relationships()
+for rel in relationships:
+    print(f"{rel['from_table']}.{rel['from_column']} -> {rel['to_table']}.{rel['to_column']}")
+    print(f"  Type: {rel['type']}, Confidence: {rel['confidence']:.2f}")
+
+# Get join suggestions
+join_path = discovery.suggest_joins(
+    from_table="users",
+    to_table="products"
+)
+print(f"Join path: {' -> '.join(join_path['path'])}")
+print(f"Estimated cost: {join_path['estimated_cost']}")
+```
+
+### Code Generation
+
+```python
+from hiveframe.ai import HiveFrameCodeGen
+
+# Create code generator
+codegen = HiveFrameCodeGen()
+
+# Generate HiveFrame code from natural language
+descriptions = [
+    "Load CSV file, filter by status='active', and count by region",
+    "Create a streaming pipeline that processes JSON events and writes to Parquet",
+    "Join users and orders, aggregate by month, and save results"
+]
+
+for desc in descriptions:
+    result = codegen.generate(desc)
+    print(f"Description: {desc}")
+    print(f"Generated code:\n{result['code']}\n")
+    print(f"Explanation: {result['explanation']}\n")
+```
+
+### Hybrid Swarm Intelligence
+
+```python
+from hiveframe.advanced_swarm import HybridSwarmOptimizer, ProblemType
+
+# Create hybrid optimizer that automatically selects the best algorithm
+optimizer = HybridSwarmOptimizer(n_particles=30, max_iterations=100)
+
+# Optimize different types of problems
+# The system automatically chooses PSO, ACO, or Firefly based on problem characteristics
+
+# Example: Numerical optimization (uses PSO)
+def numerical_fitness(solution):
+    return sum((x - 5)**2 for x in solution)
+
+result = optimizer.optimize(
+    fitness_fn=numerical_fitness,
+    dimensions=10,
+    bounds=[(-10, 10)] * 10,
+    problem_type=ProblemType.CONTINUOUS
+)
+print(f"Best solution: {result['best_solution']}")
+print(f"Best fitness: {result['best_fitness']}")
+print(f"Algorithm used: {result['algorithm_used']}")
+
+# Example: Routing optimization (uses ACO)
+def routing_fitness(path):
+    return calculate_path_distance(path)
+
+result = optimizer.optimize(
+    fitness_fn=routing_fitness,
+    dimensions=20,
+    problem_type=ProblemType.ROUTING
+)
+```
+
+### Quantum-Ready Algorithms
+
+```python
+from hiveframe.advanced_swarm import HybridQuantumClassical
+
+# Create quantum-classical hybrid optimizer
+qc_optimizer = HybridQuantumClassical(n_qubits=4, n_classical=10)
+
+# Define problem (uses quantum gates for exploration, classical for exploitation)
+def fitness_fn(solution):
+    quantum_part, classical_part = solution[:4], solution[4:]
+    return evaluate_hybrid_solution(quantum_part, classical_part)
+
+# Optimize with quantum-inspired algorithms
+result = qc_optimizer.optimize(
+    fitness_fn=fitness_fn,
+    max_iterations=50
+)
+print(f"Quantum exploration states: {result['quantum_states']}")
+print(f"Classical solution: {result['classical_solution']}")
+print(f"Best fitness: {result['best_fitness']}")
+```
+
+### Federated Learning Swarm
+
+```python
+from hiveframe.advanced_swarm import CrossOrgTrainer
+
+# Create federated learning coordinator
+fed_trainer = CrossOrgTrainer(n_organizations=5)
+
+# Each organization trains locally on private data
+# The swarm coordinates model updates with privacy guarantees
+for org_id in range(5):
+    # Simulate local training
+    local_model = train_on_local_data(org_id)
+    fed_trainer.submit_local_model(org_id, local_model)
+
+# Aggregate models with differential privacy
+global_model = fed_trainer.aggregate_models(
+    privacy_epsilon=1.0,  # Differential privacy parameter
+    use_secure_aggregation=True
+)
+
+print(f"Global model accuracy: {global_model['accuracy']:.4f}")
+print(f"Privacy budget used: {global_model['privacy_spent']:.2f}")
+print(f"Participating organizations: {global_model['n_participants']}")
+```
+
 ## Architecture
+
 
 ### Colony Structure
 
@@ -1442,6 +1749,9 @@ python examples/demo_phase2_storage.py      # HoneyStore & caching swarm
 
 # Phase 3 demo - enterprise platform features:
 python examples/demo_phase3.py              # Unity Catalog, AutoML, Feature Store, Notebooks
+
+# Phase 4 demo - autonomous data intelligence:
+python examples/demo_phase4.py              # Self-tuning, AI integration, advanced swarm algorithms
 ```
 
 **demo.py** runs five demonstrations:
@@ -1508,6 +1818,20 @@ python examples/demo_phase3.py              # Unity Catalog, AutoML, Feature Sto
 6. **Model Serving** - Swarm-based inference load balancing
 7. **HiveFrame Notebooks** - Multi-language interactive execution
 8. **Delta Sharing** - Secure cross-organization data sharing
+
+**demo_phase4.py** demonstrates autonomous data intelligence:
+1. **Self-Tuning Colony** - Automatic memory management and resource allocation
+2. **Predictive Maintenance** - Health monitoring and failure prediction
+3. **Workload Prediction** - Usage pattern analysis and resource pre-warming
+4. **Cost Optimization** - Spend analysis and SLA-based optimization
+5. **Natural Language Queries** - Plain English to SQL translation
+6. **AI-Powered Data Prep** - Automatic data quality assessment and cleaning
+7. **Intelligent Discovery** - Schema relationship detection and join suggestions
+8. **Code Generation** - Natural language to HiveFrame code
+9. **LLM Fine-tuning** - Custom model training on lakehouse data
+10. **Hybrid Swarm Algorithms** - PSO, ACO, and Firefly optimization
+11. **Quantum-Ready Computing** - Quantum-inspired optimization algorithms
+12. **Federated Learning** - Privacy-preserving cross-organization ML
 
 ## Contributing
 
