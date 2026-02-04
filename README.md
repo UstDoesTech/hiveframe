@@ -2,7 +2,7 @@
 
 **A bee-inspired distributed data processing framework — a biomimetic alternative to Apache Spark**
 
-[![Version](https://img.shields.io/badge/version-0.2.0--dev-green.svg)](https://github.com/hiveframe/hiveframe)
+[![Version](https://img.shields.io/badge/version-0.3.0--dev-green.svg)](https://github.com/hiveframe/hiveframe)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -1837,11 +1837,13 @@ python examples/demo_phase4.py              # Self-tuning, AI integration, advan
 
 Contributions welcome! Areas of interest:
 - GPU acceleration for fitness evaluation
-- Additional swarm algorithms (PSO, ACO hybrid)
+- Natural language processing improvements for AI features
+- Additional quantum algorithms and quantum hardware integration
 - Machine learning pipeline integration
 - Cloud provider integrations (AWS EMR, Azure HDInsight, GCP Dataproc)
 - Additional storage connectors (Iceberg, Hudi)
 - Performance benchmarking suite
+- Phase 5 features (Edge computing, Industry solutions, Global mesh)
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
