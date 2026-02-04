@@ -89,7 +89,7 @@ Spark Model:                    HiveFrame Model:
 ### Phase 4 (Complete) ✅
 | Feature | Description |
 |---------|-------------|
-| **Self-Tuning Colony** | Zero-configuration performance optimization with automatic memory and resource management |
+| **Self-Tuning Colony** | Automatic performance optimization with self-adjusting memory and resource management |
 | **Predictive Maintenance** | Anticipate and prevent failures before they occur with health monitoring |
 | **Workload Prediction** | Pre-warm resources based on usage patterns and periodic workload detection |
 | **Cost Optimization** | Minimize cloud spend while meeting SLAs with automatic budget tracking |
@@ -1098,8 +1098,11 @@ print(f"Best fitness: {result['best_fitness']}")
 print(f"Algorithm used: {result['algorithm_used']}")
 
 # Example: Routing optimization (uses ACO)
+# Assuming distance_matrix is defined for your problem
+distance_matrix = [[0, 10, 15, 20], [10, 0, 35, 25], [15, 35, 0, 30], [20, 25, 30, 0]]
+
 def routing_fitness(path):
-    # Calculate total path distance (implement based on your problem)
+    # Calculate total path distance
     # Example: sum of distances between consecutive cities in TSP
     return sum(distance_matrix[path[i]][path[i+1]] for i in range(len(path)-1))
 
@@ -1148,11 +1151,12 @@ fed_trainer = CrossOrgTrainer(n_organizations=5)
 # Each organization trains locally on private data
 # The swarm coordinates model updates with privacy guarantees
 for org_id in range(5):
-    # Train on local data (each org's private dataset)
-    # Returns model weights/parameters from local training
+    # Train on local data (implement these functions for your ML framework)
+    # Example: train_model_on_org_data() returns trained model weights
+    # Example: get_local_dataset_size() returns number of samples
     local_model = {
-        'weights': train_model_on_org_data(org_id),
-        'n_samples': get_local_dataset_size(org_id)
+        'weights': train_model_on_org_data(org_id),  # Your training function
+        'n_samples': get_local_dataset_size(org_id)   # Your dataset size function
     }
     fed_trainer.submit_local_model(org_id, local_model)
 
