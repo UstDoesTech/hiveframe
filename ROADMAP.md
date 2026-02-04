@@ -240,118 +240,6 @@ Traditional data platforms are built on centralized architectures that create:
 
 ---
 
-## Technical Innovations
-
-### Waggle Dance Protocol (WDP) 2.0
-```
-Traditional RPC:          Waggle Dance Protocol:
-                          
-  Request → Response       Dance → Observe → Decide
-  (Synchronous)            (Asynchronous, Quality-Weighted)
-  
-  Bottleneck at server     Self-organizing attention
-  Binary success/fail      Continuous fitness signals
-```
-
-**Key improvements:**
-- Probabilistic routing based on historical fitness
-- Epidemic-style gossip for partition metadata
-- Zero-coordination consensus for configuration changes
-
-### Pheromone-Based Backpressure
-```
-Traditional:                   Pheromone-Based:
-                               
-  if (queue.full)               pheromone_level = f(queue, latency, errors)
-    reject()                    accept_probability = 1 / (1 + e^pheromone)
-                               
-  Binary decision               Continuous, emergent throttling
-```
-
-### Colony Temperature Regulation
-- **Metabolic Rate**: Processing throughput ≈ colony temperature
-- **Cooling**: Reduce work rate when overheating (high latency)
-- **Heating**: Increase parallelism when cold (underutilized)
-- **Homeostasis**: Self-regulating equilibrium without central control
-
----
-
-## Competitive Analysis
-
-| Capability | Databricks | Snowflake | Apache Spark | HiveFrame |
-|------------|-----------|-----------|--------------|-----------|
-| Architecture | Centralized | Centralized | Centralized | **✅ Decentralized** |
-| Self-healing | Manual | Limited | Checkpoint | **✅ Emergent** |
-| Auto-tuning | Manual/AutoML | Auto-suspend | Manual | **✅ Continuous** |
-| Scalability | Linear | Linear | Sub-linear | **✅ Linear** |
-| Open source | Partial | No | Yes | **✅ Yes (MIT)** |
-| Quantum computing | No | No | No | **🔜 Phase 6** |
-| Causal inference | Limited | No | No | **🔜 Phase 6** |
-| Graph analytics | External | External | GraphX | **🔜 Native (Phase 6)** |
-| Edge-to-cloud | Limited | No | No | **✅ Native (Phase 5)** |
-| Industry solutions | Generic | Generic | Generic | **✅ 5 Verticals (Phase 5)** |
-
----
-
-## Community Goals
-
-### Open Source Commitment
-- Core engine will **always** be open source (MIT License)
-- No "open core" bait-and-switch
-- Community-driven feature prioritization
-- Transparent development process
-
-### Contributor Growth
-| Year | Target Contributors | Target Stars | Key Milestone |
-|------|-------------------|--------------|---------------|
-| 2026 | 50+ | 1,000+ | Phase 5 complete |
-| 2027 | 200+ | 5,000+ | Production adoption |
-| 2028 | 500+ | 15,000+ | Enterprise traction |
-| 2029 | 1,000+ | 30,000+ | Global ecosystem |
-| 2030+ | 2,500+ | 75,000+ | Phase 6: Quantum era |
-
-### Ecosystem Partners
-- Cloud providers: AWS, Azure, GCP native integrations
-- Data vendors: Confluent, MongoDB, Elasticsearch partnerships
-- BI tools: Tableau, Looker, PowerBI connectors
-- MLOps: MLflow, Kubeflow, Weights & Biases integration
-
----
-
-## How You Can Help
-
-### Today
-- ⭐ Star the repository
-- 🐛 Report bugs and issues
-- 📖 Improve documentation
-- 💬 Join discussions
-
-### This Quarter
-- 🔧 Contribute code improvements
-- 📊 Share benchmarks and use cases
-- 🎤 Present HiveFrame at meetups
-- 📝 Write blog posts and tutorials
-
-### This Year
-- 🏗️ Build connectors for your data sources
-- 🔬 Research swarm algorithm improvements
-- 🌍 Help with translations
-- 🎓 Create educational content
-
----
-
-## Investment in the Future
-
-We believe that nature's solutions, refined over millions of years of evolution, hold the key to the next generation of distributed computing. Bee colonies process information, make collective decisions, and adapt to changing environments — all without any central coordinator.
-
-HiveFrame brings these principles to data engineering:
-
-> *"The question isn't whether we can build a better Spark. The question is whether we can build something so fundamentally different that the comparison becomes irrelevant."*
-
-Join us in building the future of data intelligence.
-
----
-
 ### 🌌 Phase 6: Quantum Intelligence & Ecosystem Maturity (2030+)
 **Goal: Harness quantum computing and AI to create self-evolving data intelligence**
 
@@ -486,6 +374,120 @@ Join us in building the future of data intelligence.
 - **2030**: Quantum integration, causal inference, HiveFrame Cloud launch
 - **2031**: Graph analytics, neuro-symbolic AI, foundation establishment
 - **2032**: Optical computing, DNA storage, global conference series
+
+**Phase 6 Status**: 🔜 **Planned** — Development begins in 2030 after Phase 5 production deployment and ecosystem maturity.
+
+---
+
+## Technical Innovations
+
+### Waggle Dance Protocol (WDP) 2.0
+```
+Traditional RPC:          Waggle Dance Protocol:
+                          
+  Request → Response       Dance → Observe → Decide
+  (Synchronous)            (Asynchronous, Quality-Weighted)
+  
+  Bottleneck at server     Self-organizing attention
+  Binary success/fail      Continuous fitness signals
+```
+
+**Key improvements:**
+- Probabilistic routing based on historical fitness
+- Epidemic-style gossip for partition metadata
+- Zero-coordination consensus for configuration changes
+
+### Pheromone-Based Backpressure
+```
+Traditional:                   Pheromone-Based:
+                               
+  if (queue.full)               pheromone_level = f(queue, latency, errors)
+    reject()                    accept_probability = 1 / (1 + e^pheromone)
+                               
+  Binary decision               Continuous, emergent throttling
+```
+
+### Colony Temperature Regulation
+- **Metabolic Rate**: Processing throughput ≈ colony temperature
+- **Cooling**: Reduce work rate when overheating (high latency)
+- **Heating**: Increase parallelism when cold (underutilized)
+- **Homeostasis**: Self-regulating equilibrium without central control
+
+---
+
+## Competitive Analysis
+
+| Capability | Databricks | Snowflake | Apache Spark | HiveFrame |
+|------------|-----------|-----------|--------------|-----------|
+| Architecture | Centralized | Centralized | Centralized | **✅ Decentralized** |
+| Self-healing | Manual | Limited | Checkpoint | **✅ Emergent** |
+| Auto-tuning | Manual/AutoML | Auto-suspend | Manual | **✅ Continuous** |
+| Scalability | Linear | Linear | Sub-linear | **✅ Linear** |
+| Open source | Partial | No | Yes | **✅ Yes (MIT)** |
+| Quantum computing | No | No | No | **🔜 Phase 6** |
+| Causal inference | Limited | No | No | **🔜 Phase 6** |
+| Graph analytics | External | External | GraphX | **🔜 Native (Phase 6)** |
+| Edge-to-cloud | Limited | No | No | **✅ Native (Phase 5)** |
+| Industry solutions | Generic | Generic | Generic | **✅ 5 Verticals (Phase 5)** |
+
+---
+
+## Community Goals
+
+### Open Source Commitment
+- Core engine will **always** be open source (MIT License)
+- No "open core" bait-and-switch
+- Community-driven feature prioritization
+- Transparent development process
+
+### Contributor Growth
+| Year | Target Contributors | Target Stars | Key Milestone |
+|------|-------------------|--------------|---------------|
+| 2026 | 50+ | 1,000+ | Phase 5 complete |
+| 2027 | 200+ | 5,000+ | Production adoption |
+| 2028 | 500+ | 15,000+ | Enterprise traction |
+| 2029 | 1,000+ | 30,000+ | Global ecosystem |
+| 2030+ | 2,500+ | 75,000+ | Phase 6: Quantum era |
+
+### Ecosystem Partners
+- Cloud providers: AWS, Azure, GCP native integrations
+- Data vendors: Confluent, MongoDB, Elasticsearch partnerships
+- BI tools: Tableau, Looker, PowerBI connectors
+- MLOps: MLflow, Kubeflow, Weights & Biases integration
+
+---
+
+## How You Can Help
+
+### Today
+- ⭐ Star the repository
+- 🐛 Report bugs and issues
+- 📖 Improve documentation
+- 💬 Join discussions
+
+### This Quarter
+- 🔧 Contribute code improvements
+- 📊 Share benchmarks and use cases
+- 🎤 Present HiveFrame at meetups
+- 📝 Write blog posts and tutorials
+
+### This Year
+- 🏗️ Build connectors for your data sources
+- 🔬 Research swarm algorithm improvements
+- 🌍 Help with translations
+- 🎓 Create educational content
+
+---
+
+## Investment in the Future
+
+We believe that nature's solutions, refined over millions of years of evolution, hold the key to the next generation of distributed computing. Bee colonies process information, make collective decisions, and adapt to changing environments — all without any central coordinator.
+
+HiveFrame brings these principles to data engineering:
+
+> *"The question isn't whether we can build a better Spark. The question is whether we can build something so fundamentally different that the comparison becomes irrelevant."*
+
+Join us in building the future of data intelligence.
 
 ---
 
