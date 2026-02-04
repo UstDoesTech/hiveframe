@@ -880,12 +880,13 @@ colony = SelfTuningColony(total_memory_mb=8192, max_workers=50)
 
 # The colony automatically optimizes itself based on metrics
 # Record memory usage (happens automatically in production)
+# Note: used_mb represents application memory; cache and buffers are tracked separately
 stats = MemoryStats(
     total_mb=8192,
-    used_mb=5000,
-    available_mb=3192,
-    cache_mb=1024,
-    buffer_mb=512
+    used_mb=5000,      # Application memory usage
+    available_mb=3192,  # Available for new allocations
+    cache_mb=1024,      # Page cache
+    buffer_mb=512       # Kernel buffers
 )
 colony.memory_manager.record_usage(stats)
 
@@ -1098,7 +1099,9 @@ print(f"Algorithm used: {result['algorithm_used']}")
 
 # Example: Routing optimization (uses ACO)
 def routing_fitness(path):
-    return calculate_path_distance(path)
+    # Calculate total path distance (implement based on your problem)
+    # Example: sum of distances between consecutive cities in TSP
+    return sum(distance_matrix[path[i]][path[i+1]] for i in range(len(path)-1))
 
 result = optimizer.optimize(
     fitness_fn=routing_fitness,
@@ -1118,7 +1121,11 @@ qc_optimizer = HybridQuantumClassical(n_qubits=4, n_classical=10)
 # Define problem (uses quantum gates for exploration, classical for exploitation)
 def fitness_fn(solution):
     quantum_part, classical_part = solution[:4], solution[4:]
-    return evaluate_hybrid_solution(quantum_part, classical_part)
+    # Evaluate combined quantum-classical solution (implement for your problem)
+    # Example: quantum part explores complex search space, classical optimizes parameters
+    quantum_score = sum(q**2 for q in quantum_part)
+    classical_score = sum((c - 5)**2 for c in classical_part)
+    return quantum_score + classical_score
 
 # Optimize with quantum-inspired algorithms
 result = qc_optimizer.optimize(
@@ -1141,8 +1148,12 @@ fed_trainer = CrossOrgTrainer(n_organizations=5)
 # Each organization trains locally on private data
 # The swarm coordinates model updates with privacy guarantees
 for org_id in range(5):
-    # Simulate local training
-    local_model = train_on_local_data(org_id)
+    # Train on local data (each org's private dataset)
+    # Returns model weights/parameters from local training
+    local_model = {
+        'weights': train_model_on_org_data(org_id),
+        'n_samples': get_local_dataset_size(org_id)
+    }
     fed_trainer.submit_local_model(org_id, local_model)
 
 # Aggregate models with differential privacy
