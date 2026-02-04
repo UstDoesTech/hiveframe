@@ -880,20 +880,20 @@ colony = SelfTuningColony(total_memory_mb=8192, max_workers=50)
 
 # The colony automatically optimizes itself based on metrics
 # Record memory usage (happens automatically in production)
-# Note: used_mb represents application memory; cache and buffers are tracked separately
+# Note: cache and buffers can be reclaimed if needed
 stats = MemoryStats(
     total_mb=8192,
-    used_mb=5000,      # Application memory usage
-    available_mb=3192,  # Available for new allocations
-    cache_mb=1024,      # Page cache
-    buffer_mb=512       # Kernel buffers
+    used_mb=4656,       # Application memory usage (total - available - cache - buffer)
+    available_mb=2000,  # Available for immediate allocation
+    cache_mb=1024,      # Page cache (reclaimable)
+    buffer_mb=512       # Kernel buffers (reclaimable)
 )
 colony.memory_manager.record_usage(stats)
 
 # Record resource metrics
 metrics = ResourceMetrics(
     cpu_percent=75.0,
-    memory_mb=5000,
+    memory_mb=4656,  # Should match used_mb from MemoryStats
     disk_io_mb_per_sec=100.0,
     network_mb_per_sec=50.0,
     active_workers=25,
@@ -1150,13 +1150,15 @@ fed_trainer = CrossOrgTrainer(n_organizations=5)
 
 # Each organization trains locally on private data
 # The swarm coordinates model updates with privacy guarantees
+
+# Note: You need to implement these functions for your specific use case:
+# - train_model_on_org_data(org_id): trains model on org's private data, returns weights
+# - get_local_dataset_size(org_id): returns number of training samples for the org
+
 for org_id in range(5):
-    # Train on local data (implement these functions for your ML framework)
-    # Example: train_model_on_org_data() returns trained model weights
-    # Example: get_local_dataset_size() returns number of samples
     local_model = {
-        'weights': train_model_on_org_data(org_id),  # Your training function
-        'n_samples': get_local_dataset_size(org_id)   # Your dataset size function
+        'weights': train_model_on_org_data(org_id),    # Your implementation
+        'n_samples': get_local_dataset_size(org_id)     # Your implementation
     }
     fed_trainer.submit_local_model(org_id, local_model)
 
