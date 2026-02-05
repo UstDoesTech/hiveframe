@@ -148,10 +148,6 @@ class RelationshipDetector:
                 return "one-to-many", 0.6
             return "one-to-many", 0.5
 
-        # Analyze cardinality from data
-        values1 = set(row.get(col1) for row in data1 if row.get(col1) is not None)
-        values2 = set(row.get(col2) for row in data2 if row.get(col2) is not None)
-
         # Count occurrences
         counts1 = {}
         for row in data1:

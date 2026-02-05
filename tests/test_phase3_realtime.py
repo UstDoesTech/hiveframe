@@ -338,7 +338,7 @@ class TestMaterializedViews:
         manager = MaterializedViewManager()
 
         # Create view
-        view = manager.create_view(
+        manager.create_view(
             name="test_view",
             query="SELECT * FROM test",
             source_tables=["test"],

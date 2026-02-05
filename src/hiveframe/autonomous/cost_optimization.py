@@ -135,7 +135,6 @@ class SpendAnalyzer:
             return waste_sources
 
         costs = list(self.cost_history)
-        avg_cost = statistics.mean([c.total_cost_per_hour for c in costs])
 
         # Identify idle resources
         low_util_costs = [c for c in costs if c.resource_utilization < 0.2]
@@ -230,7 +229,7 @@ class SLAOptimizer:
                         risk_level=(
                             "low" if strategy == OptimizationStrategy.AGGRESSIVE else "medium"
                         ),
-                        description=f"Reduce workers by {int(reduction*100)}% due to low utilization",
+                        description=f"Reduce workers by {int(reduction * 100)}% - low util",
                         parameters={
                             "worker_reduction": int(current_cost.active_workers * reduction)
                         },

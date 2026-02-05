@@ -131,8 +131,6 @@ class ModelTrainer:
         }
 
         # Simulate training (in production, would do actual training)
-        total_steps = (len(dataset["train"]) // config.batch_size) * config.num_epochs
-
         for epoch in range(config.num_epochs):
             for step in range(len(dataset["train"]) // config.batch_size):
                 # Simulate training step
@@ -379,8 +377,6 @@ class LLMFineTuner:
         """
         if model_id not in self.models:
             raise ValueError(f"Model {model_id} not found")
-
-        model = self.models[model_id]
 
         return {
             "endpoint": f"http://hiveframe-inference/{model_id}",

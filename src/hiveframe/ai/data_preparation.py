@@ -254,7 +254,8 @@ class TransformationSuggester:
                             transformation_type="derive",
                             columns=[column],
                             description=f"Parse dates and extract features from {column}",
-                            code=f"df.select('{column}').parse_date().extract_features(['year', 'month', 'day'])",
+                            code=f"df.select('{column}').parse_date()"
+                            ".extract_features(['year', 'month', 'day'])",
                             confidence=0.9,
                         )
                     )

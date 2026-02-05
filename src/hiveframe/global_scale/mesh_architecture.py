@@ -124,7 +124,7 @@ class GlobalMeshCoordinator:
         # Haversine formula for great circle distance
         import math
 
-        R = 6371  # Earth radius in km
+        earth_radius = 6371  # Earth radius in km
 
         dlat = math.radians(lat2 - lat1)
         dlon = math.radians(lon2 - lon1)
@@ -133,7 +133,7 @@ class GlobalMeshCoordinator:
             + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
         )
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        distance_km = R * c
+        distance_km = earth_radius * c
 
         # Approximate latency: ~20ms per 1000km + base latency
         latency = (distance_km / 1000) * 20 + 10 + random.uniform(-5, 5)

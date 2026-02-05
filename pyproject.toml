@@ -104,6 +104,10 @@ ignore = [
     "F821",  # Undefined name (forward references in type hints)
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# ui.py contains embedded HTML/CSS/JS templates that can't be reformatted
+"src/hiveframe/notebooks/ui.py" = ["E501", "W291", "W293"]
+
 [tool.mypy]
 python_version = "3.9"
 warn_return_any = true

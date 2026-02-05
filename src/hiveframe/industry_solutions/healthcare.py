@@ -343,11 +343,11 @@ class PrivacyPreservingAnalytics:
         for record in records:
             anon_record = record.copy()
 
-            for field in sensitive_fields:
-                if field in anon_record:
+            for field_name in sensitive_fields:
+                if field_name in anon_record:
                     # Hash sensitive field
-                    value = str(anon_record[field])
-                    anon_record[field] = hashlib.sha256(value.encode()).hexdigest()[:16]
+                    value = str(anon_record[field_name])
+                    anon_record[field_name] = hashlib.sha256(value.encode()).hexdigest()[:16]
 
             anonymized.append(anon_record)
 
@@ -443,17 +443,17 @@ class PrivacyPreservingAnalytics:
         for record in records:
             anon_record = record.copy()
 
-            for field in quasi_identifiers:
-                if field in anon_record:
-                    value = anon_record[field]
+            for field_name in quasi_identifiers:
+                if field_name in anon_record:
+                    value = anon_record[field_name]
 
                     # Generalize numeric fields
                     if isinstance(value, (int, float)):
                         # Round to nearest multiple of k
-                        anon_record[field] = (value // k) * k
+                        anon_record[field_name] = (value // k) * k
                     elif isinstance(value, str):
                         # Keep first few characters only
-                        anon_record[field] = value[:2] + "*" * (len(value) - 2)
+                        anon_record[field_name] = value[:2] + "*" * (len(value) - 2)
 
             anonymized.append(anon_record)
 

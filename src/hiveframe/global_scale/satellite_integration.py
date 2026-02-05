@@ -226,15 +226,21 @@ class HighLatencyProtocol:
             LinkQuality.OFFLINE: 0,
         }
 
-        best_link = max(active_links, key=lambda l: quality_scores[l.quality] * l.bandwidth_kbps)
+        best_link = max(
+            active_links,
+            key=lambda link: quality_scores[link.quality] * link.bandwidth_kbps
+        )
 
         return best_link.link_id
 
     def get_protocol_stats(self) -> Dict:
         """Get protocol statistics"""
-        active_links = sum(1 for l in self.links.values() if l.is_active)
+        active_links = sum(
+            1 for link in self.links.values() if link.is_active
+        )
         avg_latency = (
-            sum(l.latency_ms for l in self.links.values() if l.is_active) / active_links
+            sum(link.latency_ms for link in self.links.values() if link.is_active)
+            / active_links
             if active_links > 0
             else 0
         )

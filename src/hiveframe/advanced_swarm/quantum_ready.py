@@ -287,7 +287,9 @@ class HybridQuantumClassical:
 
         elif operation == "optimize":
             # Use quantum-inspired optimization
-            fitness_func = lambda x: sum((a - b) ** 2 for a, b in zip(x, problem_data))
+            def fitness_func(x):
+                return sum((a - b) ** 2 for a, b in zip(x, problem_data))
+
             solution, _ = self.quantum_optimizer.optimize(fitness_func)
             return solution
 
