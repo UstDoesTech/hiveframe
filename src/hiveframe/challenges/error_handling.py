@@ -676,7 +676,10 @@ class ErrorHandlingChallenger:
             try:
                 result = scenario_fn()
                 # Calculate success rate from the result
-                success_rate = result.successful / max(1, result.total_records)
+                if result.total_records > 0:
+                    success_rate = result.successful / result.total_records
+                else:
+                    success_rate = 0.0
                 # Consider a challenge passed if success rate is above 70% or recovery rate is good
                 passed = success_rate >= 0.7 or result.recovery_rate >= 0.8
                 results[name] = {
