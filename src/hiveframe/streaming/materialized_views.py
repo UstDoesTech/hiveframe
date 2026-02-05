@@ -194,8 +194,12 @@ class MaterializedView:
                 else:
                     self._data.append(insert)
 
-            # Cleanup None entries
-            self._data = [row for row in self._data if row is not None]
+            # Cleanup deleted entries
+            if self._deleted_indices:
+                self._data = [
+                    row for i, row in enumerate(self._data) if i not in self._deleted_indices
+                ]
+                self._deleted_indices.clear()
             self._rebuild_index()
 
             self.metadata.row_count = len(self._data)
