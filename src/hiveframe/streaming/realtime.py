@@ -227,17 +227,13 @@ class AdaptiveMicroBatcher:
             # Adjust batch size based on latency vs target
             if avg_latency > self.target_latency_us * 1.5:
                 # Latency too high - reduce batch size
-                self._current_batch_size = max(
-                    self.min_batch_size, self._current_batch_size // 2
-                )
+                self._current_batch_size = max(self.min_batch_size, self._current_batch_size // 2)
             elif (
                 avg_latency < self.target_latency_us * 0.5
                 and queue_depth > self._current_batch_size * 2
             ):
                 # Latency well below target and queue building up - increase batch
-                self._current_batch_size = min(
-                    self.max_batch_size, self._current_batch_size * 2
-                )
+                self._current_batch_size = min(self.max_batch_size, self._current_batch_size * 2)
 
             # Colony temperature adjustment
             temperature = self.colony.get_colony_temperature()
@@ -321,9 +317,7 @@ class StructuredStreaming2:
         self._start_time = time.time()
 
         for i in range(self.num_workers):
-            worker = threading.Thread(
-                target=self._worker_loop, args=(i,), daemon=True
-            )
+            worker = threading.Thread(target=self._worker_loop, args=(i,), daemon=True)
             self._workers.append(worker)
             worker.start()
 
@@ -520,9 +514,7 @@ class AsyncStructuredStreaming2(Generic[T]):
         self._total_processed = 0
         self._total_latency_us = 0.0
 
-    async def start(
-        self, process_fn: Callable[[StreamingRecord], T]
-    ) -> None:
+    async def start(self, process_fn: Callable[[StreamingRecord], T]) -> None:
         """Start async streaming engine."""
         self._running = True
         self._process_fn = process_fn

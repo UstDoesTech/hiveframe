@@ -300,10 +300,12 @@ class TestMaterializedViews:
         )
 
         # Full refresh with data
-        view.full_refresh([
-            {"id": 1, "value": 100},
-            {"id": 2, "value": 200},
-        ])
+        view.full_refresh(
+            [
+                {"id": 1, "value": 100},
+                {"id": 2, "value": 200},
+            ]
+        )
 
         assert view.metadata.state == ViewState.FRESH
         assert view.metadata.row_count == 2
@@ -318,10 +320,12 @@ class TestMaterializedViews:
         view.set_key_column("id")
 
         # Full refresh
-        view.full_refresh([
-            {"id": 1, "value": 100},
-            {"id": 2, "value": 200},
-        ])
+        view.full_refresh(
+            [
+                {"id": 1, "value": 100},
+                {"id": 2, "value": 200},
+            ]
+        )
 
         # Apply delta
         delta = IncrementalDelta(

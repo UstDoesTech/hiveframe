@@ -38,7 +38,7 @@ def main():
 
     # Create and start server
     server = NotebookUIServer(port=8888, host="localhost")
-    
+
     print("\n📝 Example notebook cells to try:")
     print("\n  Python:")
     print("    from hiveframe import HiveDataFrame")

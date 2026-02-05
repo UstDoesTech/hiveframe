@@ -12,6 +12,7 @@ import re
 @dataclass
 class GeneratedCode:
     """Generated code with metadata"""
+
     code: str
     language: str  # 'python', 'sql', 'scala'
     description: str
@@ -22,6 +23,7 @@ class GeneratedCode:
 @dataclass
 class CodeTemplate:
     """Code template for common patterns"""
+
     name: str
     description: str
     template: str
@@ -32,15 +34,15 @@ class CodeTemplate:
 class CodeGenerator:
     """
     Generate code from natural language using pattern matching and templates.
-    
+
     Like bees that follow genetic blueprints to build perfect hexagonal cells,
     this generator follows code templates to produce correct HiveFrame code.
     """
-    
+
     def __init__(self):
         self.templates = self._initialize_templates()
         self.generation_history: List[Dict[str, Any]] = []
-        
+
     def _initialize_templates(self) -> Dict[str, CodeTemplate]:
         """Initialize code templates for common operations"""
         return {
@@ -55,7 +57,6 @@ print(f"Loaded {{len(df)}} rows")""",
                 parameters=["file_path"],
                 examples=["read data from file.csv", "load csv file"],
             ),
-            
             "filter_data": CodeTemplate(
                 name="filter_data",
                 description="Filter DataFrame based on condition",
@@ -65,7 +66,6 @@ print(f"Filtered to {{len(filtered_df)}} rows")""",
                 parameters=["condition"],
                 examples=["filter where age > 25", "keep only active users"],
             ),
-            
             "group_aggregate": CodeTemplate(
                 name="group_aggregate",
                 description="Group by column and aggregate",
@@ -77,7 +77,6 @@ print(result)""",
                 parameters=["group_col", "agg_col", "agg_func"],
                 examples=["count by category", "sum sales by region"],
             ),
-            
             "join_tables": CodeTemplate(
                 name="join_tables",
                 description="Join two DataFrames",
@@ -91,7 +90,6 @@ print(f"Joined result: {{len(result)}} rows")""",
                 parameters=["join_col", "join_type"],
                 examples=["join with other table", "merge on user_id"],
             ),
-            
             "streaming": CodeTemplate(
                 name="streaming",
                 description="Process streaming data",
@@ -109,23 +107,23 @@ stream.start()""",
                 examples=["stream from kafka", "process real-time data"],
             ),
         }
-    
+
     def generate(self, description: str) -> GeneratedCode:
         """
         Generate code from natural language description.
-        
+
         Args:
             description: Natural language description of desired code
-            
+
         Returns:
             GeneratedCode object
         """
         desc_lower = description.lower()
-        
+
         # Match to template
         best_template = None
         best_confidence = 0.0
-        
+
         for template_name, template in self.templates.items():
             # Check if description matches template examples
             for example in template.examples:
@@ -135,25 +133,25 @@ stream.start()""",
                         best_template = template
                         best_confidence = confidence
                         break
-        
+
         if not best_template:
             # Try keyword matching
-            if any(word in desc_lower for word in ['read', 'load', 'csv', 'file']):
-                best_template = self.templates['read_csv']
+            if any(word in desc_lower for word in ["read", "load", "csv", "file"]):
+                best_template = self.templates["read_csv"]
                 best_confidence = 0.6
-            elif any(word in desc_lower for word in ['filter', 'where', 'select']):
-                best_template = self.templates['filter_data']
+            elif any(word in desc_lower for word in ["filter", "where", "select"]):
+                best_template = self.templates["filter_data"]
                 best_confidence = 0.6
-            elif any(word in desc_lower for word in ['group', 'aggregate', 'count', 'sum']):
-                best_template = self.templates['group_aggregate']
+            elif any(word in desc_lower for word in ["group", "aggregate", "count", "sum"]):
+                best_template = self.templates["group_aggregate"]
                 best_confidence = 0.6
-            elif any(word in desc_lower for word in ['join', 'merge']):
-                best_template = self.templates['join_tables']
+            elif any(word in desc_lower for word in ["join", "merge"]):
+                best_template = self.templates["join_tables"]
                 best_confidence = 0.6
-            elif any(word in desc_lower for word in ['stream', 'real-time', 'kafka']):
-                best_template = self.templates['streaming']
+            elif any(word in desc_lower for word in ["stream", "real-time", "kafka"]):
+                best_template = self.templates["streaming"]
                 best_confidence = 0.6
-        
+
         if not best_template:
             # Generic fallback
             code = """# Generated HiveFrame code
@@ -165,39 +163,45 @@ result = df.select("*")
 print(result)"""
             return GeneratedCode(
                 code=code,
-                language='python',
+                language="python",
                 description="Generic HiveFrame template",
-                imports=['from hiveframe import HiveFrame'],
+                imports=["from hiveframe import HiveFrame"],
                 confidence=0.3,
             )
-        
+
         # Extract parameters from description
         params = self._extract_parameters(description, best_template)
-        
+
         # Fill template
         code = best_template.template
         for param, value in params.items():
             code = code.replace(f"{{{param}}}", str(value))
-        
+
         # Extract imports
-        imports = [line for line in code.split('\n') if line.strip().startswith('import') or line.strip().startswith('from')]
-        
+        imports = [
+            line
+            for line in code.split("\n")
+            if line.strip().startswith("import") or line.strip().startswith("from")
+        ]
+
         result = GeneratedCode(
             code=code,
-            language='python',
+            language="python",
             description=best_template.description,
             imports=imports,
             confidence=best_confidence,
         )
-        
-        self.generation_history.append({
-            "description": description,
-            "template": best_template.name,
-            "confidence": best_confidence,
-        })
-        
+
+        self.generation_history.append(
+            {
+                "description": description,
+                "template": best_template.name,
+                "confidence": best_confidence,
+            }
+        )
+
         return result
-    
+
     def _extract_parameters(
         self,
         description: str,
@@ -206,13 +210,13 @@ print(result)"""
         """Extract parameter values from description"""
         params = {}
         desc_lower = description.lower()
-        
+
         # Simple extraction heuristics
         if "file_path" in template.parameters:
             # Look for file names
-            match = re.search(r'(\w+\.csv|\w+\.json)', description)
+            match = re.search(r"(\w+\.csv|\w+\.json)", description)
             params["file_path"] = match.group(1) if match else "data.csv"
-        
+
         if "condition" in template.parameters:
             # Look for filter conditions
             if "where" in desc_lower:
@@ -223,7 +227,7 @@ print(result)"""
                     params["condition"] = "value > 0"
             else:
                 params["condition"] = "value > 0"
-        
+
         if "group_col" in template.parameters:
             # Look for group by column
             if "by" in desc_lower:
@@ -235,10 +239,10 @@ print(result)"""
                     params["group_col"] = "category"
             else:
                 params["group_col"] = "category"
-        
+
         if "agg_col" in template.parameters:
             params["agg_col"] = "value"
-        
+
         if "agg_func" in template.parameters:
             if "count" in desc_lower:
                 params["agg_func"] = "count"
@@ -248,7 +252,7 @@ print(result)"""
                 params["agg_func"] = "avg"
             else:
                 params["agg_func"] = "count"
-        
+
         if "join_col" in template.parameters:
             # Look for join column
             if "on" in desc_lower:
@@ -260,7 +264,7 @@ print(result)"""
                     params["join_col"] = "id"
             else:
                 params["join_col"] = "id"
-        
+
         if "join_type" in template.parameters:
             if "left" in desc_lower:
                 params["join_type"] = "left"
@@ -270,36 +274,36 @@ print(result)"""
                 params["join_type"] = "outer"
             else:
                 params["join_type"] = "inner"
-        
+
         if "source" in template.parameters:
             params["source"] = "kafka"
-        
+
         if "window_size" in template.parameters:
             params["window_size"] = "60"
-        
+
         if "sink" in template.parameters:
             params["sink"] = "console"
-        
+
         return params
 
 
 class HiveFrameCodeGen:
     """
     HiveFrame-specific code generation.
-    
+
     Generates idiomatic HiveFrame code with bee-inspired patterns.
     """
-    
+
     def __init__(self):
         self.generator = CodeGenerator()
-        
+
     def generate_pipeline(self, steps: List[str]) -> GeneratedCode:
         """
         Generate a complete data pipeline from step descriptions.
-        
+
         Args:
             steps: List of pipeline step descriptions
-            
+
         Returns:
             GeneratedCode for the complete pipeline
         """
@@ -309,29 +313,35 @@ class HiveFrameCodeGen:
             "",
             "# Data processing pipeline",
         ]
-        
+
         for i, step in enumerate(steps):
             code = self.generator.generate(step)
             # Extract just the processing code (skip imports)
-            processing_code = '\n'.join([
-                line for line in code.code.split('\n')
-                if not line.strip().startswith('import') and
-                   not line.strip().startswith('from') and
-                   line.strip() != ''
-            ])
+            processing_code = "\n".join(
+                [
+                    line
+                    for line in code.code.split("\n")
+                    if not line.strip().startswith("import")
+                    and not line.strip().startswith("from")
+                    and line.strip() != ""
+                ]
+            )
             code_parts.append(f"\n# Step {i+1}: {step}")
             code_parts.append(processing_code)
-        
-        full_code = '\n'.join(code_parts)
-        
+
+        full_code = "\n".join(code_parts)
+
         return GeneratedCode(
             code=full_code,
-            language='python',
+            language="python",
             description="Multi-step data pipeline",
-            imports=['from hiveframe import HiveFrame', 'from hiveframe.streaming import HiveStream'],
+            imports=[
+                "from hiveframe import HiveFrame",
+                "from hiveframe.streaming import HiveStream",
+            ],
             confidence=0.7,
         )
-    
+
     def generate_with_context(
         self,
         description: str,
@@ -339,23 +349,23 @@ class HiveFrameCodeGen:
     ) -> GeneratedCode:
         """
         Generate code with schema context for better accuracy.
-        
+
         Args:
             description: Natural language description
             schema: Database schema for context
-            
+
         Returns:
             GeneratedCode with context-aware generation
         """
         # Use schema to improve parameter extraction
         code = self.generator.generate(description)
-        
+
         # If we have schema, validate and improve the generated code
         if schema:
             # Replace generic table/column names with actual ones from schema
             for table_name, columns in schema.items():
                 if table_name.lower() in description.lower():
-                    code.code = code.code.replace('data.csv', f'{table_name}.csv')
+                    code.code = code.code.replace("data.csv", f"{table_name}.csv")
                     code.confidence = min(code.confidence + 0.1, 0.95)
-        
+
         return code

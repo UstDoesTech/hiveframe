@@ -643,7 +643,13 @@ NOTEBOOK_UI_HTML = """<!DOCTYPE html>
 class NotebookUIHandler(BaseHTTPRequestHandler):
     """HTTP request handler for notebook UI."""
 
-    def __init__(self, *args, session: Optional[NotebookSession] = None, notebook_dir: Optional[str] = None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        session: Optional[NotebookSession] = None,
+        notebook_dir: Optional[str] = None,
+        **kwargs,
+    ):
         self.session = session or NotebookSession()
         self.notebook_format = NotebookFormat()
         # Use provided directory or default to temp directory
@@ -750,8 +756,8 @@ class NotebookUIHandler(BaseHTTPRequestHandler):
                 notebook.cells.append(cell)
 
             # Generate safe filename
-            safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).strip()
-            safe_title = safe_title.replace(' ', '_')
+            safe_title = "".join(c for c in title if c.isalnum() or c in (" ", "_", "-")).strip()
+            safe_title = safe_title.replace(" ", "_")
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"{safe_title}_{timestamp}.ipynb"
             filepath = os.path.join(self.notebook_dir, filename)
@@ -778,13 +784,13 @@ class NotebookUIHandler(BaseHTTPRequestHandler):
             # Validate filename - no path separators allowed
             if os.path.sep in filename or (os.path.altsep and os.path.altsep in filename):
                 raise ValueError("Invalid filename: path separators not allowed")
-            
+
             # Ensure filename ends with .ipynb
-            if not filename.endswith('.ipynb'):
+            if not filename.endswith(".ipynb"):
                 raise ValueError("Invalid filename: must be a .ipynb file")
 
             filepath = os.path.join(self.notebook_dir, filename)
-            
+
             # Verify the resolved path is still within the notebook directory
             resolved_path = os.path.abspath(filepath)
             resolved_dir = os.path.abspath(self.notebook_dir)
@@ -807,7 +813,10 @@ class NotebookUIHandler(BaseHTTPRequestHandler):
                     }
                 )
 
-            response = {"success": True, "data": {"title": filename.replace(".ipynb", ""), "cells": cells}}
+            response = {
+                "success": True,
+                "data": {"title": filename.replace(".ipynb", ""), "cells": cells},
+            }
 
         except Exception as e:
             response = {"success": False, "error": str(e)}
@@ -839,7 +848,9 @@ class NotebookUIServer:
         # Open browser to http://localhost:8888
     """
 
-    def __init__(self, port: int = 8888, host: str = "localhost", notebook_dir: Optional[str] = None):
+    def __init__(
+        self, port: int = 8888, host: str = "localhost", notebook_dir: Optional[str] = None
+    ):
         """
         Initialize server.
 

@@ -219,9 +219,7 @@ class Pattern:
     def where(self, field: str, operator: str, value: Any) -> "Pattern":
         """Add a condition to the current element."""
         if self._current_element:
-            self._current_element.conditions.append(
-                PatternCondition(field, operator, value)
-            )
+            self._current_element.conditions.append(PatternCondition(field, operator, value))
         return self
 
     def times(self, n: int) -> "Pattern":
@@ -389,9 +387,7 @@ class PatternMatcher:
 
         return result_states
 
-    def _check_element_complete(
-        self, element: PatternElement, state: PatternState
-    ) -> bool:
+    def _check_element_complete(self, element: PatternElement, state: PatternState) -> bool:
         """Check if an element's quantifier is satisfied."""
         if element.quantifier == QuantifierType.ONE:
             return state.match_count >= 1
@@ -523,9 +519,7 @@ class CEPEngine:
 
         return all_matches
 
-    def process_events(
-        self, events: List[Dict[str, Any]]
-    ) -> List[PatternMatch]:
+    def process_events(self, events: List[Dict[str, Any]]) -> List[PatternMatch]:
         """Process a batch of events."""
         all_matches: List[PatternMatch] = []
         for event in events:
@@ -535,10 +529,7 @@ class CEPEngine:
 
     def get_active_states_count(self) -> Dict[str, int]:
         """Get count of active states per pattern."""
-        return {
-            name: matcher.get_active_count()
-            for name, matcher in self._matchers.items()
-        }
+        return {name: matcher.get_active_count() for name, matcher in self._matchers.items()}
 
     def get_metrics(self) -> Dict[str, Any]:
         """Get engine metrics."""
@@ -574,8 +565,6 @@ def begin(element_name: str) -> PatternElement:
     return PatternElement(element_name)
 
 
-def condition(
-    field: str, operator: str, value: Any, negate: bool = False
-) -> PatternCondition:
+def condition(field: str, operator: str, value: Any, negate: bool = False) -> PatternCondition:
     """Create a pattern condition."""
     return PatternCondition(field, operator, value, negate)

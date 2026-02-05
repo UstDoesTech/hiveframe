@@ -272,9 +272,7 @@ class MaterializedViewManager:
         self._refresh_count = 0
         self._refresh_times: List[float] = []
 
-    def set_query_executor(
-        self, executor: Callable[[str], List[Dict[str, Any]]]
-    ) -> None:
+    def set_query_executor(self, executor: Callable[[str], List[Dict[str, Any]]]) -> None:
         """Set the query executor function for refreshing views."""
         self._query_executor = executor
 
@@ -402,9 +400,7 @@ class MaterializedViewManager:
             return
 
         self._running = True
-        self._refresh_thread = threading.Thread(
-            target=self._auto_refresh_loop, daemon=True
-        )
+        self._refresh_thread = threading.Thread(target=self._auto_refresh_loop, daemon=True)
         self._refresh_thread.start()
 
     def stop_auto_refresh(self) -> None:
@@ -440,9 +436,7 @@ class MaterializedViewManager:
         for view_name, view in self._views.items():
             if view.metadata.state == ViewState.FRESH:
                 # Simple exact match
-                if self._normalize_query(query) == self._normalize_query(
-                    view.metadata.query
-                ):
+                if self._normalize_query(query) == self._normalize_query(view.metadata.query):
                     return f"SELECT * FROM _mv_{view_name}", view_name
 
         return query, None

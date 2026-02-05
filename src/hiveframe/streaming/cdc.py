@@ -129,9 +129,7 @@ class ChangeLog:
             self.events.append(event)
             return self.last_sequence
 
-    def get_changes_since(
-        self, sequence: int, limit: Optional[int] = None
-    ) -> List[ChangeEvent]:
+    def get_changes_since(self, sequence: int, limit: Optional[int] = None) -> List[ChangeEvent]:
         """Get all changes since a sequence number."""
         with self._lock:
             result = []
@@ -174,9 +172,7 @@ class ChangeCapture(ABC):
     """
 
     @abstractmethod
-    def capture_changes(
-        self, since_sequence: int = 0
-    ) -> Iterator[ChangeEvent]:
+    def capture_changes(self, since_sequence: int = 0) -> Iterator[ChangeEvent]:
         """Capture changes since a sequence number."""
         pass
 
@@ -209,9 +205,7 @@ class QueryBasedCapture(ChangeCapture):
         self._last_snapshot: Dict[Any, Dict[str, Any]] = {}
         self._sequence = 0
 
-    def capture_changes(
-        self, since_sequence: int = 0
-    ) -> Iterator[ChangeEvent]:
+    def capture_changes(self, since_sequence: int = 0) -> Iterator[ChangeEvent]:
         """Capture changes by comparing snapshots."""
         # Get current data
         query = (
@@ -298,9 +292,7 @@ class InMemoryCapture(ChangeCapture):
         )
         return self._change_log.append(event)
 
-    def capture_changes(
-        self, since_sequence: int = 0
-    ) -> Iterator[ChangeEvent]:
+    def capture_changes(self, since_sequence: int = 0) -> Iterator[ChangeEvent]:
         """Get all recorded changes since a sequence."""
         for event in self._change_log.get_changes_since(since_sequence):
             yield event
@@ -341,9 +333,7 @@ class CDCReplicator:
         self._apply_fn: Optional[Callable[[List[ChangeEvent]], int]] = None
         self._checkpoints: Dict[str, TableCheckpoint] = {}
         self._callbacks: List[Callable[[ChangeEvent], None]] = []
-        self._conflict_resolver: Optional[
-            Callable[[ChangeEvent, ChangeEvent], ChangeEvent]
-        ] = None
+        self._conflict_resolver: Optional[Callable[[ChangeEvent, ChangeEvent], ChangeEvent]] = None
         self._lock = threading.RLock()
 
         # State
@@ -357,9 +347,7 @@ class CDCReplicator:
         self._errors = 0
         self._lag_events = 0
 
-    def register_source(
-        self, source_id: str, capture: ChangeCapture
-    ) -> None:
+    def register_source(self, source_id: str, capture: ChangeCapture) -> None:
         """Register a change capture source."""
         with self._lock:
             self._sources[source_id] = capture
@@ -369,9 +357,7 @@ class CDCReplicator:
                 source_id=source_id,
             )
 
-    def set_apply_function(
-        self, apply_fn: Callable[[List[ChangeEvent]], int]
-    ) -> None:
+    def set_apply_function(self, apply_fn: Callable[[List[ChangeEvent]], int]) -> None:
         """Set the function that applies changes to the target."""
         self._apply_fn = apply_fn
 
@@ -383,9 +369,7 @@ class CDCReplicator:
         self._conflict_resolver = resolver
         self.conflict_resolution = ConflictResolution.CUSTOM
 
-    def add_callback(
-        self, callback: Callable[[ChangeEvent], None]
-    ) -> None:
+    def add_callback(self, callback: Callable[[ChangeEvent], None]) -> None:
         """Add a callback to be invoked for each change event."""
         self._callbacks.append(callback)
 
@@ -424,9 +408,7 @@ class CDCReplicator:
 
                     # Update checkpoint
                     if events:
-                        self._checkpoints[source_id].last_sequence = (
-                            events[-1].sequence_number
-                        )
+                        self._checkpoints[source_id].last_sequence = events[-1].sequence_number
                         self._checkpoints[source_id].checkpoint_time = time.time()
 
                     # Waggle dance for fitness tracking
@@ -472,9 +454,7 @@ class CDCReplicator:
         self._running = True
         self._poll_interval = poll_interval_seconds
 
-        self._replication_thread = threading.Thread(
-            target=self._replication_loop, daemon=True
-        )
+        self._replication_thread = threading.Thread(target=self._replication_loop, daemon=True)
         self._replication_thread.start()
 
     def stop(self) -> None:
@@ -513,9 +493,7 @@ class CDCReplicator:
         """Get checkpoint for a source."""
         return self._checkpoints.get(source_id)
 
-    def set_checkpoint(
-        self, source_id: str, checkpoint: TableCheckpoint
-    ) -> None:
+    def set_checkpoint(self, source_id: str, checkpoint: TableCheckpoint) -> None:
         """Set checkpoint for a source."""
         self._checkpoints[source_id] = checkpoint
 
@@ -555,24 +533,18 @@ class CDCStream:
 
     def __init__(self):
         self._tables: Dict[str, InMemoryCapture] = {}
-        self._handlers: Dict[str, List[Callable[[ChangeEvent], None]]] = defaultdict(
-            list
-        )
+        self._handlers: Dict[str, List[Callable[[ChangeEvent], None]]] = defaultdict(list)
         self._global_handlers: List[Callable[[ChangeEvent], None]] = []
         self._running = False
         self._lock = threading.Lock()
 
-    def add_table(
-        self, table_name: str, primary_key: str = "id"
-    ) -> InMemoryCapture:
+    def add_table(self, table_name: str, primary_key: str = "id") -> InMemoryCapture:
         """Add a table for change tracking."""
         capture = InMemoryCapture(table_name)
         self._tables[table_name] = capture
         return capture
 
-    def on_change(
-        self, table_name: Optional[str] = None
-    ) -> Callable:
+    def on_change(self, table_name: Optional[str] = None) -> Callable:
         """Decorator to register a change handler."""
 
         def decorator(fn: Callable[[ChangeEvent], None]) -> Callable:
@@ -584,9 +556,7 @@ class CDCStream:
 
         return decorator
 
-    def record_insert(
-        self, table_name: str, primary_key: Any, data: Dict[str, Any]
-    ) -> None:
+    def record_insert(self, table_name: str, primary_key: Any, data: Dict[str, Any]) -> None:
         """Record an insert event."""
         if table_name in self._tables:
             self._tables[table_name].record_change(
@@ -630,9 +600,7 @@ class CDCStream:
                 ),
             )
 
-    def record_delete(
-        self, table_name: str, primary_key: Any, data: Dict[str, Any]
-    ) -> None:
+    def record_delete(self, table_name: str, primary_key: Any, data: Dict[str, Any]) -> None:
         """Record a delete event."""
         if table_name in self._tables:
             self._tables[table_name].record_change(
@@ -650,9 +618,7 @@ class CDCStream:
                 ),
             )
 
-    def _dispatch_event(
-        self, table_name: str, event: ChangeEvent
-    ) -> None:
+    def _dispatch_event(self, table_name: str, event: ChangeEvent) -> None:
         """Dispatch event to handlers."""
         # Table-specific handlers
         for handler in self._handlers.get(table_name, []):
@@ -668,9 +634,7 @@ class CDCStream:
             except Exception:
                 pass
 
-    def get_changes(
-        self, table_name: str, since_sequence: int = 0
-    ) -> List[ChangeEvent]:
+    def get_changes(self, table_name: str, since_sequence: int = 0) -> List[ChangeEvent]:
         """Get changes for a table since a sequence number."""
         if table_name not in self._tables:
             return []
