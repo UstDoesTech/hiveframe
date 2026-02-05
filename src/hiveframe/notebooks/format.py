@@ -139,9 +139,9 @@ class NotebookFormat:
 
     def _serialize_notebook(self, notebook: Notebook) -> Dict[str, Any]:
         """Serialize notebook to JSON-compatible dict."""
-        cells_data = []
+        cells_data: List[Dict[str, Any]] = []
         for cell in notebook.cells:
-            cell_data = {
+            cell_data: Dict[str, Any] = {
                 "cell_type": cell.cell_type.value,
                 "source": cell.source,
                 "metadata": cell.metadata,

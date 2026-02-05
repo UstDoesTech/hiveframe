@@ -8,7 +8,6 @@ Web-based Jupyter-style UI for notebook authoring and execution.
 import json
 import os
 import tempfile
-import uuid
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Dict, Optional
@@ -863,7 +862,7 @@ class NotebookUIServer:
         self.host = host
         self.notebook_dir = notebook_dir or tempfile.gettempdir()
         self.session = NotebookSession()
-        self.server = None
+        self.server: Optional[HTTPServer] = None
 
     def start(self, blocking: bool = True):
         """

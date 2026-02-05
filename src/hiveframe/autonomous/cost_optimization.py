@@ -4,12 +4,12 @@ Cost Optimization Engine
 Minimize cloud spend while meeting SLAs using bee-inspired resource efficiency.
 """
 
-import time
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
-from collections import deque
-from enum import Enum
 import statistics
+import time
+from collections import deque
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class OptimizationStrategy(Enum):
@@ -129,13 +129,12 @@ class SpendAnalyzer:
         Returns:
             List of waste sources
         """
-        waste_sources = []
+        waste_sources: List[Dict[str, Any]] = []
 
         if len(self.cost_history) < 10:
             return waste_sources
 
         costs = list(self.cost_history)
-        avg_cost = statistics.mean([c.total_cost_per_hour for c in costs])
 
         # Identify idle resources
         low_util_costs = [c for c in costs if c.resource_utilization < 0.2]
@@ -230,7 +229,7 @@ class SLAOptimizer:
                         risk_level=(
                             "low" if strategy == OptimizationStrategy.AGGRESSIVE else "medium"
                         ),
-                        description=f"Reduce workers by {int(reduction*100)}% due to low utilization",
+                        description=f"Reduce workers {int(reduction * 100)}% (low utilization)",
                         parameters={
                             "worker_reduction": int(current_cost.active_workers * reduction)
                         },

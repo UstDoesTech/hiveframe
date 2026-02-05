@@ -9,8 +9,7 @@ maintain coordination while in flight.
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Set, Tuple
-import random
+from typing import Dict, List, Optional, Set
 
 
 class NetworkSliceType(Enum):
@@ -346,10 +345,13 @@ class HandoffHandler:
         self.cells[target_cell].add(device_id)
 
         migration_state["phase"] = "completed"
-        migration_state["end_time"] = time.time()
-        migration_state["duration_ms"] = (
-            migration_state["end_time"] - migration_state["start_time"]
-        ) * 1000
+        end_time = time.time()
+        migration_state["end_time"] = end_time
+        start_time_val = migration_state["start_time"]
+        if isinstance(start_time_val, (int, float)):
+            migration_state["duration_ms"] = (end_time - start_time_val) * 1000
+        else:
+            migration_state["duration_ms"] = 0
 
         # Record handoff
         self.handoff_history.append(

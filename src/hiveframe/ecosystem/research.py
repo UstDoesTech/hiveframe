@@ -8,7 +8,7 @@ publication management to advance swarm intelligence research.
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional
 
 
 class GrantStatus(Enum):
@@ -124,9 +124,6 @@ class GrantApplication:
         # Auto-update status if enough reviews
         grant = self.grants[grant_id]
         if len(self.reviews[grant_id]) >= 3:  # Require 3 reviews
-            avg_score = sum(r["score"] for r in self.reviews[grant_id]) / len(
-                self.reviews[grant_id]
-            )
             grant.status = GrantStatus.UNDER_REVIEW
 
         return True

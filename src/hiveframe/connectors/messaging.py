@@ -205,6 +205,43 @@ class Topic:
         return lag
 
 
+class Producer:
+    """Simple producer wrapper for MessageBroker."""
+
+    def __init__(self, broker: "MessageBroker"):
+        self.broker = broker
+
+    def send(self, topic_name: str, value: Any, key: Optional[str] = None) -> Message:
+        """Send a message to a topic."""
+        topic = self.broker.get_topic(topic_name)
+        if topic is None:
+            raise ValueError(f"Topic {topic_name} does not exist")
+        return topic.produce(key, value)
+
+
+class Consumer:
+    """Simple consumer wrapper for MessageBroker."""
+
+    def __init__(self, broker: "MessageBroker", topic_name: str, consumer_group: str):
+        self.broker = broker
+        self.topic_name = topic_name
+        self.consumer_group = consumer_group
+        topic = broker.get_topic(topic_name)
+        if topic is None:
+            raise ValueError(f"Topic {topic_name} does not exist")
+        self.topic: Topic = topic
+
+    def poll(self, timeout: float = 1.0, max_messages: int = 100) -> List[Message]:
+        """Poll for messages from all partitions."""
+        messages: List[Message] = []
+        for partition in range(self.topic.num_partitions):
+            partition_messages = self.topic.consume(
+                self.consumer_group, partition, max_messages
+            )
+            messages.extend(partition_messages)
+        return messages
+
+
 class MessageBroker:
     """
     In-memory message broker for testing.
@@ -232,6 +269,14 @@ class MessageBroker:
     def list_topics(self) -> List[str]:
         """List all topics."""
         return list(self._topics.keys())
+
+    def create_producer(self) -> Producer:
+        """Create a producer for this broker."""
+        return Producer(self)
+
+    def create_consumer(self, topic_name: str, consumer_group: str) -> Consumer:
+        """Create a consumer for a specific topic."""
+        return Consumer(self, topic_name, consumer_group)
 
 
 class MessageQueueSource(DataSource[Message]):

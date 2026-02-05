@@ -3,27 +3,25 @@ Tests for Phase 4: Generative AI Integration
 """
 
 import pytest
-from hiveframe.ai.natural_language import (
-    NaturalLanguageQuery,
-    QueryTranslator,
-    SQLGenerator,
-    QueryIntent,
-    GeneratedQuery,
-)
+
+from hiveframe.ai.code_generation import CodeGenerator, GeneratedCode, HiveFrameCodeGen
 from hiveframe.ai.data_preparation import (
+    AIDataPrep,
     DataCleaner,
     TransformationSuggester,
-    AIDataPrep,
-    DataQualityIssue,
 )
 from hiveframe.ai.intelligent_discovery import (
-    RelationshipDetector,
-    JoinSuggester,
     DataDiscovery,
-    Relationship,
+    JoinSuggester,
+    RelationshipDetector,
 )
-from hiveframe.ai.code_generation import CodeGenerator, HiveFrameCodeGen, GeneratedCode
-from hiveframe.ai.llm_platform import LLMFineTuner, ModelTrainer, CustomModelSupport, TrainingConfig
+from hiveframe.ai.llm_platform import LLMFineTuner, ModelTrainer, TrainingConfig
+from hiveframe.ai.natural_language import (
+    NaturalLanguageQuery,
+    QueryIntent,
+    QueryTranslator,
+    SQLGenerator,
+)
 
 
 class TestQueryTranslator:

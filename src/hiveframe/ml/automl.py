@@ -118,19 +118,19 @@ class AutoMLSwarm:
 
     def _sample_configuration(self) -> Dict[str, Any]:
         """Sample a random configuration from the search space."""
-        config = {}
+        config: Dict[str, Any] = {}
 
         # Sample continuous parameters
         for param, (low, high) in self.space.continuous.items():
             config[param] = random.uniform(low, high)
 
         # Sample discrete parameters
-        for param, values in self.space.discrete.items():
-            config[param] = random.choice(values)
+        for param, discrete_values in self.space.discrete.items():
+            config[param] = random.choice(discrete_values)
 
         # Sample categorical parameters
-        for param, values in self.space.categorical.items():
-            config[param] = random.choice(values)
+        for param, cat_values in self.space.categorical.items():
+            config[param] = random.choice(cat_values)
 
         return config
 
@@ -171,7 +171,7 @@ class AutoMLSwarm:
             return random.choice(self.configurations)
 
         r = random.uniform(0, total_fitness)
-        cumsum = 0
+        cumsum: float = 0
         for config in self.configurations:
             cumsum += config.fitness
             if cumsum >= r:
@@ -201,11 +201,11 @@ class AutoMLSwarm:
         # Initialize configurations
         self.configurations = []
         for _ in range(self.n_workers):
-            config = self._sample_configuration()
-            score = objective(config)
+            params = self._sample_configuration()
+            score = objective(params)
 
             model_config = ModelConfiguration(
-                params=config, score=score, trials=1, fitness=score if maximize else -score
+                params=params, score=score, trials=1, fitness=score if maximize else -score
             )
             self.configurations.append(model_config)
 

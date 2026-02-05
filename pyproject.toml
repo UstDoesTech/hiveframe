@@ -45,6 +45,7 @@ dependencies = [
 dev = [
     "pytest>=7.0",
     "pytest-asyncio>=0.21",
+    "pytest-timeout>=2.2",
     "black>=23.0",
     "mypy>=1.0",
     "ruff>=0.1",
@@ -104,6 +105,10 @@ ignore = [
     "F821",  # Undefined name (forward references in type hints)
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# ui.py contains embedded HTML/CSS/JS templates that can't be reformatted
+"src/hiveframe/notebooks/ui.py" = ["E501", "W291", "W293"]
+
 [tool.mypy]
 python_version = "3.9"
 warn_return_any = true
@@ -114,6 +119,7 @@ ignore_missing_imports = true
 testpaths = ["tests"]
 pythonpath = ["src"]
 asyncio_mode = "auto"
+timeout = 30  # Default timeout of 30 seconds per test
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]

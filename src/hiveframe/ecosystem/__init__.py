@@ -5,25 +5,25 @@ Components for marketplace, partner certification, academic research,
 and open source governance to build a thriving community.
 """
 
+from .governance import (
+    ContributorGuidelines,
+    DecisionMakingProcess,
+    GovernanceModel,
+)
 from .marketplace import (
-    PluginSystem,
     AppRegistry,
+    PluginSystem,
     VersionManager,
 )
 from .partners import (
     CertificationFramework,
-    SkillsVerification,
     PartnerDirectory,
+    SkillsVerification,
 )
 from .research import (
     GrantApplication,
-    ResearchProjectTracker,
     PublicationManager,
-)
-from .governance import (
-    GovernanceModel,
-    ContributorGuidelines,
-    DecisionMakingProcess,
+    ResearchProjectTracker,
 )
 
 __all__ = [

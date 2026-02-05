@@ -15,44 +15,37 @@ import pytest
 from hiveframe import (
     # Structured Streaming 2.0
     AdaptiveMicroBatcher,
-    LatencyMetrics,
-    LockFreeQueue,
-    PriorityLevel,
-    PriorityQueue,
-    ProcessingMode,
-    StreamingRecord,
-    StructuredStreaming2,
-    # Complex Event Processing
-    CEPEngine,
-    ContiguityType,
-    Pattern,
-    PatternCondition,
-    PatternElement,
-    PatternMatch,
-    PatternMatcher,
-    QuantifierType,
-    pattern,
-    # Materialized Views
-    IncrementalDelta,
-    MaterializedView,
-    MaterializedViewManager,
-    RefreshStrategy,
-    ViewChange,
-    ViewMetadata,
-    ViewState,
-    create_materialized_view,
     # Change Data Capture
     CDCReplicator,
-    CDCStream,
+    CEPEngine,
     ChangeEvent,
     ChangeLog,
     ChangeType,
     ConflictResolution,
+    IncrementalDelta,
     InMemoryCapture,
+    LatencyMetrics,
+    LockFreeQueue,
+    MaterializedView,
+    MaterializedViewManager,
+    Pattern,
+    PatternCondition,
+    PatternElement,
+    PatternMatcher,
+    PriorityLevel,
+    PriorityQueue,
+    ProcessingMode,
+    RefreshStrategy,
     ReplicationMode,
+    StreamingRecord,
+    StructuredStreaming2,
     TableCheckpoint,
+    ViewChange,
+    ViewState,
     create_cdc_stream,
+    create_materialized_view,
     create_replicator,
+    pattern,
 )
 
 
@@ -345,7 +338,7 @@ class TestMaterializedViews:
         manager = MaterializedViewManager()
 
         # Create view
-        view = manager.create_view(
+        manager.create_view(
             name="test_view",
             query="SELECT * FROM test",
             source_tables=["test"],

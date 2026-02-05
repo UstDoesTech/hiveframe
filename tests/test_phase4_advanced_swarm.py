@@ -2,25 +2,26 @@
 Tests for Phase 4: Advanced Swarm Algorithms
 """
 
-import pytest
 import math
-from typing import Tuple
+
+import pytest
+
+from hiveframe.advanced_swarm.federated_learning import (
+    CrossOrgTrainer,
+    FederatedSwarm,
+    LocalModel,
+    PrivacyPreservingML,
+)
 from hiveframe.advanced_swarm.hybrid_swarm import (
-    ParticleSwarmOptimizer,
     AntColonyOptimizer,
     FireflyAlgorithm,
     HybridSwarmOptimizer,
+    ParticleSwarmOptimizer,
 )
 from hiveframe.advanced_swarm.quantum_ready import (
+    HybridQuantumClassical,
     QuantumGateInterface,
     QuantumInspiredOptimizer,
-    HybridQuantumClassical,
-)
-from hiveframe.advanced_swarm.federated_learning import (
-    FederatedSwarm,
-    PrivacyPreservingML,
-    CrossOrgTrainer,
-    LocalModel,
 )
 
 

@@ -171,6 +171,8 @@ class ChangeCapture(ABC):
     Different implementations support different capture modes.
     """
 
+    table_name: str  # Subclasses must set this
+
     @abstractmethod
     def capture_changes(self, since_sequence: int = 0) -> Iterator[ChangeEvent]:
         """Capture changes since a sequence number."""

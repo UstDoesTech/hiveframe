@@ -4,9 +4,9 @@ Code Generation Module
 Generate HiveFrame code from natural language descriptions.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
 import re
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -358,7 +358,7 @@ class HiveFrameCodeGen:
             GeneratedCode with context-aware generation
         """
         # Use schema to improve parameter extraction
-        code = self.generator.generate(description)
+        code: GeneratedCode = self.generator.generate(description)
 
         # If we have schema, validate and improve the generated code
         if schema:

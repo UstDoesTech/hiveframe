@@ -4,10 +4,9 @@ AI-Powered Data Preparation
 Automatic data cleaning and transformation suggestions using swarm intelligence.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any, Tuple
-import statistics
 import re
+from dataclasses import dataclass
+from typing import Any, Dict, List, Tuple
 
 
 @dataclass
@@ -74,7 +73,7 @@ class DataCleaner:
                         severity=severity,
                         affected_rows=missing_count,
                         description=f"{missing_count} missing values in {column}",
-                        suggested_fix=f"Impute with median/mode or remove rows",
+                        suggested_fix="Impute with median/mode or remove rows",
                     )
                 )
 
@@ -249,13 +248,15 @@ class TransformationSuggester:
 
             # Suggest date parsing
             if all(isinstance(v, str) for v in values[:10]):
-                if self._looks_like_date(values[0]):
+                first_val = values[0]
+                if isinstance(first_val, str) and self._looks_like_date(first_val):
                     suggestions.append(
                         TransformationSuggestion(
                             transformation_type="derive",
                             columns=[column],
                             description=f"Parse dates and extract features from {column}",
-                            code=f"df.select('{column}').parse_date().extract_features(['year', 'month', 'day'])",
+                            code=f"df.select('{column}').parse_date()"
+                            ".extract_features(['year', 'month', 'day'])",
                             confidence=0.9,
                         )
                     )

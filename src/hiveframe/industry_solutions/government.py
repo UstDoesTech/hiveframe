@@ -9,7 +9,6 @@ import time
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Set
-import hashlib
 
 
 class JurisdictionLevel(Enum):
@@ -401,7 +400,7 @@ class ComplianceFramework:
             }
 
         # Get most recent check for each standard
-        by_standard = {}
+        by_standard: Dict[str, Dict] = {}
         for check in entity_checks:
             standard = check["standard"]
             if (

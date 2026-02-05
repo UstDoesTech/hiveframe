@@ -17,7 +17,7 @@ import time
 from collections import deque
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar
+from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar, Union
 
 from ..core import ColonyState, Pheromone, WaggleDance
 
@@ -96,7 +96,7 @@ class LockFreeQueue:
     def enqueue(self, item: Any) -> bool:
         """Add item to queue with minimal blocking."""
         with self._lock:
-            if len(self._queue) >= self._queue.maxlen:
+            if self._queue.maxlen is not None and len(self._queue) >= self._queue.maxlen:
                 return False
             self._queue.append(item)
             self._size += 1
@@ -112,7 +112,7 @@ class LockFreeQueue:
 
     def dequeue_batch(self, max_items: int) -> List[Any]:
         """Dequeue multiple items in a single operation."""
-        batch = []
+        batch: List[Any] = []
         with self._lock:
             while self._queue and len(batch) < max_items:
                 batch.append(self._queue.popleft())
@@ -138,7 +138,7 @@ class PriorityQueue:
     """
 
     def __init__(self, max_size: int = 100000):
-        self._queues: Dict[PriorityLevel, deque] = {
+        self._queues: Dict[PriorityLevel, deque[StreamingRecord]] = {
             level: deque(maxlen=max_size // 4) for level in PriorityLevel
         }
         self._lock = threading.Lock()
@@ -148,7 +148,7 @@ class PriorityQueue:
         """Add record to appropriate priority queue."""
         with self._lock:
             queue = self._queues[record.priority]
-            if len(queue) >= queue.maxlen:
+            if queue.maxlen is not None and len(queue) >= queue.maxlen:
                 return False
             queue.append(record)
             self._total_size += 1
@@ -289,7 +289,7 @@ class StructuredStreaming2:
         self.use_priority_queue = use_priority_queue
 
         self.colony = ColonyState()
-        self._queue: PriorityQueue | LockFreeQueue
+        self._queue: "Union[PriorityQueue, LockFreeQueue]"
         if use_priority_queue:
             self._queue = PriorityQueue(max_size=buffer_size)
         else:
@@ -377,7 +377,8 @@ class StructuredStreaming2:
 
         start_us = time.time() * 1_000_000
         try:
-            self._process_fn(record)
+            if self._process_fn is not None:
+                self._process_fn(record)
             end_us = time.time() * 1_000_000
             latency_us = end_us - start_us
 
@@ -405,7 +406,8 @@ class StructuredStreaming2:
         start_us = time.time() * 1_000_000
         for record in batch:
             try:
-                self._process_fn(record)
+                if self._process_fn is not None:
+                    self._process_fn(record)
             except Exception:
                 self.colony.emit_pheromone(
                     Pheromone(

@@ -5,30 +5,30 @@ Specialized modules for Healthcare, Finance, Retail, Manufacturing,
 and Government sectors with industry-specific optimizations.
 """
 
-from .healthcare import (
-    DataEncryption,
-    AuditLogger,
-    PrivacyPreservingAnalytics,
-)
 from .finance import (
     FraudDetector,
-    RiskScorer,
     RegulatoryReporter,
+    RiskScorer,
+)
+from .government import (
+    ComplianceFramework,
+    DataSovereigntyController,
+    SecureMultiTenancy,
+)
+from .healthcare import (
+    AuditLogger,
+    DataEncryption,
+    PrivacyPreservingAnalytics,
+)
+from .manufacturing import (
+    PredictiveMaintenanceSystem,
+    QualityControlAnalytics,
+    SensorDataProcessor,
 )
 from .retail import (
     CustomerDataIntegrator,
     DemandForecaster,
     RecommendationEngine,
-)
-from .manufacturing import (
-    SensorDataProcessor,
-    PredictiveMaintenanceSystem,
-    QualityControlAnalytics,
-)
-from .government import (
-    DataSovereigntyController,
-    SecureMultiTenancy,
-    ComplianceFramework,
 )
 
 __all__ = [

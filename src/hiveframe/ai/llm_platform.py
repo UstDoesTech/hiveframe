@@ -4,10 +4,9 @@ LLM Fine-tuning Platform
 Train custom language models on lakehouse data for domain-specific AI.
 """
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Callable
 import time
-import json
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
 
 
 @dataclass
@@ -132,8 +131,6 @@ class ModelTrainer:
         }
 
         # Simulate training (in production, would do actual training)
-        total_steps = (len(dataset["train"]) // config.batch_size) * config.num_epochs
-
         for epoch in range(config.num_epochs):
             for step in range(len(dataset["train"]) // config.batch_size):
                 # Simulate training step
@@ -291,7 +288,7 @@ class LLMFineTuner:
         """
         # In production, would load data from lakehouse
         # For now, simulate with empty dataset
-        data = []  # Would be: lakehouse.load_table(table_name)
+        data: List[Dict[str, Any]] = []  # Would be: lakehouse.load_table(table_name)
 
         # Prepare dataset
         dataset = self.trainer.prepare_dataset(data, text_column, label_column)
@@ -304,7 +301,7 @@ class LLMFineTuner:
         )
 
         # Train model
-        model = self.trainer.train(config, dataset)
+        model: FineTunedModel = self.trainer.train(config, dataset)
 
         # Register model
         self.models[model.model_id] = model
@@ -333,7 +330,7 @@ class LLMFineTuner:
             Dictionary with optimization results and model
         """
         # Prepare dataset
-        data = []  # Would load from lakehouse
+        data: List[Dict[str, Any]] = []  # Would load from lakehouse
         dataset = self.trainer.prepare_dataset(data, text_column)
 
         # Default param ranges if not provided
@@ -380,8 +377,6 @@ class LLMFineTuner:
         """
         if model_id not in self.models:
             raise ValueError(f"Model {model_id} not found")
-
-        model = self.models[model_id]
 
         return {
             "endpoint": f"http://hiveframe-inference/{model_id}",

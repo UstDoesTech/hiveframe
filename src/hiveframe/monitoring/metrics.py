@@ -59,7 +59,7 @@ class Metric(ABC):
         self.name = name
         self.help_text = help_text
         self.metric_type = metric_type
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()  # Use RLock to allow reentrant locking
 
     @abstractmethod
     def collect(self) -> List[Dict[str, Any]]:

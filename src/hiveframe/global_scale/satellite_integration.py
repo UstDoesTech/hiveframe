@@ -7,10 +7,10 @@ colony cohesion over vast distances.
 """
 
 import time
+from collections import deque
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Any
-from collections import deque
+from typing import Dict, List, Optional
 
 
 class LinkQuality(Enum):
@@ -226,15 +226,21 @@ class HighLatencyProtocol:
             LinkQuality.OFFLINE: 0,
         }
 
-        best_link = max(active_links, key=lambda l: quality_scores[l.quality] * l.bandwidth_kbps)
+        best_link = max(
+            active_links,
+            key=lambda link: quality_scores[link.quality] * link.bandwidth_kbps
+        )
 
         return best_link.link_id
 
     def get_protocol_stats(self) -> Dict:
         """Get protocol statistics"""
-        active_links = sum(1 for l in self.links.values() if l.is_active)
+        active_links = sum(
+            1 for link in self.links.values() if link.is_active
+        )
         avg_latency = (
-            sum(l.latency_ms for l in self.links.values() if l.is_active) / active_links
+            sum(link.latency_ms for link in self.links.values() if link.is_active)
+            / active_links
             if active_links > 0
             else 0
         )
@@ -362,7 +368,7 @@ class DataBufferingStrategy:
 
     def __init__(self, max_buffer_mb: int = 1000):
         self.max_buffer_mb = max_buffer_mb
-        self.current_buffer_mb = 0
+        self.current_buffer_mb: float = 0
         self.buffer: deque = deque()
         self.overflow_count = 0
 

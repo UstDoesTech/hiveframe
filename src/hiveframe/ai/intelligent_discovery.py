@@ -4,9 +4,9 @@ Intelligent Data Discovery
 AI-suggested joins and relationship detection using swarm intelligence patterns.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any, Set, Tuple
 import statistics
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -148,18 +148,14 @@ class RelationshipDetector:
                 return "one-to-many", 0.6
             return "one-to-many", 0.5
 
-        # Analyze cardinality from data
-        values1 = set(row.get(col1) for row in data1 if row.get(col1) is not None)
-        values2 = set(row.get(col2) for row in data2 if row.get(col2) is not None)
-
         # Count occurrences
-        counts1 = {}
+        counts1: Dict[Any, int] = {}
         for row in data1:
             val = row.get(col1)
             if val:
                 counts1[val] = counts1.get(val, 0) + 1
 
-        counts2 = {}
+        counts2: Dict[Any, int] = {}
         for row in data2:
             val = row.get(col2)
             if val:
@@ -291,7 +287,7 @@ class JoinSuggester:
         if from_table not in graph:
             return None
 
-        queue = [(from_table, [])]
+        queue: List[Tuple[str, List[Tuple[str, str, Any]]]] = [(from_table, [])]
         visited = {from_table}
 
         while queue:

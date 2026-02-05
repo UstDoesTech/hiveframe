@@ -158,9 +158,11 @@ class NotebookKernel:
             # Execute code
             # NOTE: eval/exec on user code is a security risk
             # This is acceptable for Phase 3 demo but needs sandboxing for production
-            result = (
-                eval(code, self.context) if self._is_expression(code) else exec(code, self.context)
-            )
+            if self._is_expression(code):
+                result = eval(code, self.context)
+            else:
+                exec(code, self.context)
+                result = None
 
             # Get captured output
             output_text = captured_output.getvalue()
@@ -232,7 +234,7 @@ class NotebookKernel:
                 data={"text/plain": result_text},
                 execution_count=self.execution_count,
             )
-        except Exception as e:
+        except Exception:
             # Re-raise to let execute() method handle it consistently
             raise
 

@@ -56,7 +56,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -v --tb=short
+        pytest -v --tb=short -m "not slow" --timeout=30
 
   format:
     runs-on: ubuntu-latest

@@ -8,8 +8,7 @@ building a thriving ecosystem of extensions.
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Set, Callable, Any
-import hashlib
+from typing import Any, Callable, Dict, List, Optional, Set
 
 
 class PluginType(Enum):
@@ -180,7 +179,7 @@ class PluginSystem:
         """Get plugin system statistics"""
         active_plugins = sum(1 for p in self.plugins.values() if p.status == PluginStatus.ACTIVE)
 
-        by_type = {}
+        by_type: Dict[str, int] = {}
         for plugin in self.plugins.values():
             plugin_type = plugin.plugin_type.value
             by_type[plugin_type] = by_type.get(plugin_type, 0) + 1

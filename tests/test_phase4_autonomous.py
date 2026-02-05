@@ -2,37 +2,34 @@
 Tests for Phase 4: Autonomous Operations
 """
 
-import pytest
 import time
-from hiveframe.autonomous.self_tuning import (
-    MemoryManager,
-    ResourceAllocator,
-    QueryPredictor,
-    SelfTuningColony,
-    MemoryStats,
-    ResourceMetrics,
-    QueryPerformance,
+
+import pytest
+
+from hiveframe.autonomous.cost_optimization import (
+    CostMetrics,
+    CostOptimizer,
+    OptimizationStrategy,
+    SLAMetrics,
 )
 from hiveframe.autonomous.predictive_maintenance import (
-    HealthMonitor,
-    FailurePredictor,
-    PredictiveMaintenance,
     HealthMetric,
+    HealthMonitor,
     HealthStatus,
+    PredictiveMaintenance,
+)
+from hiveframe.autonomous.self_tuning import (
+    MemoryManager,
+    MemoryStats,
+    QueryPerformance,
+    QueryPredictor,
+    ResourceAllocator,
+    ResourceMetrics,
+    SelfTuningColony,
 )
 from hiveframe.autonomous.workload_prediction import (
     WorkloadPredictor,
-    UsageAnalyzer,
-    ResourcePrewarmer,
     WorkloadSample,
-)
-from hiveframe.autonomous.cost_optimization import (
-    CostOptimizer,
-    SpendAnalyzer,
-    SLAOptimizer,
-    CostMetrics,
-    SLAMetrics,
-    OptimizationStrategy,
 )
 
 

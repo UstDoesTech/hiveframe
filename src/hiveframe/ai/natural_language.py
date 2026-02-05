@@ -4,9 +4,9 @@ Natural Language Query Interface
 Translate natural language questions to SQL and HiveFrame operations.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
 import re
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -178,9 +178,11 @@ class SQLGenerator:
     def _generate_explanation(self, intent: QueryIntent, sql: str) -> str:
         """Generate human-readable explanation of the query"""
         if intent.aggregations:
-            return f"Calculating {intent.aggregations[0]} over {intent.entities[0] if intent.entities else 'data'}"
+            entity = intent.entities[0] if intent.entities else "data"
+            return f"Calculating {intent.aggregations[0]} over {entity}"
         else:
-            return f"Retrieving data from {intent.entities[0] if intent.entities else 'table'}"
+            entity = intent.entities[0] if intent.entities else "table"
+            return f"Retrieving data from {entity}"
 
 
 class NaturalLanguageQuery:
