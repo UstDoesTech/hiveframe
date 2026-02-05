@@ -235,9 +235,7 @@ class Consumer:
         """Poll for messages from all partitions."""
         messages: List[Message] = []
         for partition in range(self.topic.num_partitions):
-            partition_messages = self.topic.consume(
-                self.consumer_group, partition, max_messages
-            )
+            partition_messages = self.topic.consume(self.consumer_group, partition, max_messages)
             messages.extend(partition_messages)
         return messages
 
