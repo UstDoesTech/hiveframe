@@ -232,7 +232,8 @@ class Consumer:
 
     def poll(self, timeout: float = 1.0, max_messages: int = 100) -> List[Message]:
         """Poll for messages from all partitions."""
-        messages = []
+        messages: List[Message] = []
+        assert self.topic is not None  # Already checked in __init__
         for partition in range(self.topic.num_partitions):
             partition_messages = self.topic.consume(
                 self.consumer_group, partition, max_messages
