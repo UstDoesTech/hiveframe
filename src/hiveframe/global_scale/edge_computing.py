@@ -9,8 +9,7 @@ staying connected to the main colony.
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Any, Set
-import hashlib
+from typing import Any, Dict, List, Optional, Set
 
 
 class EdgeNodeType(Enum):

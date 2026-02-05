@@ -8,7 +8,6 @@ Web-based Jupyter-style UI for notebook authoring and execution.
 import json
 import os
 import tempfile
-import uuid
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Dict, Optional

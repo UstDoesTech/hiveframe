@@ -4,10 +4,10 @@ Hybrid Swarm Intelligence
 Combines multiple swarm intelligence algorithms for superior optimization.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Callable, Tuple, Any, Dict, Optional
-import random
 import math
+import random
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 
 @dataclass

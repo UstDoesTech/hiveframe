@@ -5,21 +5,21 @@ Hybrid swarm intelligence combining multiple nature-inspired algorithms,
 quantum-ready implementations, and federated learning.
 """
 
+from .federated_learning import (
+    CrossOrgTrainer,
+    FederatedSwarm,
+    PrivacyPreservingML,
+)
 from .hybrid_swarm import (
-    ParticleSwarmOptimizer,
     AntColonyOptimizer,
     FireflyAlgorithm,
     HybridSwarmOptimizer,
+    ParticleSwarmOptimizer,
 )
 from .quantum_ready import (
-    QuantumGateInterface,
     HybridQuantumClassical,
+    QuantumGateInterface,
     QuantumInspiredOptimizer,
-)
-from .federated_learning import (
-    FederatedSwarm,
-    PrivacyPreservingML,
-    CrossOrgTrainer,
 )
 
 __all__ = [

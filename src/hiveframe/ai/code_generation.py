@@ -4,9 +4,9 @@ Code Generation Module
 Generate HiveFrame code from natural language descriptions.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
 import re
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 
 @dataclass

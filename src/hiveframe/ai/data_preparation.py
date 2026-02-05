@@ -4,10 +4,9 @@ AI-Powered Data Preparation
 Automatic data cleaning and transformation suggestions using swarm intelligence.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any, Tuple
-import statistics
 import re
+from dataclasses import dataclass
+from typing import Any, Dict, List, Tuple
 
 
 @dataclass
@@ -74,7 +73,7 @@ class DataCleaner:
                         severity=severity,
                         affected_rows=missing_count,
                         description=f"{missing_count} missing values in {column}",
-                        suggested_fix=f"Impute with median/mode or remove rows",
+                        suggested_fix="Impute with median/mode or remove rows",
                     )
                 )
 

@@ -8,8 +8,7 @@ risk scoring, and regulatory reporting capabilities.
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Set
-import random
+from typing import Dict, List, Optional
 
 
 class FraudRiskLevel(Enum):

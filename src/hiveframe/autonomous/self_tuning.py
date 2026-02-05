@@ -6,11 +6,11 @@ Inspired by how bee colonies automatically adjust their behavior based on
 environmental conditions and colony needs.
 """
 
-import time
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
-from collections import deque
 import statistics
+import time
+from collections import deque
+from dataclasses import dataclass, field
+from typing import Any, Dict, List
 
 
 @dataclass

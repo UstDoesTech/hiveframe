@@ -8,7 +8,7 @@ publication management to advance swarm intelligence research.
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional
 
 
 class GrantStatus(Enum):

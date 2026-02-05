@@ -5,40 +5,40 @@ This module provides self-managing capabilities for the HiveFrame platform,
 including self-tuning, predictive maintenance, workload prediction, and cost optimization.
 """
 
-from .self_tuning import (
-    SelfTuningColony,
-    MemoryManager,
-    ResourceAllocator,
-    QueryPredictor,
-    MemoryStats,
-    ResourceMetrics,
-    QueryPerformance,
+from .cost_optimization import (
+    CostMetrics,
+    CostOptimizer,
+    OptimizationRecommendation,
+    OptimizationStrategy,
+    SLAMetrics,
+    SLAOptimizer,
+    SpendAnalyzer,
 )
 from .predictive_maintenance import (
-    PredictiveMaintenance,
-    HealthMonitor,
+    FailurePrediction,
     FailurePredictor,
     HealthMetric,
+    HealthMonitor,
     HealthStatus,
-    FailurePrediction,
+    PredictiveMaintenance,
     SystemHealth,
 )
-from .workload_prediction import (
-    WorkloadPredictor,
-    UsageAnalyzer,
-    ResourcePrewarmer,
-    WorkloadSample,
-    WorkloadForecast,
-    UsagePattern,
+from .self_tuning import (
+    MemoryManager,
+    MemoryStats,
+    QueryPerformance,
+    QueryPredictor,
+    ResourceAllocator,
+    ResourceMetrics,
+    SelfTuningColony,
 )
-from .cost_optimization import (
-    CostOptimizer,
-    SpendAnalyzer,
-    SLAOptimizer,
-    CostMetrics,
-    SLAMetrics,
-    OptimizationStrategy,
-    OptimizationRecommendation,
+from .workload_prediction import (
+    ResourcePrewarmer,
+    UsageAnalyzer,
+    UsagePattern,
+    WorkloadForecast,
+    WorkloadPredictor,
+    WorkloadSample,
 )
 
 __all__ = [

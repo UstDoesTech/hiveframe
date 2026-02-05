@@ -5,7 +5,6 @@ Tests for Phase 3 HiveFrame Notebooks
 import os
 import tempfile
 
-from hiveframe import HiveDataFrame
 from hiveframe.notebooks import (
     CollaborationManager,
     GPUCell,

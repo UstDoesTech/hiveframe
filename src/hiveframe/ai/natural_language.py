@@ -4,9 +4,9 @@ Natural Language Query Interface
 Translate natural language questions to SQL and HiveFrame operations.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
 import re
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 
 @dataclass

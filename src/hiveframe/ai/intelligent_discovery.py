@@ -4,9 +4,9 @@ Intelligent Data Discovery
 AI-suggested joins and relationship detection using swarm intelligence patterns.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any, Set, Tuple
 import statistics
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass

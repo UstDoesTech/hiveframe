@@ -8,8 +8,7 @@ building a thriving ecosystem of extensions.
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Set, Callable, Any
-import hashlib
+from typing import Any, Callable, Dict, List, Optional, Set
 
 
 class PluginType(Enum):

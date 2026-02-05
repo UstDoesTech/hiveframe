@@ -232,7 +232,7 @@ class NotebookKernel:
                 data={"text/plain": result_text},
                 execution_count=self.execution_count,
             )
-        except Exception as e:
+        except Exception:
             # Re-raise to let execute() method handle it consistently
             raise
 

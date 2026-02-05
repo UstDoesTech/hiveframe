@@ -5,25 +5,25 @@ Planet-scale infrastructure, edge computing, satellite integration,
 and 5G/6G optimization for worldwide distributed data processing.
 """
 
-from .mesh_architecture import (
-    GlobalMeshCoordinator,
-    CrossRegionReplicator,
-    LatencyAwareRouter,
-)
 from .edge_computing import (
-    EdgeNodeManager,
     EdgeCloudSync,
+    EdgeNodeManager,
     OfflineOperationSupport,
 )
-from .satellite_integration import (
-    HighLatencyProtocol,
-    BandwidthOptimizer,
-    DataBufferingStrategy,
+from .mesh_architecture import (
+    CrossRegionReplicator,
+    GlobalMeshCoordinator,
+    LatencyAwareRouter,
 )
 from .mobile_optimization import (
+    HandoffHandler,
     MobileAwareScheduler,
     NetworkSliceIntegration,
-    HandoffHandler,
+)
+from .satellite_integration import (
+    BandwidthOptimizer,
+    DataBufferingStrategy,
+    HighLatencyProtocol,
 )
 
 __all__ = [

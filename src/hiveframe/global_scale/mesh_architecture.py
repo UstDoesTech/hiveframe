@@ -5,12 +5,10 @@ Implements geo-distributed swarm coordination using bio-inspired principles
 to enable planet-scale data processing with minimal latency.
 """
 
-import time
+import random
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Set, Tuple
-import hashlib
-import random
+from typing import Dict, List, Optional, Tuple
 
 
 class RegionStatus(Enum):

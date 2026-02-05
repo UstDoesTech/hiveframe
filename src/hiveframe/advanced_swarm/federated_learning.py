@@ -4,11 +4,11 @@ Federated Learning Swarm
 Privacy-preserving machine learning across organizations using swarm intelligence.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional, Callable, Tuple
-import time
 import random
 import statistics
+import time
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 
 @dataclass

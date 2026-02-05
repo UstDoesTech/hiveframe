@@ -341,19 +341,16 @@ from .streaming import (
     CaptureMode,
     CDCReplicator,
     CDCStream,
+    # Phase 3: Complex Event Processing
+    CEPEngine,
     ChangeCapture,
     ChangeEvent,
     ChangeLog,
     ChangeType,
-    # Phase 3: Complex Event Processing
-    CEPEngine,
     # Enhanced streaming - state
     Checkpoint,
     ConflictResolution,
     ContiguityType,
-    create_cdc_stream,
-    create_materialized_view,
-    create_replicator,
     # Enhanced streaming - delivery
     DeliveryGuarantee,
     EnhancedStreamProcessor,
@@ -414,6 +411,9 @@ from .streaming import (
     condition,
     # Enhanced streaming - aggregators
     count_aggregator,
+    create_cdc_stream,
+    create_materialized_view,
+    create_replicator,
     max_aggregator,
     min_aggregator,
     pattern,

@@ -5,12 +5,12 @@ Anticipate and prevent failures before they occur using bee-inspired health moni
 and swarm intelligence for anomaly detection.
 """
 
-import time
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
-from collections import deque
-from enum import Enum
 import statistics
+import time
+from collections import deque
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 
 class HealthStatus(Enum):

@@ -70,6 +70,13 @@ from .core import (
     StreamRecord,
 )
 
+# Delivery guarantees
+from .delivery import (
+    DeliveryGuarantee,
+    IdempotencyStore,
+    ProcessingContext,
+)
+
 # Phase 3: Materialized Views
 from .materialized_views import (
     IncrementalDelta,
@@ -80,6 +87,12 @@ from .materialized_views import (
     ViewMetadata,
     ViewState,
     create_materialized_view,
+)
+
+# Enhanced processor
+from .processor import (
+    EnhancedStreamProcessor,
+    WindowAggregation,
 )
 
 # Phase 3: Structured Streaming 2.0
@@ -93,19 +106,6 @@ from .realtime import (
     ProcessingMode,
     StreamingRecord,
     StructuredStreaming2,
-)
-
-# Delivery guarantees
-from .delivery import (
-    DeliveryGuarantee,
-    IdempotencyStore,
-    ProcessingContext,
-)
-
-# Enhanced processor
-from .processor import (
-    EnhancedStreamProcessor,
-    WindowAggregation,
 )
 
 # State management
