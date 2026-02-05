@@ -229,7 +229,7 @@ class SLAOptimizer:
                         risk_level=(
                             "low" if strategy == OptimizationStrategy.AGGRESSIVE else "medium"
                         ),
-                        description=f"Reduce workers by {int(reduction * 100)}% - low util",
+                        description=f"Reduce workers {int(reduction * 100)}% (low utilization)",
                         parameters={
                             "worker_reduction": int(current_cost.active_workers * reduction)
                         },
