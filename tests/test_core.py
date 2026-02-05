@@ -41,7 +41,7 @@ class TestHiveFrameInitialization:
 
     def test_create_hive_with_config(self):
         """Test creating hive with custom configuration."""
-        hive = create_hive(num_workers=8, abandonment_limit=10, dance_threshold=0.5)
+        hive = create_hive(num_workers=8, abandonment_limit=10)
         assert hive is not None
 
 
@@ -155,17 +155,29 @@ class TestWaggleDance:
 
     def test_dance_creation(self):
         """Test creating a waggle dance signal."""
-        dance = WaggleDance(quality=0.8, source_id="task_1", worker_id="bee_1")
+        dance = WaggleDance(
+            partition_id="task_1",
+            quality_score=0.8,
+            processing_time=1.0,
+            result_size=100,
+            worker_id="bee_1",
+        )
 
-        assert dance.quality == 0.8
-        assert dance.source_id == "task_1"
+        assert dance.quality_score == 0.8
+        assert dance.partition_id == "task_1"
 
     def test_dance_floor_registration(self):
         """Test registering dances on the floor."""
         floor = DanceFloor()
 
-        dance = WaggleDance(quality=0.9, source_id="task_1", worker_id="bee_1")
-        floor.register_dance(dance)
+        dance = WaggleDance(
+            partition_id="task_1",
+            quality_score=0.9,
+            processing_time=1.0,
+            result_size=100,
+            worker_id="bee_1",
+        )
+        floor.perform_dance(dance)
 
         # Should be able to observe dances
         dances = floor.observe_dances()
@@ -177,10 +189,10 @@ class TestFoodSource:
 
     def test_food_source_creation(self):
         """Test creating a food source."""
-        source = FoodSource(source_id="source_1", data=[1, 2, 3], quality=0.7)
+        source = FoodSource(partition_id="source_1", data=[1, 2, 3], fitness=0.7)
 
-        assert source.source_id == "source_1"
-        assert source.quality == 0.7
+        assert source.partition_id == "source_1"
+        assert source.fitness == 0.7
 
 
 # Performance tests

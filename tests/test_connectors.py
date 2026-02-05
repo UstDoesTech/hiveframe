@@ -21,6 +21,7 @@ import pytest
 from hiveframe.connectors import (
     CSVSink,
     CSVSource,
+    HTTPConfig,
     HTTPSource,
     JSONLSink,
     JSONLSource,
@@ -400,7 +401,7 @@ class TestMessageBroker:
     def test_create_topic(self):
         """Test creating a topic."""
         broker = MessageBroker()
-        broker.create_topic("test-topic", partitions=3)
+        broker.create_topic("test-topic", num_partitions=3)
 
         topics = broker.list_topics()
         assert "test-topic" in topics
@@ -442,7 +443,7 @@ class TestMessageBroker:
     def test_message_ordering(self):
         """Test that messages maintain order within partition."""
         broker = MessageBroker()
-        broker.create_topic("ordered-topic", partitions=1)
+        broker.create_topic("ordered-topic", num_partitions=1)
 
         producer = broker.create_producer()
         consumer = broker.create_consumer("ordered-topic", "test-group")
@@ -468,17 +469,17 @@ class TestHTTPSource:
 
     def test_http_source_creation(self):
         """Test creating HTTP source."""
-        source = HTTPSource(
-            url="https://api.example.com/data", headers={"Authorization": "Bearer token"}
-        )
+        config = HTTPConfig(headers={"Authorization": "Bearer token"})
+        source = HTTPSource(base_url="https://api.example.com/data", config=config)
         assert source is not None
-        assert source.url == "https://api.example.com/data"
+        assert source.base_url == "https://api.example.com/data"
 
     def test_http_source_rate_limiting(self):
         """Test HTTP source respects rate limits."""
-        source = HTTPSource(url="https://api.example.com/data", requests_per_second=2.0)
+        config = HTTPConfig(rate_limit_per_second=2.0)
+        source = HTTPSource(base_url="https://api.example.com/data", config=config)
         # Rate limiter should be configured
-        assert source.rate_limit == 2.0
+        assert source.config.rate_limit_per_second == 2.0
 
 
 # ============================================================================
