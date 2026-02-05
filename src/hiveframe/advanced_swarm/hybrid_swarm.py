@@ -122,7 +122,8 @@ class ParticleSwarmOptimizer:
                     r1, r2 = random.random(), random.random()
 
                     cognitive = self.c1 * r1 * (particle.best_position[d] - particle.position[d])
-                    social = self.c2 * r2 * (self.global_best_position[d] - particle.position[d])
+                    global_pos = self.global_best_position[d] if self.global_best_position else 0
+                    social = self.c2 * r2 * (global_pos - particle.position[d])
 
                     particle.velocity[d] = self.w * particle.velocity[d] + cognitive + social
 
@@ -134,6 +135,8 @@ class ParticleSwarmOptimizer:
                         self.bounds[0], min(self.bounds[1], particle.position[d])
                     )
 
+        if self.global_best_position is None:
+            self.global_best_position = []
         return self.global_best_position, self.global_best_fitness
 
 
@@ -203,6 +206,8 @@ class AntColonyOptimizer:
             # Update pheromones
             self._update_pheromones(ants)
 
+        if self.best_path is None:
+            self.best_path = []
         return self.best_path, self.best_distance
 
     def _construct_path(self) -> List[int]:
@@ -230,18 +235,18 @@ class AntColonyOptimizer:
         # Roulette wheel selection
         total = sum(p[1] for p in probabilities)
         r = random.uniform(0, total)
-        cumsum = 0
+        cumsum: float = 0
 
         for node, prob in probabilities:
             cumsum += prob
             if cumsum >= r:
-                return node
+                return int(node)
 
-        return list(unvisited)[0]
+        return int(list(unvisited)[0])
 
     def _calculate_distance(self, path: List[int]) -> float:
         """Calculate total path distance"""
-        distance = 0
+        distance: float = 0
         for i in range(len(path) - 1):
             distance += self.distance_matrix[path[i]][path[i + 1]]
         # Return to start
@@ -352,6 +357,8 @@ class FireflyAlgorithm:
                                 self.bounds[0], min(self.bounds[1], firefly_i.position[d])
                             )
 
+        if best_position is None:
+            best_position = []
         return best_position, best_fitness
 
     def _distance(self, pos1: List[float], pos2: List[float]) -> float:

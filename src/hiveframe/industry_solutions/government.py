@@ -400,7 +400,7 @@ class ComplianceFramework:
             }
 
         # Get most recent check for each standard
-        by_standard = {}
+        by_standard: Dict[str, Dict] = {}
         for check in entity_checks:
             standard = check["standard"]
             if (

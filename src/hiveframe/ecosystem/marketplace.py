@@ -179,7 +179,7 @@ class PluginSystem:
         """Get plugin system statistics"""
         active_plugins = sum(1 for p in self.plugins.values() if p.status == PluginStatus.ACTIVE)
 
-        by_type = {}
+        by_type: Dict[str, int] = {}
         for plugin in self.plugins.values():
             plugin_type = plugin.plugin_type.value
             by_type[plugin_type] = by_type.get(plugin_type, 0) + 1

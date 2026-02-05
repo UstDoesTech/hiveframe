@@ -169,7 +169,7 @@ class GPUCell:
             # For now, execute as regular Python
             # In real implementation, would set CUDA device context
             # NOTE: exec on user code is a security risk - needs sandboxing for production
-            context = {}
+            context: Dict[str, Any] = {}
             exec(code, context)
 
             # Get result (last expression or variable named 'result')

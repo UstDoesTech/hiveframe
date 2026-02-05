@@ -109,6 +109,7 @@ class MaterializedView:
         )
 
         self._data: List[Dict[str, Any]] = []
+        self._deleted_indices: Set[int] = set()  # Track deleted row indices
         self._index: Dict[Any, int] = {}  # key -> row index
         self._key_column: Optional[str] = None
         self._pending_changes: List[ViewChange] = []
@@ -129,6 +130,7 @@ class MaterializedView:
     def _rebuild_index(self) -> None:
         """Rebuild the key index."""
         self._index.clear()
+        self._deleted_indices.clear()
         if self._key_column:
             for i, row in enumerate(self._data):
                 if self._key_column in row:
@@ -137,7 +139,7 @@ class MaterializedView:
     def get_data(self) -> List[Dict[str, Any]]:
         """Get all data from the view."""
         with self._lock:
-            return list(self._data)
+            return [row for i, row in enumerate(self._data) if i not in self._deleted_indices]
 
     def query_view(
         self,
@@ -146,7 +148,7 @@ class MaterializedView:
     ) -> List[Dict[str, Any]]:
         """Query the materialized view with optional filter."""
         with self._lock:
-            result = self._data
+            result = [row for i, row in enumerate(self._data) if i not in self._deleted_indices]
             if filter_fn:
                 result = [row for row in result if filter_fn(row)]
             if limit:
@@ -169,7 +171,7 @@ class MaterializedView:
                 for key in delta.deletes:
                     if key in self._index:
                         idx = self._index.pop(key)
-                        self._data[idx] = None  # Mark for cleanup
+                        self._deleted_indices.add(idx)  # Mark for cleanup
 
             # Apply updates
             for update in delta.updates:
@@ -453,7 +455,7 @@ class MaterializedViewManager:
             else 0
         )
 
-        views_by_state = defaultdict(int)
+        views_by_state: Dict[str, int] = defaultdict(int)
         for view in self._views.values():
             views_by_state[view.metadata.state.value] += 1
 

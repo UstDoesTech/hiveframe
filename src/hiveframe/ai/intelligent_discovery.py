@@ -149,13 +149,13 @@ class RelationshipDetector:
             return "one-to-many", 0.5
 
         # Count occurrences
-        counts1 = {}
+        counts1: Dict[Any, int] = {}
         for row in data1:
             val = row.get(col1)
             if val:
                 counts1[val] = counts1.get(val, 0) + 1
 
-        counts2 = {}
+        counts2: Dict[Any, int] = {}
         for row in data2:
             val = row.get(col2)
             if val:
@@ -287,7 +287,7 @@ class JoinSuggester:
         if from_table not in graph:
             return None
 
-        queue = [(from_table, [])]
+        queue: List[Tuple[str, List[Tuple[str, str, Any]]]] = [(from_table, [])]
         visited = {from_table}
 
         while queue:

@@ -84,7 +84,7 @@ class ModelServer:
             return random.choice(self.replicas)
 
         r = random.uniform(0, total_fitness)
-        cumsum = 0
+        cumsum: float = 0
         for replica in self.replicas:
             cumsum += replica.fitness
             if cumsum >= r:
@@ -123,7 +123,7 @@ class ModelServer:
 
     def get_health_status(self) -> Dict[str, Any]:
         """Get health status of all replicas."""
-        status = {"healthy": True, "replicas": []}
+        status: Dict[str, Any] = {"healthy": True, "replicas": []}
 
         for replica in self.replicas:
             error_rate = replica.total_errors / max(1, replica.total_requests)
@@ -190,7 +190,7 @@ class DistributedTrainer:
 
         # Initialize workers
         for i in range(n_workers):
-            worker = {
+            worker: Dict[str, Any] = {
                 "worker_id": f"worker_{i}",
                 "status": "idle",
                 "current_batch": None,

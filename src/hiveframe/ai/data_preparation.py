@@ -248,7 +248,8 @@ class TransformationSuggester:
 
             # Suggest date parsing
             if all(isinstance(v, str) for v in values[:10]):
-                if self._looks_like_date(values[0]):
+                first_val = values[0]
+                if isinstance(first_val, str) and self._looks_like_date(first_val):
                     suggestions.append(
                         TransformationSuggestion(
                             transformation_type="derive",

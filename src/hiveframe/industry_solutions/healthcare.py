@@ -300,7 +300,7 @@ class AuditLogger:
 
     def get_audit_stats(self) -> Dict:
         """Get audit log statistics"""
-        event_type_counts = {}
+        event_type_counts: Dict[str, int] = {}
         for event in self.events:
             event_type = event.event_type.value
             event_type_counts[event_type] = event_type_counts.get(event_type, 0) + 1
@@ -383,7 +383,7 @@ class PrivacyPreservingAnalytics:
         u = random.uniform(-0.5, 0.5)
         noise = -scale * (1 if u >= 0 else -1) * (abs(u) ** 0.5)
 
-        return value + noise
+        return float(value + noise)
 
     def aggregate_with_privacy(
         self,

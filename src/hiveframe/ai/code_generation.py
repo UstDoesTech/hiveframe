@@ -358,7 +358,7 @@ class HiveFrameCodeGen:
             GeneratedCode with context-aware generation
         """
         # Use schema to improve parameter extraction
-        code = self.generator.generate(description)
+        code: GeneratedCode = self.generator.generate(description)
 
         # If we have schema, validate and improve the generated code
         if schema:

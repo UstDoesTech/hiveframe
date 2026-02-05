@@ -155,7 +155,7 @@ class CertificationFramework:
         """Get certification statistics"""
         valid_certs = sum(1 for c in self.certifications.values() if c.is_valid)
 
-        by_level = {}
+        by_level: Dict[str, int] = {}
         for cert in self.certifications.values():
             if cert.is_valid:
                 level = cert.level.value

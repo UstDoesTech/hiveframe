@@ -308,7 +308,7 @@ class ContributorGuidelines:
 
     def get_contributor_stats(self) -> Dict:
         """Get contributor statistics"""
-        by_role = {}
+        by_role: Dict[str, int] = {}
         for contributor in self.contributors.values():
             role = contributor.role
             by_role[role] = by_role.get(role, 0) + 1
@@ -400,7 +400,7 @@ class DecisionMakingProcess:
         decision = self.decisions[decision_id]
 
         # Count votes for each option
-        vote_counts = {}
+        vote_counts: Dict[str, int] = {}
         for response in decision["responses"].values():
             option = response["option"]
             vote_counts[option] = vote_counts.get(option, 0) + 1
@@ -419,7 +419,7 @@ class DecisionMakingProcess:
 
         # Find option with most votes
         if vote_counts:
-            winning_option = max(vote_counts, key=vote_counts.get)
+            winning_option = max(vote_counts, key=lambda k: vote_counts[k])
             winning_votes = vote_counts[winning_option]
             consensus_percentage = winning_votes / total_responses
 

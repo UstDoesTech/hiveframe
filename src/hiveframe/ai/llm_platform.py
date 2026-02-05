@@ -288,7 +288,7 @@ class LLMFineTuner:
         """
         # In production, would load data from lakehouse
         # For now, simulate with empty dataset
-        data = []  # Would be: lakehouse.load_table(table_name)
+        data: List[Dict[str, Any]] = []  # Would be: lakehouse.load_table(table_name)
 
         # Prepare dataset
         dataset = self.trainer.prepare_dataset(data, text_column, label_column)
@@ -301,7 +301,7 @@ class LLMFineTuner:
         )
 
         # Train model
-        model = self.trainer.train(config, dataset)
+        model: FineTunedModel = self.trainer.train(config, dataset)
 
         # Register model
         self.models[model.model_id] = model
@@ -330,7 +330,7 @@ class LLMFineTuner:
             Dictionary with optimization results and model
         """
         # Prepare dataset
-        data = []  # Would load from lakehouse
+        data: List[Dict[str, Any]] = []  # Would load from lakehouse
         dataset = self.trainer.prepare_dataset(data, text_column)
 
         # Default param ranges if not provided

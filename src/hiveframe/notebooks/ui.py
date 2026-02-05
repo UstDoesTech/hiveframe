@@ -862,7 +862,7 @@ class NotebookUIServer:
         self.host = host
         self.notebook_dir = notebook_dir or tempfile.gettempdir()
         self.session = NotebookSession()
-        self.server = None
+        self.server: Optional[HTTPServer] = None
 
     def start(self, blocking: bool = True):
         """

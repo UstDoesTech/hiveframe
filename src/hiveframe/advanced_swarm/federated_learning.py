@@ -400,7 +400,7 @@ class CrossOrgTrainer:
             self.organizations[org_id]["contributions"] += 1
 
         # Aggregate models
-        global_model = self.swarm.aggregate_models(privacy_preserving=True)
+        global_model: GlobalModel = self.swarm.aggregate_models(privacy_preserving=True)
 
         return global_model
 

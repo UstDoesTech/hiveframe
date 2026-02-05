@@ -25,7 +25,7 @@ class QuantumState:
         probabilities = [p / total for p in probabilities]
 
         r = random.random()
-        cumsum = 0
+        cumsum: float = 0
         for i, prob in enumerate(probabilities):
             cumsum += prob
             if cumsum >= r:
@@ -249,6 +249,8 @@ class QuantumInspiredOptimizer:
                     self.quantum_gate_update(ind, best_solution) for ind in self.quantum_population
                 ]
 
+        if best_solution is None:
+            best_solution = []
         return best_solution, best_fitness
 
 
@@ -291,7 +293,7 @@ class HybridQuantumClassical:
                 return sum((a - b) ** 2 for a, b in zip(x, problem_data))
 
             solution, _ = self.quantum_optimizer.optimize(fitness_func)
-            return solution
+            return list(solution)
 
         elif operation == "sample":
             # Quantum sampling for probabilistic inference
@@ -318,7 +320,7 @@ class HybridQuantumClassical:
         samples = []
         for _ in range(len(data)):
             r = random.random()
-            cumsum = 0
+            cumsum: float = 0
             for i, prob in enumerate(probabilities):
                 cumsum += prob
                 if cumsum >= r:
@@ -374,7 +376,7 @@ class HybridQuantumClassical:
         state = [math.sin(p) for p in params] + [0] * (n - len(params))
         state = state[:n]
 
-        energy = 0
+        energy: float = 0
         for i in range(n):
             for j in range(n):
                 energy += hamiltonian[i][j] * state[i] * state[j]

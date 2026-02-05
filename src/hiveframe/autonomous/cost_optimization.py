@@ -129,7 +129,7 @@ class SpendAnalyzer:
         Returns:
             List of waste sources
         """
-        waste_sources = []
+        waste_sources: List[Dict[str, Any]] = []
 
         if len(self.cost_history) < 10:
             return waste_sources

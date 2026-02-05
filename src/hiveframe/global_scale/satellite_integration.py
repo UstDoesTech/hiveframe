@@ -368,7 +368,7 @@ class DataBufferingStrategy:
 
     def __init__(self, max_buffer_mb: int = 1000):
         self.max_buffer_mb = max_buffer_mb
-        self.current_buffer_mb = 0
+        self.current_buffer_mb: float = 0
         self.buffer: deque = deque()
         self.overflow_count = 0
 

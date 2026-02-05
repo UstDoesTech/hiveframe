@@ -62,25 +62,25 @@ class PatternCondition:
     def _compare(self, field_value: Any) -> bool:
         """Compare field value with condition value."""
         if self.operator == "eq":
-            return field_value == self.value
+            return bool(field_value == self.value)
         elif self.operator == "ne":
-            return field_value != self.value
+            return bool(field_value != self.value)
         elif self.operator == "gt":
-            return field_value > self.value
+            return bool(field_value > self.value)
         elif self.operator == "lt":
-            return field_value < self.value
+            return bool(field_value < self.value)
         elif self.operator == "gte":
-            return field_value >= self.value
+            return bool(field_value >= self.value)
         elif self.operator == "lte":
-            return field_value <= self.value
+            return bool(field_value <= self.value)
         elif self.operator == "contains":
             return self.value in str(field_value)
         elif self.operator == "regex":
             return bool(re.match(str(self.value), str(field_value)))
         elif self.operator == "in":
-            return field_value in self.value
+            return bool(field_value in self.value)
         elif self.operator == "not_in":
-            return field_value not in self.value
+            return bool(field_value not in self.value)
         else:
             return False
 
@@ -144,6 +144,7 @@ class PatternElement:
         self.conditions = conditions or []
         self.quantifier = quantifier
         self.quantifier_value = quantifier_value
+        self.strict = False  # Whether this element requires strict contiguity
 
     def matches(self, event: Dict[str, Any]) -> bool:
         """Check if an event matches this element's conditions."""

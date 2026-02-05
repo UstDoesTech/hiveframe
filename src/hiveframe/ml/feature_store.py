@@ -172,7 +172,7 @@ class FeatureHive:
         Returns:
             Dictionary mapping feature_name -> list of values
         """
-        results = {fname: [] for fname in feature_names}
+        results: Dict[str, List[Any]] = {fname: [] for fname in feature_names}
 
         for feature_name in feature_names:
             if feature_name not in self._features:
