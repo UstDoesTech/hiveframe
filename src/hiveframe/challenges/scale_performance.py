@@ -560,19 +560,19 @@ def run_all_scale_scenarios() -> Dict[str, List[ScaleResult]]:
 class ScalePerformanceChallenger:
     """
     Wrapper class for running scale and performance challenges.
-    
+
     Provides a standardized interface for the CI system.
     """
-    
+
     def run_quick_benchmarks(self) -> Dict[str, str]:
         """
         Run quick performance benchmarks suitable for CI.
-        
+
         Returns:
             Dict mapping benchmark name to result summary string.
         """
         results = {}
-        
+
         # Run lightweight versions of scenarios for CI
         try:
             # Throughput test with small dataset
@@ -587,17 +587,16 @@ class ScalePerformanceChallenger:
                 )
         except Exception as e:
             results["throughput"] = f"FAILED: {e}"
-        
+
         try:
             # Partition skew test
             skew_result = run_partition_skew_scenario(num_records=1000, skew_factor=0.8)
             results["partition_skew"] = (
-                f"{skew_result.throughput:.0f} rec/s "
-                f"(p95: {skew_result.p95_latency_ms:.1f}ms)"
+                f"{skew_result.throughput:.0f} rec/s " f"(p95: {skew_result.p95_latency_ms:.1f}ms)"
             )
         except Exception as e:
             results["partition_skew"] = f"FAILED: {e}"
-        
+
         try:
             # Sustained load test (shorter duration for CI)
             sustained_result = run_sustained_load_scenario(
@@ -609,7 +608,7 @@ class ScalePerformanceChallenger:
             )
         except Exception as e:
             results["sustained_load"] = f"FAILED: {e}"
-        
+
         try:
             # Worker saturation test
             saturation_results = run_worker_saturation_scenario(
@@ -623,7 +622,7 @@ class ScalePerformanceChallenger:
                 )
         except Exception as e:
             results["worker_saturation"] = f"FAILED: {e}"
-        
+
         return results
 
 

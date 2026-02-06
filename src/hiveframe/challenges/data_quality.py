@@ -838,19 +838,19 @@ def run_all_data_quality_scenarios() -> List[DataQualityResult]:
 class DataQualityChallenger:
     """
     Wrapper class for running data quality challenges.
-    
+
     Provides a standardized interface for the CI system.
     """
-    
+
     def run_all_challenges(self) -> Dict[str, Dict[str, Any]]:
         """
         Run all data quality challenges and return results in CI format.
-        
+
         Returns:
             Dict mapping challenge name to result dict with 'passed' key.
         """
         results = {}
-        
+
         scenarios = [
             ("malformed_data", lambda: run_malformed_data_scenario(1000)),
             ("schema_drift", lambda: run_schema_drift_scenario(10, 100)),
@@ -858,7 +858,7 @@ class DataQualityChallenger:
             ("unicode_encoding", lambda: run_unicode_encoding_scenario(500)),
             ("extreme_values", lambda: run_extreme_values_scenario(500)),
         ]
-        
+
         for name, scenario_fn in scenarios:
             try:
                 result = scenario_fn()
@@ -876,7 +876,7 @@ class DataQualityChallenger:
                     "passed": False,
                     "error": str(e),
                 }
-        
+
         return results
 
 
