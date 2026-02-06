@@ -34,7 +34,7 @@ jobs:
 
     - name: Run linting
       run: |
-        ruff check --fix src tests
+        ruff check --fix --unsafe-fixes src tests
 
     - name: Commit linting fixes
       if: matrix.python-version == '3.11'
