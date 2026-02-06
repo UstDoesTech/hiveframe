@@ -849,7 +849,7 @@ class DataQualityChallenger:
         Returns:
             Dict mapping challenge name to result dict with 'passed' key.
         """
-        results = {}
+        results: Dict[str, Dict[str, Any]] = {}
 
         scenarios = [
             ("malformed_data", lambda: run_malformed_data_scenario(1000)),
