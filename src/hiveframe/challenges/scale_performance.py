@@ -557,5 +557,75 @@ def run_all_scale_scenarios() -> Dict[str, List[ScaleResult]]:
     return results
 
 
+class ScalePerformanceChallenger:
+    """
+    Wrapper class for running scale and performance challenges.
+    
+    Provides a standardized interface for the CI system.
+    """
+    
+    def run_quick_benchmarks(self) -> Dict[str, str]:
+        """
+        Run quick performance benchmarks suitable for CI.
+        
+        Returns:
+            Dict mapping benchmark name to result summary string.
+        """
+        results = {}
+        
+        # Run lightweight versions of scenarios for CI
+        try:
+            # Throughput test with small dataset
+            throughput_results = run_throughput_scaling_scenario(
+                initial_records=100, max_records=1000, step_multiplier=2.0, num_workers=4
+            )
+            if throughput_results:
+                last_result = throughput_results[-1]
+                results["throughput"] = (
+                    f"{last_result.throughput:.0f} rec/s "
+                    f"({last_result.record_count:,} records in {last_result.elapsed_seconds:.2f}s)"
+                )
+        except Exception as e:
+            results["throughput"] = f"FAILED: {e}"
+        
+        try:
+            # Partition skew test
+            skew_result = run_partition_skew_scenario(num_records=1000, skew_factor=0.8)
+            results["partition_skew"] = (
+                f"{skew_result.throughput:.0f} rec/s "
+                f"(p95: {skew_result.p95_latency_ms:.1f}ms)"
+            )
+        except Exception as e:
+            results["partition_skew"] = f"FAILED: {e}"
+        
+        try:
+            # Sustained load test (shorter duration for CI)
+            sustained_result = run_sustained_load_scenario(
+                records_per_second=100, duration_seconds=5, num_workers=4
+            )
+            results["sustained_load"] = (
+                f"{sustained_result.throughput:.0f} rec/s "
+                f"({sustained_result.success_rate*100:.1f}% success)"
+            )
+        except Exception as e:
+            results["sustained_load"] = f"FAILED: {e}"
+        
+        try:
+            # Worker saturation test
+            saturation_results = run_worker_saturation_scenario(
+                num_records=500, processing_time_ms=2.0, worker_counts=[2, 4, 8]
+            )
+            if saturation_results:
+                best_result = max(saturation_results, key=lambda r: r.throughput)
+                results["worker_saturation"] = (
+                    f"{best_result.throughput:.0f} rec/s "
+                    f"(util: {best_result.worker_utilization*100:.0f}%)"
+                )
+        except Exception as e:
+            results["worker_saturation"] = f"FAILED: {e}"
+        
+        return results
+
+
 if __name__ == "__main__":
     run_all_scale_scenarios()

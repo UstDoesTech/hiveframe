@@ -835,5 +835,50 @@ def run_all_data_quality_scenarios() -> List[DataQualityResult]:
     return results
 
 
+class DataQualityChallenger:
+    """
+    Wrapper class for running data quality challenges.
+    
+    Provides a standardized interface for the CI system.
+    """
+    
+    def run_all_challenges(self) -> Dict[str, Dict[str, Any]]:
+        """
+        Run all data quality challenges and return results in CI format.
+        
+        Returns:
+            Dict mapping challenge name to result dict with 'passed' key.
+        """
+        results = {}
+        
+        scenarios = [
+            ("malformed_data", lambda: run_malformed_data_scenario(1000)),
+            ("schema_drift", lambda: run_schema_drift_scenario(10, 100)),
+            ("null_handling", lambda: run_null_handling_scenario(1000)),
+            ("unicode_encoding", lambda: run_unicode_encoding_scenario(500)),
+            ("extreme_values", lambda: run_extreme_values_scenario(500)),
+        ]
+        
+        for name, scenario_fn in scenarios:
+            try:
+                result = scenario_fn()
+                # Consider a challenge passed if quality score is above 70%
+                passed = result.quality_score >= 0.7
+                results[name] = {
+                    "passed": passed,
+                    "quality_score": result.quality_score,
+                    "total_records": result.total_records,
+                    "elapsed_seconds": result.elapsed_seconds,
+                }
+            except Exception as e:
+                logger.error(f"Challenge {name} failed with exception", error=str(e))
+                results[name] = {
+                    "passed": False,
+                    "error": str(e),
+                }
+        
+        return results
+
+
 if __name__ == "__main__":
     run_all_data_quality_scenarios()

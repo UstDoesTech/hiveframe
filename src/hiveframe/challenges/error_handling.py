@@ -15,7 +15,7 @@ import random
 import threading
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from ..exceptions import (
     DeadLetterQueue,
@@ -646,6 +646,57 @@ def run_all_error_scenarios() -> List[ScenarioResult]:
     print(f"Average Recovery Rate:   {100*avg_recovery:.1f}%")
 
     return results
+
+
+class ErrorHandlingChallenger:
+    """
+    Wrapper class for running error handling challenges.
+    
+    Provides a standardized interface for the CI system.
+    """
+    
+    def run_all_challenges(self) -> Dict[str, Dict[str, Any]]:
+        """
+        Run all error handling challenges and return results in CI format.
+        
+        Returns:
+            Dict mapping challenge name to result dict with 'passed' key.
+        """
+        results = {}
+        
+        scenarios = [
+            ("transient_recovery", lambda: run_transient_recovery_scenario(1000, 0.2)),
+            ("dead_letter_queue", lambda: run_dead_letter_scenario(1000, 0.05)),
+            ("circuit_breaker", lambda: run_circuit_breaker_scenario(500, 30, 5)),
+            ("mixed_errors", lambda: run_mixed_error_scenario(1000)),
+            ("poison_pills", lambda: run_poison_pill_scenario(1000, 0.02)),
+        ]
+        
+        for name, scenario_fn in scenarios:
+            try:
+                result = scenario_fn()
+                # Calculate success rate from the result
+                if result.total_records > 0:
+                    success_rate = result.successful / result.total_records
+                else:
+                    success_rate = 0.0
+                # Consider a challenge passed if success rate is above 70% or recovery rate is good
+                passed = success_rate >= 0.7 or result.recovery_rate >= 0.8
+                results[name] = {
+                    "passed": passed,
+                    "success_rate": success_rate,
+                    "recovery_rate": result.recovery_rate,
+                    "total_records": result.total_records,
+                    "elapsed_seconds": result.elapsed_seconds,
+                }
+            except Exception as e:
+                logger.error(f"Challenge {name} failed with exception", error=str(e))
+                results[name] = {
+                    "passed": False,
+                    "error": str(e),
+                }
+        
+        return results
 
 
 if __name__ == "__main__":
