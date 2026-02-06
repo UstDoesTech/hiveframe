@@ -662,7 +662,7 @@ class ErrorHandlingChallenger:
         Returns:
             Dict mapping challenge name to result dict with 'passed' key.
         """
-        results = {}
+        results: Dict[str, Dict[str, Any]] = {}
 
         scenarios = [
             ("transient_recovery", lambda: run_transient_recovery_scenario(1000, 0.2)),
