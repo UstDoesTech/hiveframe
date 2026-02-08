@@ -1,8 +1,12 @@
 # HiveFrame - Bee-Inspired Distributed Data Processing Framework
 # Multi-stage build for optimized production image
 
+# Build arguments
+ARG PYTHON_VERSION=3.11
+ARG HIVEFRAME_VERSION=0.3.0-dev
+
 # Stage 1: Builder
-FROM python:3.11-slim AS builder
+FROM python:${PYTHON_VERSION}-slim AS builder
 
 # Set working directory
 WORKDIR /build
@@ -24,12 +28,15 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -e ".[production]"
 
 # Stage 2: Runtime
-FROM python:3.11-slim
+FROM python:${PYTHON_VERSION}-slim
+
+# Re-declare build args for this stage
+ARG HIVEFRAME_VERSION=0.3.0-dev
 
 # Set labels
 LABEL maintainer="HiveFrame Contributors"
 LABEL description="A bee-inspired distributed data processing framework"
-LABEL version="0.3.0-dev"
+LABEL version="${HIVEFRAME_VERSION}"
 
 # Set working directory
 WORKDIR /app

@@ -48,6 +48,7 @@ coverage.xml
 docs/_build/
 *.md
 !README.md
+!LICENSE
 CHANGELOG.md
 CONTRIBUTING.md
 *.rst

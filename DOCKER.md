@@ -90,6 +90,12 @@ Build the HiveFrame image:
 docker build -t hiveframe:latest .
 ```
 
+Build with a specific version:
+
+```bash
+docker build --build-arg HIVEFRAME_VERSION=1.0.0 -t hiveframe:1.0.0 .
+```
+
 Run a single container:
 
 ```bash
