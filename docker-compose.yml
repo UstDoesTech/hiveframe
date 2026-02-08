@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Colony 1 - US East region
   colony-us-east:
@@ -23,7 +21,8 @@ services:
     volumes:
       - ./examples:/app/examples
       - colony-us-east-data:/app/data
-    command: python3 -c "
+    command: >
+      python3 -c "
       from hiveframe import create_hive;
       import time;
       print('Colony US-East starting...');
@@ -56,7 +55,8 @@ services:
     volumes:
       - ./examples:/app/examples
       - colony-us-west-data:/app/data
-    command: python3 -c "
+    command: >
+      python3 -c "
       from hiveframe import create_hive;
       import time;
       print('Colony US-West starting...');
@@ -89,7 +89,8 @@ services:
     volumes:
       - ./examples:/app/examples
       - colony-eu-central-data:/app/data
-    command: python3 -c "
+    command: >
+      python3 -c "
       from hiveframe import create_hive;
       import time;
       print('Colony EU-Central starting...');
@@ -115,7 +116,8 @@ services:
       - hive-network
     volumes:
       - ./examples:/app/examples
-    command: python3 -c "
+    command: >
+      python3 -c "
       from hiveframe.dashboard import Dashboard;
       from hiveframe import create_hive;
       print('Starting HiveFrame Dashboard on port 8080...');
