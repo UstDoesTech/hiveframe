@@ -77,7 +77,7 @@ def demo_dataframe_api():
     ]
 
     # Create DataFrame
-    df = HiveDataFrame.from_list(data)
+    df = HiveDataFrame.from_records(data)
     print("Created DataFrame with 100 rows")
     print()
 

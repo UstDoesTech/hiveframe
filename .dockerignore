@@ -50,7 +50,6 @@ docs/_build/
 !README.md
 CHANGELOG.md
 CONTRIBUTING.md
-LICENSE
 *.rst
 *.txt
 !requirements*.txt

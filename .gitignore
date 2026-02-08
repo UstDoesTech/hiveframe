@@ -163,3 +163,7 @@ docs/.docusaurus/
 *.parquet
 !tests/fixtures/*.csv
 !tests/fixtures/*.jsonl
+
+# Docker volumes and data
+data/
+logs/
