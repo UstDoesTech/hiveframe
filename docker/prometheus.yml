@@ -1,0 +1,32 @@
+# Prometheus configuration for HiveFrame multi-colony monitoring
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'hiveframe-multi-colony'
+    monitor: 'docker-compose'
+
+scrape_configs:
+  # Monitor colony metrics
+  - job_name: 'hiveframe-colonies'
+    static_configs:
+      - targets:
+          - 'colony-us-east:9090'
+          - 'colony-us-west:9090'
+          - 'colony-eu-central:9090'
+        labels:
+          service: 'colony'
+
+  # Monitor dashboard
+  - job_name: 'hiveframe-dashboard'
+    static_configs:
+      - targets:
+          - 'dashboard:9090'
+        labels:
+          service: 'dashboard'
+
+  # Self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets:
+          - 'localhost:9090'
