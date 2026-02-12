@@ -71,10 +71,7 @@ def demo_dataframe_api():
     print_header("DataFrame API Demo")
 
     # Create sample data
-    data = [
-        {"id": i, "value": i * 2, "region": f"region-{i % 3}"}
-        for i in range(100)
-    ]
+    data = [{"id": i, "value": i * 2, "region": f"region-{i % 3}"} for i in range(100)]
 
     # Create DataFrame
     df = HiveDataFrame.from_records(data)
@@ -143,6 +140,7 @@ def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 
