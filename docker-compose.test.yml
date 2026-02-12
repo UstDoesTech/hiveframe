@@ -1,0 +1,67 @@
+# Minimal multi-colony setup for testing - without monitoring stack
+# This file is for testing the core multi-colony functionality
+
+services:
+  # Colony 1 - US East region
+  colony-us-east:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hiveframe-colony-us-east
+    hostname: colony-us-east
+    environment:
+      - HIVE_COLONY_NAME=us-east-hive
+      - HIVE_COLONY_REGION=us-east
+      - HIVE_NUM_WORKERS=4
+      - PYTHONUNBUFFERED=1
+    networks:
+      - hive-network
+    volumes:
+      - ./examples:/app/examples
+    command: >
+      python3 /app/examples/demo_docker_multicolony.py
+    restart: "no"
+
+  # Colony 2 - US West region  
+  colony-us-west:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hiveframe-colony-us-west
+    hostname: colony-us-west
+    environment:
+      - HIVE_COLONY_NAME=us-west-hive
+      - HIVE_COLONY_REGION=us-west
+      - HIVE_NUM_WORKERS=4
+      - PYTHONUNBUFFERED=1
+    networks:
+      - hive-network
+    volumes:
+      - ./examples:/app/examples
+    command: >
+      python3 /app/examples/demo_docker_multicolony.py
+    restart: "no"
+
+  # Colony 3 - EU Central region
+  colony-eu-central:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hiveframe-colony-eu-central
+    hostname: colony-eu-central
+    environment:
+      - HIVE_COLONY_NAME=eu-central-hive
+      - HIVE_COLONY_REGION=eu-central
+      - HIVE_NUM_WORKERS=4
+      - PYTHONUNBUFFERED=1
+    networks:
+      - hive-network
+    volumes:
+      - ./examples:/app/examples
+    command: >
+      python3 /app/examples/demo_docker_multicolony.py
+    restart: "no"
+
+networks:
+  hive-network:
+    driver: bridge

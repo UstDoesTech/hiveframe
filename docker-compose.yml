@@ -1,0 +1,164 @@
+services:
+  # Colony 1 - US East region
+  colony-us-east:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hiveframe-colony-us-east
+    hostname: colony-us-east
+    environment:
+      - HIVE_COLONY_NAME=us-east-hive
+      - HIVE_COLONY_REGION=us-east
+      - HIVE_NUM_WORKERS=8
+      - HIVE_EMPLOYED_RATIO=0.5
+      - HIVE_ONLOOKER_RATIO=0.4
+      - HIVE_SCOUT_RATIO=0.1
+      - HIVE_ABANDONMENT_LIMIT=10
+      - HIVE_MAX_CYCLES=100
+      - PYTHONUNBUFFERED=1
+    networks:
+      - hive-network
+    volumes:
+      - ./examples:/app/examples
+      - colony-us-east-data:/app/data
+    command: >
+      python3 -c "
+      from hiveframe import create_hive;
+      import time;
+      print('Colony US-East starting...');
+      hive = create_hive(num_workers=8);
+      print('Colony US-East ready with', 8, 'workers');
+      print('Press Ctrl+C to stop');
+      while True: time.sleep(60)
+      "
+    restart: unless-stopped
+
+  # Colony 2 - US West region  
+  colony-us-west:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hiveframe-colony-us-west
+    hostname: colony-us-west
+    environment:
+      - HIVE_COLONY_NAME=us-west-hive
+      - HIVE_COLONY_REGION=us-west
+      - HIVE_NUM_WORKERS=8
+      - HIVE_EMPLOYED_RATIO=0.5
+      - HIVE_ONLOOKER_RATIO=0.4
+      - HIVE_SCOUT_RATIO=0.1
+      - HIVE_ABANDONMENT_LIMIT=10
+      - HIVE_MAX_CYCLES=100
+      - PYTHONUNBUFFERED=1
+    networks:
+      - hive-network
+    volumes:
+      - ./examples:/app/examples
+      - colony-us-west-data:/app/data
+    command: >
+      python3 -c "
+      from hiveframe import create_hive;
+      import time;
+      print('Colony US-West starting...');
+      hive = create_hive(num_workers=8);
+      print('Colony US-West ready with', 8, 'workers');
+      print('Press Ctrl+C to stop');
+      while True: time.sleep(60)
+      "
+    restart: unless-stopped
+
+  # Colony 3 - EU Central region
+  colony-eu-central:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hiveframe-colony-eu-central
+    hostname: colony-eu-central
+    environment:
+      - HIVE_COLONY_NAME=eu-central-hive
+      - HIVE_COLONY_REGION=eu-central
+      - HIVE_NUM_WORKERS=8
+      - HIVE_EMPLOYED_RATIO=0.5
+      - HIVE_ONLOOKER_RATIO=0.4
+      - HIVE_SCOUT_RATIO=0.1
+      - HIVE_ABANDONMENT_LIMIT=10
+      - HIVE_MAX_CYCLES=100
+      - PYTHONUNBUFFERED=1
+    networks:
+      - hive-network
+    volumes:
+      - ./examples:/app/examples
+      - colony-eu-central-data:/app/data
+    command: >
+      python3 -c "
+      from hiveframe import create_hive;
+      import time;
+      print('Colony EU-Central starting...');
+      hive = create_hive(num_workers=8);
+      print('Colony EU-Central ready with', 8, 'workers');
+      print('Press Ctrl+C to stop');
+      while True: time.sleep(60)
+      "
+    restart: unless-stopped
+
+  # Dashboard service for monitoring all colonies
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hiveframe-dashboard
+    hostname: dashboard
+    ports:
+      - "8080:8080"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - hive-network
+    volumes:
+      - ./examples:/app/examples
+    command: >
+      python3 -c "
+      from hiveframe.dashboard import Dashboard;
+      from hiveframe import create_hive;
+      print('Starting HiveFrame Dashboard on port 8080...');
+      hive = create_hive(num_workers=4);
+      dashboard = Dashboard(hive);
+      dashboard.start(port=8080)
+      "
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Prometheus for metrics collection (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hiveframe-prometheus
+    hostname: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - hive-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+
+networks:
+  hive-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+
+volumes:
+  colony-us-east-data:
+  colony-us-west-data:
+  colony-eu-central-data:
+  prometheus-data:

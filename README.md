@@ -165,6 +165,23 @@ pip install -e ".[all]"
 
 ## Quick Start
 
+### 🐳 Docker (Recommended for Testing)
+
+The fastest way to get started with HiveFrame, especially for testing multi-colony systems:
+
+```bash
+# Single colony with interactive shell
+docker-compose -f docker-compose.simple.yml up
+
+# Multi-colony federation (3 colonies + dashboard + monitoring)
+docker-compose up -d
+
+# Access the dashboard
+open http://localhost:8080
+```
+
+See [DOCKER.md](DOCKER.md) for complete Docker deployment guide.
+
 ### RDD-Style API
 
 ```python
